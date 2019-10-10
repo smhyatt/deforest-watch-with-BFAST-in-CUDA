@@ -1,2 +1,3 @@
 *.in
+!testset.in
 .DS_Store
