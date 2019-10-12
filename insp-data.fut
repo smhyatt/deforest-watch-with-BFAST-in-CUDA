@@ -10,6 +10,6 @@ let sample = map (\row -> map(\j -> let pixel = row[j] in
             then -10000f32
             else row[j]
         ) (iota N)
-    ) images[0:1]
+    ) images[0:2]
 in
 (trend, k, m, n, N, freq, hfrac, lam, mappingindices, sample)
