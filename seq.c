@@ -64,9 +64,8 @@ float dotProdFilt(float* Xvct, float* XTvct, float* yvct) {
 
         if (yvct[idx] != -10000.000000) {
             acc += Xvct[idx] * XTvct[idx];
-        } 
+        }
     }
-
     return acc;
 }
 
@@ -77,7 +76,6 @@ void vctTranspose(float* XT, float* vct, uint offset, uint colIdx, uint K){
         vct[i]   = XT[idx];
     }
 }
-
 
 // let matmul_filt [n][p][m] (xss: [n][p]f32) (yss: [p][m]f32) (vct: [p]f32) : [n][m]f32 =
 //   map (\xs -> map (dotprod_filt vct xs) (transpose yss)) xss
@@ -93,34 +91,126 @@ void vctTranspose(float* XT, float* vct, uint offset, uint colIdx, uint K){
 // y  = [8,9,7]
 // xss = Xn, yss = XTn, vct = y
 void mmMulFilt(float* X, float* XT, float* y, float* Xsqr, uint K){
-    uint yLen = sizeof(y)/sizeof(y[0]);
-
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < yLen; j++) {
-            uint vctIdx = i*n*sizeof(float) + j*sizeof(float);
-            uint resIdx = 
+    // K
+    for (int i = 0; i < K; i++) {
+        // K
+        for (int j = 0; j < K; j++) {
+            uint XIdx = i*n*sizeof(float) + j*sizeof(float);
+            uint XTIdx = j*sizeof(float);
+            uint resIdx = i*K*sizeof(float) + j*sizeof(float);
 
             float* tspVct = malloc(n*sizeof(float));
-            vctTranspose(XT, tspVct, n, idx, K);
+            vctTranspose(XT, tspVct, n, XTIdx, K);
 
-            Xsqr[resIdx] = dotProdFilt(&X[vctIdx], tspVct, y);
+            Xsqr[resIdx] = dotProdFilt(&X[XIdx], tspVct, y);
         }
     }
 }
 
 
-// -- Xsqr,Xsqr−1:[K][K]f32; β0,β:[K]f32 
+// -- Xsqr,Xsqr−1:[K][K]f32; β0,β:[K]f32
 // let Xsqr = mmMulFilt X[:,:n] XT[:n,:] y[:n] -- ker 2
-void ker2(float* X, float* XT, float* Xsqr) {
+void ker2(float* X, float* XT, float* Xsqr, uint K) {
     uint YLen = sizeof(sample)/sizeof(sample[0]);
 
     for (int pix = 0; pix < YLen; pix++) {
-        mmMulFilt(X, XT, sample[pix], Xsqr);
+        mmMulFilt(X, XT, sample[pix], Xsqr, K);
     }
 
 }
 
 
+
+// ----------
+//   let Xinv = intrinsics.opaque <|
+//              map mat_inv Xsqr
+
+//   let gauss_jordan [nm] (n:i32) (m:i32) (A: *[nm]f32): [nm]f32 =
+//     loop A for i < n do
+//       let v1 = A[i]
+//       let A' = map (\ind -> let (k, j) = (ind / m, ind % m)
+//                             in if v1 == 0.0 then unsafe A[k*m+j] else
+//                             let x = unsafe (A[j] / v1) in
+//                                 if k < n-1  -- Ap case
+//                                 then unsafe ( A[(k+1)*m+j] - A[(k+1)*m+i] * x )
+//                                 else x      -- irow case
+//                    ) (iota nm)
+//       in  scatter A (iota nm) A'
+void gaussJordan(float* XsqrP,uint cols,uint identIdx, float* XsqrInv){
+    /* Now finding the elements of diagonal matrix */
+    for(uint j=0; j<identIdx; j++){
+        for(uint i=0; i<cols; i++){
+            if(i!=j){
+                uint ijIndex = i*identIdx*sizeof(float) + j*sizeof(float);
+                uint jiIndex = j*identIdx*sizeof(float) + i*sizeof(float);
+                float c=XsqrP[ijIndex]/XsqrP[jiIndex];
+                for(uint l=0; l<cols+1; l++){
+                    uint ilIndex = i*identIdx*sizeof(float) + l*sizeof(float);
+                    uint jlIndex = j*identIdx*sizeof(float) + l*sizeof(float);
+                    XsqrInv[ilIndex]=XsqrP[ilIndex]-c*XsqrP[jlIndex];
+                }
+            }
+        }
+    }
+}
+
+//   let mat_inv [n] (A: [n][n]f32): [n][n]f32 =
+//     let m = 2*n
+//     let nm= n*m
+//     -- Pad the matrix with the identity matrix.
+//     let Ap = map (\ind -> let (i, j) = (ind / m, ind % m)
+//                           in  if j < n then unsafe ( A[i,j] )
+//                                        else if j == n+i
+//                                             then 1.0
+//                                             else 0.0
+//                  ) (iota nm)
+//     let Ap' = gauss_jordan n m Ap
+//     -- Drop the identity matrix at the front!
+//     in (unflatten n m Ap')[0:n,n:2*n]
+
+void ker3(float* Xsqr, float* XsqrInv, uint K){
+    uint cols = 2*K;        // 2*8=16
+    // uint identIdx = K*cols; // 8*16=128
+    float* XsqrP = calloc(2*K,sizeof(float));
+
+    for (uint i = 0; i < K; i++){
+        for (uint j = 0; j < K; j++){
+            // 1*8+0
+            uint sqrIdx = i*K*sizeof(float) + j*sizeof(float);
+            // 1*16
+            uint invIdx = i*cols*sizeof(float) + j*sizeof(float);
+            XsqrInv[invIdx] = Xsqr[sqrIdx];
+        }
+    }
+
+    // for (uint i = 0; i < K; i++){
+    //     for (uint j = K; j < identIdx; j+=cols+1){
+    //         uint idx = i*identIdx*sizeof(float) + j*sizeof(float);
+    //         XsqrInv[idx] = 1.0;
+    //     }
+    // }
+
+
+    // for (uint ind = 0; ind < identIdx; ind++){
+    //     // (i, j) = (ind / m, ind % m)
+    //     uint iIdx = ind / cols;
+    //     uint jIdx = ind % cols;
+    //     uint invIdx = iIdx*identIdx*sizeof(float) + jIdx*sizeof(float);
+    //     uint sqrIdx = iIdx*K*sizeof(float) + jIdx*sizeof(float);
+    //     if(jIdx<K){
+    //         XsqrInv[invIdx] = Xsqr[sqrIdx];
+    //     } else {
+    //         if(jIdx==K+iIdx){
+    //             XsqrInv[invIdx] = 1.0;
+    //         } else {
+    //             XsqrInv[invIdx] = 0.0;
+    //         }
+    //     }
+    // }
+
+    // gaussJordan(XsqrP, cols, identIdx, XsqrInv);
+
+}
 
 
 int main(int argc, char const *argv[]) {
@@ -143,15 +233,15 @@ int main(int argc, char const *argv[]) {
 	printf("%lu\n", sizeof(mappingindices)/sizeof(mappingindices[0]));
 	printf("%u\n", mLen);
 
-    int k2p2 = 2*k +2;
-    float* X  = malloc(k2p2*N*sizeof(float) + N*sizeof(float));
-    float* XT = malloc(k2p2*N*sizeof(float) + N*sizeof(float));
-    ker1(k2p2,freq,X);
-    transpose(k2p2,X,XT);
+    int K = 2*k +2;
+    float* X  = malloc(K*N*sizeof(float) + N*sizeof(float));
+    float* XT = malloc(K*N*sizeof(float) + N*sizeof(float));
+    ker1(K,freq,X);
+    transpose(K,X,XT);
 
     // printf("\n****** Printing X ******\n");
     // for (size_t i = 0; i < N; i++){
-    //     for (size_t j = 0; j < k2p2; j++){
+    //     for (size_t j = 0; j < K; j++){
     //         uint index = i*N*sizeof(float) + j*sizeof(float);
     //         printf("%f, ", XT[index]);
     //     }
@@ -160,18 +250,31 @@ int main(int argc, char const *argv[]) {
     // printf("\n");
 
     // [n][m]
-    float* Xsqr = malloc(k2p2*sizeof(float) + k2p2*sizeof(float));
-    ker2(X, XT, Xsqr);
+    float* Xsqr = malloc(K*sizeof(float) + K*sizeof(float));
+    ker2(X, XT, Xsqr, K);
 
     printf("\n****** Printing Xsqr ******\n");
-    for (size_t i = 0; i < k2p2; i++){
-        for (size_t j = 0; j < k2p2; j++){
+    for (size_t i = 0; i < K; i++){
+        for (size_t j = 0; j < K; j++){
             uint index = i*n*sizeof(float) + j*sizeof(float);
             printf("%f, ", Xsqr[index]);
         }
         printf("\n");
     }
     printf("\n");
+
+    float* XsqrInv = calloc(2*K,sizeof(float));
+    ker3(Xsqr,XsqrInv,K);
+    printf("\n****** Printing XsqrInv ******\n");
+    for (uint i = 0; i < K; i++){
+        for (uint j = 0; j < 2*K; j++){
+            uint index = i*n*sizeof(float) + j*sizeof(float);
+            printf("%f, ", XsqrInv[index]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+
 
 	return 0;
 }

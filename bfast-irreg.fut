@@ -70,9 +70,11 @@ let mkX_no_trend [N] (k2p2m1: i32) (f: f32) (mappingindices: [N]i32): [k2p2m1][N
       in  scatter A (iota nm) A'
 
   let mat_inv [n] (A: [n][n]f32): [n][n]f32 =
-    let m = 2*n
-    let nm= n*m
+    let m = 2*n -- 2*K = 16
+    let nm= n*m -- 8*16 = 128
     -- Pad the matrix with the identity matrix.
+    --                        (7,15)       =  127 / 16, 127 % 16
+    --                        (7,15)       =  127 / 16, 127 % 16
     let Ap = map (\ind -> let (i, j) = (ind / m, ind % m)
                           in  if j < n then unsafe ( A[i,j] )
                                        else if j == n+i

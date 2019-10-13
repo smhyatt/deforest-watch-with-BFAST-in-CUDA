@@ -1,6 +1,6 @@
 CC=gcc
 # CFLAGS= -std=c++17 -Wall -Werror -Wextra -pedantic
-CFLAGS= -v
+CFLAGS=
 
 .PHONY: clean all
 cmd:
