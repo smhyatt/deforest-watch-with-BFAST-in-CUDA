@@ -171,7 +171,7 @@ void gaussJordan(float* XsqrP,uint cols,uint identIdx, float* XsqrInv){
 void ker3(float* Xsqr, float* XsqrInv, uint K){
     uint cols = 2*K;        // 2*8=16
     // uint identIdx = K*cols; // 8*16=128
-    float* XsqrP = calloc(2*K,sizeof(float));
+    float* XsqrP = calloc(2*K*K,sizeof(float));
 
     for (uint i = 0; i < K; i++){
         for (uint j = 0; j < K; j++){
@@ -250,7 +250,7 @@ int main(int argc, char const *argv[]) {
     // printf("\n");
 
     // [n][m]
-    float* Xsqr = malloc(K*sizeof(float) + K*sizeof(float));
+    float* Xsqr = malloc(2*K*sizeof(float));
     ker2(X, XT, Xsqr, K);
 
     printf("\n****** Printing Xsqr ******\n");
@@ -263,7 +263,7 @@ int main(int argc, char const *argv[]) {
     }
     printf("\n");
 
-    float* XsqrInv = calloc(2*K,sizeof(float));
+    float* XsqrInv = calloc(2*K*K,sizeof(float));
     ker3(Xsqr,XsqrInv,K);
     printf("\n****** Printing XsqrInv ******\n");
     for (uint i = 0; i < K; i++){
