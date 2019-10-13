@@ -24,7 +24,7 @@ void ker1(int kp, int f, float* X){
     for (uint i = 0; i < kp; i++){
         for (uint j = 0; j < N; j++){
             float ind = mappingindices[j];
-            uint index = i*N*sizeof(float) + j*sizeof(float);
+            uint index = i*N + j;
             if(i==0){
                 X[index] = 1.0;
             } else if(i==1){
@@ -171,14 +171,14 @@ void gaussJordan(float* XsqrP,uint cols,uint identIdx, float* XsqrInv){
 void ker3(float* Xsqr, float* XsqrInv, uint K){
     uint cols = 2*K;        // 2*8=16
     // uint identIdx = K*cols; // 8*16=128
-    float* XsqrP = calloc(2*K*K,sizeof(float));
+    // float* XsqrP = calloc(2*K*K,sizeof(float));
 
     for (uint i = 0; i < K; i++){
         for (uint j = 0; j < K; j++){
             // 1*8+0
-            uint sqrIdx = i*K*sizeof(float) + j*sizeof(float);
+            uint sqrIdx = i*K + j;
             // 1*16
-            uint invIdx = i*cols*sizeof(float) + j*sizeof(float);
+            uint invIdx = i*cols + j;
             XsqrInv[invIdx] = Xsqr[sqrIdx];
         }
     }
@@ -239,15 +239,15 @@ int main(int argc, char const *argv[]) {
     ker1(K,freq,X);
     transpose(K,X,XT);
 
-    // printf("\n****** Printing X ******\n");
-    // for (size_t i = 0; i < N; i++){
-    //     for (size_t j = 0; j < K; j++){
-    //         uint index = i*N*sizeof(float) + j*sizeof(float);
-    //         printf("%f, ", XT[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    printf("\n****** Printing X ******\n");
+    for (size_t i = 0; i < N; i++){
+        for (size_t j = 0; j < K; j++){
+            uint index = i*N*sizeof(float) + j*sizeof(float);
+            printf("%f, ", XT[index]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 
     // [n][m]
     float* Xsqr = malloc(2*K*sizeof(float));
@@ -256,7 +256,7 @@ int main(int argc, char const *argv[]) {
     printf("\n****** Printing Xsqr ******\n");
     for (size_t i = 0; i < K; i++){
         for (size_t j = 0; j < K; j++){
-            uint index = i*n*sizeof(float) + j*sizeof(float);
+            uint index = i*n + j;
             printf("%f, ", Xsqr[index]);
         }
         printf("\n");
