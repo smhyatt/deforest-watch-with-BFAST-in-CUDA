@@ -60,10 +60,8 @@ void transpose(int K, float* X, float* XT) {
 float dotProdFilt(float* Xvct, float* XTvct, float* yvct) {
     float acc = 0.0;
     for (uint i = 0; i < n; i++) {
-        uint idx  = i;
-
-        if (yvct[idx] != -10000.000000) {
-            acc += Xvct[idx] * XTvct[idx];
+        if (yvct[i] != -10000.000000) {
+            acc += Xvct[i] * XTvct[i];
         }
     }
     return acc;
@@ -101,16 +99,16 @@ void mmMulFilt(float* X, float* XT, float* y, float* Xsqr, uint K){
     for (int i = 0; i < K; i++) {
         // K
         for (int j = 0; j < K; j++) {
-            uint XIdx = i*N + j;
+            uint XIdx = i*N;
             uint XTIdx = j;
             uint resIdx = i*K + j;
             // printf("XIDX: %d\n", XIdx);
 
 
             for (uint l = 0; l < n; l++) {
-                uint idx = l*K + j;
+                uint idx  = l*K + j;
                 // printf("TRANSPOSE IDX: %d\n", idx);
-                tspVct[l]   = XT[idx];
+                tspVct[l] = XT[idx];
                 // printf("%f -- %d ----- %f -- %d\n", tspVct[l], l, XT[9], idx);
             }
             // printf("%f ----- %f\n", tspVct[0], XT[0]);
@@ -150,18 +148,55 @@ void ker2(float* X, float* XT, float* Xsqr, uint K) {
 //                                 else x      -- irow case
 //                    ) (iota nm)
 //       in  scatter A (iota nm) A'
-void gaussJordan(float* XsqrP,uint cols,uint identIdx, float* XsqrInv){
+
+
+// 3. Apply Gauss Jordan Elimination on Matrix A:
+    
+//     For i = 1 to n
+        
+//         If Ai,i = 0
+            
+//             Print "Mathematical Error!"
+//             Stop
+        
+//         End If
+        
+//         For j = 1 to n
+            
+//             If i ≠ j 
+                
+//                 Ratio = Aj,i/Ai,i
+                
+//                 For k = 1 to n+1
+                
+//                     Aj,k = Aj,k - Ratio * Ai,k
+            
+//                 Next k
+                
+//             End If
+            
+//         Next j
+//     Next i
+
+// 4. Obtaining Solution:
+    
+//     For i = 1 to n 
+//         Xi = Ai,n+1/Ai,i
+//     Next i
+
+void gaussJordan(float* XsqrP, uint cols, uint K, float* XsqrInv){
     /* Now finding the elements of diagonal matrix */
-    for(uint j=0; j<identIdx; j++){
+    for(uint j=0; j<K; j++){
         for(uint i=0; i<cols; i++){
-            if(i!=j){
-                uint ijIndex = i*identIdx + j;
-                uint jiIndex = j*identIdx + i;
-                float c=XsqrP[ijIndex]/XsqrP[jiIndex];
-                for(uint l=0; l<cols+1; l++){
-                    uint ilIndex = i*identIdx + l;
-                    uint jlIndex = j*identIdx + l;
-                    XsqrInv[ilIndex]=XsqrP[ilIndex]-c*XsqrP[jlIndex];
+            if(i != j){
+                uint ijIdx = i*K + j;
+                uint jiIdx = j*K + j;
+                float c = XsqrP[ijIdx] / XsqrP[jiIdx];
+
+                for(uint l=1; l<cols+1; l++){
+                    uint ilIdx = i*K + l;
+                    uint jlIdx = j*K + l;
+                    XsqrInv[ilIdx] = XsqrP[ilIdx] - (c * XsqrP[jlIdx]);
                 }
             }
         }
@@ -184,8 +219,8 @@ void gaussJordan(float* XsqrP,uint cols,uint identIdx, float* XsqrInv){
 
 void ker3(float* Xsqr, float* XsqrInv, uint K){
     uint cols = 2*K;        // 2*8=16
-    // uint identIdx = K*cols; // 8*16=128
-    // float* XsqrP = calloc(2*K*K,sizeof(float));
+    uint identIdx = K*cols; // 8*16=128
+    float* XsqrP = calloc(2*K*K,sizeof(float));
 
     for (uint i = 0; i < K; i++){
         for (uint j = 0; j < K; j++){
@@ -193,16 +228,16 @@ void ker3(float* Xsqr, float* XsqrInv, uint K){
             uint sqrIdx = i*K + j;
             // 1*16
             uint invIdx = i*cols + j;
-            XsqrInv[invIdx] = Xsqr[sqrIdx];
+            XsqrP[invIdx] = Xsqr[sqrIdx];
         }
     }
 
-    // for (uint i = 0; i < K; i++){
-    //     for (uint j = K; j < identIdx; j+=cols+1){
-    //         uint idx = i*identIdx*sizeof(float) + j*sizeof(float);
-    //         XsqrInv[idx] = 1.0;
-    //     }
-    // }
+    for (uint i = 0; i < K; i++){
+        for (uint j = K; j < identIdx; j+=cols+1){
+            uint idx = i*identIdx + j;
+            XsqrP[idx] = 1.0;
+        }
+    }
 
 
     // for (uint ind = 0; ind < identIdx; ind++){
@@ -222,7 +257,7 @@ void ker3(float* Xsqr, float* XsqrInv, uint K){
     //     }
     // }
 
-    // gaussJordan(XsqrP, cols, identIdx, XsqrInv);
+    gaussJordan(XsqrP, cols, K, XsqrInv);
 
 }
 
@@ -278,7 +313,7 @@ int main(int argc, char const *argv[]) {
     printf("\n****** Printing Xsqr ******\n");
     for (size_t i = 0; i < K; i++){
         for (size_t j = 0; j < K; j++){
-            uint index = i*n + j;
+            uint index = i*K + j;
             printf("%f, ", Xsqr[index]);
         }
         printf("\n");
@@ -287,10 +322,11 @@ int main(int argc, char const *argv[]) {
 
     float* XsqrInv = calloc(2*K*K,sizeof(float));
     ker3(Xsqr,XsqrInv,K);
+
     printf("\n****** Printing XsqrInv ******\n");
     for (uint i = 0; i < K; i++){
         for (uint j = 0; j < 2*K; j++){
-            uint index = i*n + j;
+            uint index = i*2*K + j;
             printf("%f, ", XsqrInv[index]);
         }
         printf("\n");
