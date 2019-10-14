@@ -335,6 +335,10 @@ int main(int argc, char const *argv[]) {
     }
     printf("\n");
 
+    free(X);
+    free(XT);
+    free(Xsqr);
+    free(XsqrInv);
 
 	return 0;
 }
