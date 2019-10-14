@@ -150,47 +150,38 @@ void ker2(float* X, float* XT, float* Xsqr, uint K) {
 //       in  scatter A (iota nm) A'
 
 
-// 3. Apply Gauss Jordan Elimination on Matrix A:
-
-//     For i = 1 to n
-
-//         If Ai,i = 0
-
-//             Print "Mathematical Error!"
-//             Stop
-
-//         End If
-
-//         For j = 1 to n
-
-//             If i ≠ j
-
-//                 Ratio = Aj,i/Ai,i
-
-//                 For k = 1 to n+1
-
-//                     Aj,k = Aj,k - Ratio * Ai,k
-
-//                 Next k
-
-//             End If
-
-//         Next j
-//     Next i
-
-// 4. Obtaining Solution:
-
-//     For i = 1 to n
-//         Xi = Ai,n+1/Ai,i
-//     Next i
-
-integer i, j, k; real array (ai j )1:n×1:n , (bi )1:n
+procedure Naive Gauss(n, (ai j ), (bi ), (xi ))
+integer i, j, k, n; real sum, xmult
+real array (ai j )1:n×1:n , (bi )1:n , (xi )1:n
 for k = 1 to n − 1 do
     for i = k + 1 to n do
-        for j = k to n do
-            aij ←aij −(aik/akk)akj
-void gaussJordan2(float* XsqrP, uint cols, uint K, float* XsqrInv){
+        xmult ← aik/akk
+        aik ← xmult
+        for j = k + 1 to n do
+            aij ← aij −(xmult)akj
+        end for
+        bi ← bi − (xmult)bk
+    end for
+end for
+xn ←bn/ann
+for i =n−1to1 step−1do
+    sum ← bi
+    for j = i + 1 to n do
+        sum ← sum − ai j x j
+    end for
+xi ← sum/aii
+end for
+end procedure Naive Gauss
 
+void gaussJordan2(float* XsqrP, uint cols, uint K, float* XsqrInv){
+    for(uint row = 1; row < n; row++){
+        for (uint col = row+1; col < cols; col++){
+            float xmult = XsqrP[col row] / XsqrP[row row]
+            for (uint j = 0; j < ; j++){
+                X[col j] = X[ col j] − (X[col row]/X[row row]) * X[row j]
+            }
+        }
+    }
 }
 
 void gaussJordan(float* XsqrP, uint cols, uint K, float* XsqrInv){
