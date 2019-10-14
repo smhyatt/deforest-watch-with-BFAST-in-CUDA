@@ -10,4 +10,5 @@ insp:
 	futhark c insp-data.fut
 	./insp-data < data/peru.in > data/testset.in
 
-
+gaussjordan: gaussjordan.c
+	$(CC) $(CFLAGS) gaussjordan.c

@@ -153,11 +153,11 @@ void ker2(float* X, float* XT, float* Xsqr, uint K) {
 procedure Naive Gauss(n, (ai j ), (bi ), (xi ))
 integer i, j, k, n; real sum, xmult
 real array (ai j )1:n×1:n , (bi )1:n , (xi )1:n
-for k = 1 to n − 1 do
-    for i = k + 1 to n do
+for k = 1 to n − 1 do           // row
+    for i = k + 1 to n do       // row we are working on
         xmult ← aik/akk
         aik ← xmult
-        for j = k + 1 to n do
+        for j = k + 1 to n do   // column
             aij ← aij −(xmult)akj
         end for
         bi ← bi − (xmult)bk
@@ -174,14 +174,18 @@ end for
 end procedure Naive Gauss
 
 void gaussJordan2(float* XsqrP, uint cols, uint K, float* XsqrInv){
-    for(uint row = 1; row < n; row++){
-        for (uint col = row+1; col < cols; col++){
-            float xmult = XsqrP[col row] / XsqrP[row row]
-            for (uint j = 0; j < ; j++){
-                X[col j] = X[ col j] − (X[col row]/X[row row]) * X[row j]
+    // Making the upper triangle
+    for (uint row = 0; row < n; row++){
+        for (uint rowWork = row+1; rowWork < cols; rowWork++){
+            float xMult = XsqrP[rowWork row] / XsqrP[row row];
+            for (uint col = row + 1; col < ; col++){
+                uint factorIdx   = row     * n + col;
+                uint elemIdx     = rowWork * n + col;
+                XsqrInv[elemIdx] = XsqrP[elemIdx] − xMult * XsqrP[factorIdx]
             }
         }
     }
+
 }
 
 void gaussJordan(float* XsqrP, uint cols, uint K, float* XsqrInv){
