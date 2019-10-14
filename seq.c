@@ -151,51 +151,60 @@ void ker2(float* X, float* XT, float* Xsqr, uint K) {
 
 
 // 3. Apply Gauss Jordan Elimination on Matrix A:
-    
+
 //     For i = 1 to n
-        
+
 //         If Ai,i = 0
-            
+
 //             Print "Mathematical Error!"
 //             Stop
-        
+
 //         End If
-        
+
 //         For j = 1 to n
-            
-//             If i ≠ j 
-                
+
+//             If i ≠ j
+
 //                 Ratio = Aj,i/Ai,i
-                
+
 //                 For k = 1 to n+1
-                
+
 //                     Aj,k = Aj,k - Ratio * Ai,k
-            
+
 //                 Next k
-                
+
 //             End If
-            
+
 //         Next j
 //     Next i
 
 // 4. Obtaining Solution:
-    
-//     For i = 1 to n 
+
+//     For i = 1 to n
 //         Xi = Ai,n+1/Ai,i
 //     Next i
 
+integer i, j, k; real array (ai j )1:n×1:n , (bi )1:n
+for k = 1 to n − 1 do
+    for i = k + 1 to n do
+        for j = k to n do
+            aij ←aij −(aik/akk)akj
+void gaussJordan2(float* XsqrP, uint cols, uint K, float* XsqrInv){
+
+}
+
 void gaussJordan(float* XsqrP, uint cols, uint K, float* XsqrInv){
     /* Now finding the elements of diagonal matrix */
-    for(uint j=0; j<K; j++){
-        for(uint i=0; i<cols; i++){
+    for(uint i=0; i<K; i++){
+        for(uint j=0; j<cols; j++){
             if(i != j){
-                uint ijIdx = i*K + j;
-                uint jiIdx = j*K + j;
-                float c = XsqrP[ijIdx] / XsqrP[jiIdx];
+                uint ijIdx = i*K + j; // X[i,j]
+                uint pivot = i*K + i; // X[i,i]
+                float coefficient = XsqrP[ijIdx] / XsqrP[pivot]; // X[i,j] / pivot
 
-                for(uint l=1; l<cols+1; l++){
-                    uint ilIdx = i*K + l;
-                    uint jlIdx = j*K + l;
+                for(uint l=i+1; l<K; l++){
+                    uint ilIdx = i*K + l; //
+                    uint jlIdx = j*K + l; //
                     XsqrInv[ilIdx] = XsqrP[ilIdx] - (c * XsqrP[jlIdx]);
                 }
             }
