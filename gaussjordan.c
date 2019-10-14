@@ -49,6 +49,30 @@ void gaussJordan2(float* _X, uint cols, uint K, float* _Xres){
         }
     }
 
+    for (uint i = 0; i < K; i++) {
+        float temp = _X[i*cols+i];
+        for (uint j = i; j < cols; j++){
+            _X[i*cols+j] = _X[i*cols+j] / temp;
+        }
+    }
+
+    for (uint row = K-1; row >= 1; row--){
+        printf("HELLO: %d \n", row);
+        for (int rowWork = row-1; 0 <= rowWork ; rowWork--){
+            printf("HELLO2: %u \n", rowWork);
+            // x = _X[1*6+2] / _X[2*6+2]
+            // x = _X[8] / _X[14]
+            // x = 1 / 1 = 1
+            float x = _X[rowWork*cols+row] / _X[row*cols+row];
+            for (uint col = row; col < cols; col++){
+                // rowWork = rowWork - row * x
+                _X[rowWork*cols+col] = _X[rowWork*cols+col] - _X[row*cols+col] * x;
+            }
+        }
+    }
+
+
+
 }
 
 void printMatrix(float* X, uint numRows, uint numCols){
@@ -65,7 +89,7 @@ void printMatrix(float* X, uint numRows, uint numCols){
 int main() {
     float X[R][C]   = {{1, 0, 1, 1, 0, 0}
                       ,{0, 2, 1, 0, 1, 0}
-                      ,{1, 0, 1, 0, 0, 1}};
+                      ,{1, 1, 1, 0, 0, 1}};
 
     float* Xinv     = calloc(R*C,sizeof(float));
 
@@ -77,6 +101,7 @@ int main() {
     printf("Matrix X:\n");
     printMatrix(&X[0][0],R,C);
     gaussJordan2(&X[0][0],C,R,Xinv);
+
     printf("Matrix X:\n");
     printMatrix(&X[0][0],R,C);
 

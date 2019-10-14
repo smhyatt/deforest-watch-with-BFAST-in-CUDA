@@ -150,62 +150,61 @@ void ker2(float* X, float* XT, float* Xsqr, uint K) {
 //       in  scatter A (iota nm) A'
 
 
-procedure Naive Gauss(n, (ai j ), (bi ), (xi ))
-integer i, j, k, n; real sum, xmult
-real array (ai j )1:n×1:n , (bi )1:n , (xi )1:n
-for k = 1 to n − 1 do           // row
-    for i = k + 1 to n do       // row we are working on
-        xmult ← aik/akk
-        aik ← xmult
-        for j = k + 1 to n do   // column
-            aij ← aij −(xmult)akj
-        end for
-        bi ← bi − (xmult)bk
-    end for
-end for
-xn ←bn/ann
-for i =n−1to1 step−1do
-    sum ← bi
-    for j = i + 1 to n do
-        sum ← sum − ai j x j
-    end for
-xi ← sum/aii
-end for
-end procedure Naive Gauss
+// procedure Naive Gauss(n, (ai j ), (bi ), (xi ))
+// integer i, j, k, n; real sum, xmult
+// real array (ai j )1:n×1:n , (bi )1:n , (xi )1:n
+// for k = 1 to n − 1 do           // row
+//     for i = k + 1 to n do       // row we are working on
+//         xmult ← aik/akk
+//         aik ← xmult
+//         for j = k + 1 to n do   // column
+//             aij ← aij −(xmult)akj
+//         end for
+//         bi ← bi − (xmult)bk
+//     end for
+// end for
+// xn ←bn/ann
+// for i =n−1to1 step−1do
+//     sum ← bi
+//     for j = i + 1 to n do
+//         sum ← sum − ai j x j
+//     end for
+// xi ← sum/aii
+// end for
+// end procedure Naive Gauss
 
-void gaussJordan2(float* XsqrP, uint cols, uint K, float* XsqrInv){
+void gaussJordan(float* XsqrInv, uint cols, uint K){
     // Making the upper triangle
-    for (uint row = 0; row < n; row++){
-        for (uint rowWork = row+1; rowWork < cols; rowWork++){
-            float xMult = XsqrP[rowWork row] / XsqrP[row row];
-            for (uint col = row + 1; col < ; col++){
-                uint factorIdx   = row     * n + col;
-                uint elemIdx     = rowWork * n + col;
-                XsqrInv[elemIdx] = XsqrP[elemIdx] − xMult * XsqrP[factorIdx]
+    for (uint row = 0; row < K-1; row++){
+        for (uint rowWork = row + 1; rowWork < K; rowWork++){
+            float xMult = XsqrInv[rowWork*cols+row] / XsqrInv[row*cols+row];
+            for (uint col = row; col < cols; col++){
+                uint factorIdx   = row     * cols + col;
+                uint elemIdx     = rowWork * cols + col;
+                XsqrInv[elemIdx] = XsqrInv[elemIdx] - xMult * XsqrInv[factorIdx];
             }
         }
     }
 
-}
+    // scalling
+    for (uint i = 0; i < K; i++) {
+        float temp = XsqrInv[i*cols+i];
+        for (uint j = i; j < cols; j++){
+            XsqrInv[i*cols+j] = XsqrInv[i*cols+j] / temp;
+        }
+    }
 
-void gaussJordan(float* XsqrP, uint cols, uint K, float* XsqrInv){
-    /* Now finding the elements of diagonal matrix */
-    for(uint i=0; i<K; i++){
-        for(uint j=0; j<cols; j++){
-            if(i != j){
-                uint ijIdx = i*K + j; // X[i,j]
-                uint pivot = i*K + i; // X[i,i]
-                float coefficient = XsqrP[ijIdx] / XsqrP[pivot]; // X[i,j] / pivot
-
-                for(uint l=i+1; l<K; l++){
-                    uint ilIdx = i*K + l; //
-                    uint jlIdx = j*K + l; //
-                    XsqrInv[ilIdx] = XsqrP[ilIdx] - (c * XsqrP[jlIdx]);
-                }
+    // Making back substitution
+    for (uint row = K-1; row >= 1; row--){
+        for (int rowWork = row-1; 0 <= rowWork ; rowWork--){
+            float x = XsqrInv[rowWork*cols+row] / XsqrInv[row*cols+row];
+            for (uint col = row; col < cols; col++){
+                XsqrInv[rowWork*cols+col] = XsqrInv[rowWork*cols+col] - XsqrInv[row*cols+col] * x;
             }
         }
     }
 }
+
 
 //   let mat_inv [n] (A: [n][n]f32): [n][n]f32 =
 //     let m = 2*n
@@ -224,7 +223,6 @@ void gaussJordan(float* XsqrP, uint cols, uint K, float* XsqrInv){
 void ker3(float* Xsqr, float* XsqrInv, uint K){
     uint cols = 2*K;        // 2*8=16
     uint identIdx = K*cols; // 8*16=128
-    float* XsqrP = calloc(2*K*K,sizeof(float));
 
     for (uint i = 0; i < K; i++){
         for (uint j = 0; j < K; j++){
@@ -232,14 +230,14 @@ void ker3(float* Xsqr, float* XsqrInv, uint K){
             uint sqrIdx = i*K + j;
             // 1*16
             uint invIdx = i*cols + j;
-            XsqrP[invIdx] = Xsqr[sqrIdx];
+            XsqrInv[invIdx] = Xsqr[sqrIdx];
         }
     }
 
     for (uint i = 0; i < K; i++){
         for (uint j = K; j < identIdx; j+=cols+1){
             uint idx = i*identIdx + j;
-            XsqrP[idx] = 1.0;
+            XsqrInv[idx] = 1.0;
         }
     }
 
@@ -261,7 +259,7 @@ void ker3(float* Xsqr, float* XsqrInv, uint K){
     //     }
     // }
 
-    gaussJordan(XsqrP, cols, K, XsqrInv);
+    gaussJordan(XsqrInv, cols, K);
 
 }
 
@@ -292,14 +290,14 @@ int main(int argc, char const *argv[]) {
     ker1(K,freq,X);
     transpose(K,X,XT);
 
-    printf("\n****** Printing X ******\n");
-    for (size_t i = 0; i < K; i++){
-        for (size_t j = 0; j < N; j++){
-            uint index = i*N + j;
-            printf(" %f ", X[index]);
-        }
-        printf("\n");
-    }
+    // printf("\n****** Printing X ******\n");
+    // for (size_t i = 0; i < K; i++){
+    //     for (size_t j = 0; j < N; j++){
+    //         uint index = i*N + j;
+    //         printf(" %f ", X[index]);
+    //     }
+    //     printf("\n");
+    // }
 
     // printf("\n****** Printing XT ******\n");
     // for (size_t i = 0; i < N; i++){
