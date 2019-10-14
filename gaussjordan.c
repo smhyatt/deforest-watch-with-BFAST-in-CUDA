@@ -3,6 +3,7 @@
 typedef unsigned int uint;
 #define R 3
 #define C 6
+
 // integer i, j, k, n; real sum, xmult
 // real array (ai j )1:n×1:n , (bi )1:n , (xi )1:n
 // for k = 1 to n − 1 do           // row
@@ -27,14 +28,23 @@ typedef unsigned int uint;
 
 void gaussJordan2(float* _X, uint cols, uint K, float* _Xres){
     // Making the upper triangle
-    for (uint row = 1; row < K; row++){
-        for (uint rowWork = row + 1; rowWork < cols; rowWork++){
-            float xMult = _X[rowWork*K+row] / _X[row*K+row];
-            _X[rowWork*K+row] = xMult;
-            for (uint col = row + 1; col < K; col++){
-                uint factorIdx   = row     * K + col;
-                uint elemIdx     = rowWork * K + col;
-                _Xres[elemIdx] = _X[elemIdx] - xMult * _X[factorIdx];
+    // row = 0
+    for (uint row = 0; row < K-1; row++){
+        // rowWork = 2
+        for (uint rowWork = row + 1; rowWork < K; rowWork++){
+            // xMult = _X[2*6+0] / _X[0*6+0] = 1 / 1 = 1
+            float xMult = _X[rowWork*cols+row] / _X[row*cols+row];
+            // _Xres[2*6+0] = 1;
+            // _Xres[rowWork*cols+row] = xMult;
+            // col = 5
+            for (uint col = row; col < cols; col++){
+                // factorIdx = 0 * 6 + 5 = 5
+                uint factorIdx   = row     * cols + col;
+                // elemIdx = 2 * 6 + 5 = 17
+                uint elemIdx     = rowWork * cols + col;
+                // _Xres[5] = _X[17] - 1 * _X[5];
+                // _Xres[5] = 1 - 1 * 0;
+                _X[elemIdx] = _X[elemIdx] - xMult * _X[factorIdx];
             }
         }
     }
@@ -64,11 +74,14 @@ int main() {
                       ,{0, 1, 0,-1, 0, 1}
                       ,{0, 0, 1, 2, 1,-2}};
 
+    printf("Matrix X:\n");
+    printMatrix(&X[0][0],R,C);
     gaussJordan2(&X[0][0],C,R,Xinv);
     printf("Matrix X:\n");
     printMatrix(&X[0][0],R,C);
-    printf("Matrix Xinv:\n");
-    printMatrix(Xinv,R,C);
+
+    // printf("Matrix Xinv:\n");
+    // printMatrix(Xinv,R,C);
     printf("Expected matrix XinvTrueFact:\n");
     printMatrix(&XinvTrueFact[0][0],R,C);
     return 0;
