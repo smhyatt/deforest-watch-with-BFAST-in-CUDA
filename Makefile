@@ -12,3 +12,6 @@ insp:
 
 gaussjordan: gaussjordan.c
 	$(CC) $(CFLAGS) gaussjordan.c
+
+clean:
+	rm a.out
