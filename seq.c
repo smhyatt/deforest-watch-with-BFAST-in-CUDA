@@ -102,7 +102,7 @@ void mmMulFilt(float* X, float* XT, float* y, float* Xsqr, uint K){
         }
     }
 
-    free(tspVct);
+    // free(tspVct);
 }
 
 
@@ -116,7 +116,6 @@ void ker2(float* X, float* XT, float* Xsqr, uint K) {
     }
 
 }
-
 
 
 // ----------
@@ -187,6 +186,17 @@ void gaussJordan(float* XsqrInv, uint cols, uint K){
             for (uint col = row; col < cols; col++){
                 XsqrInv[rowWork*cols+col] = XsqrInv[rowWork*cols+col] - XsqrInv[row*cols+col] * x;
             }
+        }
+    }
+}
+
+
+void doubleDown(float* XsqrInv, float* XsqrInvLess, uint K) {
+    for (int i = 0; i < K; i++) {
+        for (int j = 0; j < K; j++) {
+            uint XinvIdx  = i*(K*2) + j+K; // XsqrInv er K længere
+            uint XlessIdx = i*K + j;
+            XsqrInvLess[XlessIdx] = XsqrInv[XinvIdx];
         }
     }
 }
@@ -278,27 +288,37 @@ void ker4(float* X, uint K, float* B0){
 
 
 
-void mvMul(float* XsqrInv, float* B0, uint K, float* B) {
-     for (int i = 0; i < K; i++) {
+void mvMul(float* M, float* v, uint rows, uint cols, float* res_v) {
+
+    for (int i = 0; i < rows; i++) {
         float acc = 0.0;
 
-        for (uint elm = 0; elm < K; elm++) {
-            uint XInvIdx = i*K + elm;
-            acc += XsqrInv[XInvIdx] * B0[elm];
+        for (uint elm = 0; elm < cols; elm++) {
+            uint MIdx = i*cols + elm;
+            acc += M[MIdx] * v[elm];
         }
-        B[i] = acc;
+        res_v[i] = acc;
     }
 }
 
 
-
 // let β = mvMul Xsqr−1 β0
 void ker5(float* XsqrInv, uint K, float* B0, float* B){
-    mvMul(XsqrInv, B0, K, B);
+    mvMul(XsqrInv, B0, K, K, B);
 }
 
 
+// -- yˆ,r,I : [N]f32
+// let yˆ = mvMul XT β
+void ker6(float* XT, float* B, uint K, float* yhat) {
+    mvMul(XT, B, N, K, yhat);
+}
 
+
+let (N,r,I)= map2 (-) y yˆ |> filterNaNsWKeys
+void ker7() {
+
+}
 
 int main(int argc, char const *argv[]) {
 
@@ -354,7 +374,7 @@ int main(int argc, char const *argv[]) {
     // }
 
     // [n][m]
-    float* Xsqr = calloc(2*K,sizeof(float));
+    float* Xsqr = calloc(K*K,sizeof(float));
     ker2(X, XT, Xsqr, K);
 
     printf("\n****** Printing Xsqr ******\n");
@@ -381,6 +401,19 @@ int main(int argc, char const *argv[]) {
     printf("\n");
 
 
+    float* XsqrInvLess = calloc(K*K,sizeof(float));
+    doubleDown(XsqrInv, XsqrInvLess, K);
+
+    printf("\n****** Printing XsqrInvLess ******\n");
+    for (size_t i = 0; i < K; i++){
+        for (size_t j = 0; j < K; j++){
+            uint index = i*K + j;
+            printf("%f, ", XsqrInvLess[index]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+
     float* B0 = calloc(K,sizeof(float));
     ker4(X, K, B0);
 
@@ -396,6 +429,15 @@ int main(int argc, char const *argv[]) {
     printf("\n****** Printing B ******\n");
     for (uint i = 0; i < K; i++){
         printf("%f, ", B[i]);
+    }
+    printf("\n");
+
+    float* yhat = calloc(N,sizeof(float));
+    ker6(XT, B, K, yhat);
+
+    printf("\n****** Printing yhat ******\n");
+    for (uint i = 0; i < N; i++){
+        printf("%f, ", yhat[i]);
     }
     printf("\n");
 
