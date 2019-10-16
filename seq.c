@@ -62,22 +62,12 @@ float dotProdFilt(float* Xvct, float* XTvct, float* yvct) {
     for (uint i = 0; i < n; i++) {
         if (yvct[i] != -10000.000000) {
             acc += Xvct[i] * XTvct[i];
-        }
+        } 
     }
     return acc;
 }
 
 
-void vctTranspose(float* XT, float* vct, uint offset, uint colIdx, uint K){
-    for (uint i = 0; i < n; i++) {
-        uint idx = i*K + colIdx;
-        // printf("TRANSPOSE IDX: %d\n", idx);
-        vct[i]   = XT[idx];
-    }
-    // for (int i = 0; i < n; i++) {
-    printf("%f\n", vct[0]);
-    // }
-}
 
 // let matmul_filt [n][p][m] (xss: [n][p]f32) (yss: [p][m]f32) (vct: [p]f32) : [n][m]f32 =
 //   map (\xs -> map (dotprod_filt vct xs) (transpose yss)) xss
@@ -93,7 +83,7 @@ void vctTranspose(float* XT, float* vct, uint offset, uint colIdx, uint K){
 // y  = [8,9,7]
 // xss = Xn, yss = XTn, vct = y
 void mmMulFilt(float* X, float* XT, float* y, float* Xsqr, uint K){
-    float* tspVct = malloc(n*sizeof(float));
+    float* tspVct = calloc(n,sizeof(float));
 
     // K
     for (int i = 0; i < K; i++) {
@@ -102,21 +92,17 @@ void mmMulFilt(float* X, float* XT, float* y, float* Xsqr, uint K){
             uint XIdx = i*N;
             uint XTIdx = j;
             uint resIdx = i*K + j;
-            // printf("XIDX: %d\n", XIdx);
-
 
             for (uint l = 0; l < n; l++) {
                 uint idx  = l*K + j;
-                // printf("TRANSPOSE IDX: %d\n", idx);
                 tspVct[l] = XT[idx];
-                // printf("%f -- %d ----- %f -- %d\n", tspVct[l], l, XT[9], idx);
             }
-            // printf("%f ----- %f\n", tspVct[0], XT[0]);
-            // vctTranspose(XT, tspVct, n, XTIdx, K);
 
             Xsqr[resIdx] = dotProdFilt(&X[XIdx], tspVct, y);
         }
     }
+
+    free(tspVct);
 }
 
 
@@ -264,6 +250,56 @@ void ker3(float* Xsqr, float* XsqrInv, uint K){
 }
 
 
+
+// let matvecmul_row_filt [n][m] (xss: [n][m]f32) (ys: [m]f32) =
+//     map (\xs -> map2 (\x y -> if (f32.isnan y) then 0 else x*y) xs ys |> f32.sum) xss
+
+void mvMulFilt(float* X, float* y, uint K, float* B0){
+
+    for (int i = 0; i < K; i++) {
+        uint XIdx = i*N;
+
+        B0[i] = dotProdFilt(&X[XIdx], y, y);
+    }
+}
+
+
+
+// let beta0  = map (matvecmul_row_filt Xh) Yh   -- [2k+2]
+//                |> intrinsics.opaque
+// let β0 = mvMulFilt X[:,:n] y[:n]
+void ker4(float* X, uint K, float* B0){
+    uint numPix = sizeof(sample)/sizeof(sample[0]);
+
+    for (uint pix = 0; pix < numPix; pix++) {
+        mvMulFilt(X, &sample[pix][0], K, B0);
+    }
+}
+
+
+
+void mvMul(float* XsqrInv, float* B0, uint K, float* B) {
+     for (int i = 0; i < K; i++) {
+        float acc = 0.0;
+
+        for (uint elm = 0; elm < K; elm++) {
+            uint XInvIdx = i*K + elm;
+            acc += XsqrInv[XInvIdx] * B0[elm];
+        }
+        B[i] = acc;
+    }
+}
+
+
+
+// let β = mvMul Xsqr−1 β0
+void ker5(float* XsqrInv, uint K, float* B0, float* B){
+    mvMul(XsqrInv, B0, K, B);
+}
+
+
+
+
 int main(int argc, char const *argv[]) {
 
 	if (argc > 1) {
@@ -285,19 +321,28 @@ int main(int argc, char const *argv[]) {
 	printf("%u\n", mLen);
 
     int K = 2*k +2;
-    float* X  = malloc(K*N*sizeof(float));
-    float* XT = malloc(K*N*sizeof(float));
+    float* X  = calloc(K*N,sizeof(float));
+    float* XT = calloc(K*N,sizeof(float));
     ker1(K,freq,X);
     transpose(K,X,XT);
 
-    // printf("\n****** Printing X ******\n");
-    // for (size_t i = 0; i < K; i++){
-    //     for (size_t j = 0; j < N; j++){
-    //         uint index = i*N + j;
-    //         printf(" %f ", X[index]);
+    printf("\n****** Printing X ******\n");
+    for (size_t i = 0; i < 1; i++){ // i < K
+        for (size_t j = 0; j < n; j++){
+            uint index = i*N + j;
+            printf(" %f ", X[index]);
+        }
+        printf("\n");
+    }
+
+    // printf("\n****** Printing Y ******\n");
+    // uint Ylen = sizeof(sample)/sizeof(sample[0]);
+    // for (size_t i = 0; i < Ylen; i++){ // i < Ylen
+    //     for (size_t j = 0; j < n; j++){
+    //         printf(" %lf ", sample[i][j]);
     //     }
     //     printf("\n");
-    // }
+    // }    
 
     // printf("\n****** Printing XT ******\n");
     // for (size_t i = 0; i < N; i++){
@@ -309,7 +354,7 @@ int main(int argc, char const *argv[]) {
     // }
 
     // [n][m]
-    float* Xsqr = malloc(2*K*sizeof(float));
+    float* Xsqr = calloc(2*K,sizeof(float));
     ker2(X, XT, Xsqr, K);
 
     printf("\n****** Printing Xsqr ******\n");
@@ -335,10 +380,32 @@ int main(int argc, char const *argv[]) {
     }
     printf("\n");
 
+
+    float* B0 = calloc(K,sizeof(float));
+    ker4(X, K, B0);
+
+    printf("\n****** Printing B0 ******\n");
+    for (uint i = 0; i < K; i++){
+        printf("%f, ", B0[i]);
+    }
+    printf("\n");
+
+    float* B = calloc(K,sizeof(float));
+    ker5(XsqrInv, K, B0, B);
+
+    printf("\n****** Printing B ******\n");
+    for (uint i = 0; i < K; i++){
+        printf("%f, ", B[i]);
+    }
+    printf("\n");
+
+
     free(X);
     free(XT);
     free(Xsqr);
     free(XsqrInv);
+    free(B0);
+    free(B);
 
 	return 0;
 }
