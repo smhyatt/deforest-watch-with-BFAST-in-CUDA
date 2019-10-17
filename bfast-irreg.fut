@@ -15,6 +15,8 @@ let logplus (x: f32) : f32 =
 
 let adjustValInds [N] (n : i32) (ns : i32) (Ns : i32) (val_inds : [N]i32) (ind: i32) : i32 =
     if ind < Ns - ns then (unsafe val_inds[ind+ns]) - n else -1
+-- returns some sort of indexing (for a scatter). 
+
 
 -- filterPadWithKeys (\y -> !(f32.isnan y)) (f32.nan) y_error_all
 -- Input:   p:(p->value:true or nan:false) dummy:nan arr:[nan,float,nan,float]
@@ -185,7 +187,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
                                   then ye-yep else f32.nan )
             -- [nan,dif,nan,dif]
             let (tups, Ns) = filterPadWithKeys (\y -> !(f32.isnan y)) (f32.nan) y_error_all
-            -- [false,] [nan,dif,nan,dif]
+            -- (tups:([false,],[nan,dif,nan,dif]), Ns:float#ofvalid)
             let (y_error, val_inds) = unzip tups
             in  (Ns, y_error, val_inds)
          ) images y_preds )
@@ -243,14 +245,24 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
   -- 8. moving sums computation:             --
   ---------------------------------------------
   let (_MOs, _MOs_NN, breaks, means) = zip (zip4 Nss nss sigmas hs) (zip3 MO_fsts y_errors val_indss) |>
+    -- (Nss:[#valid,#valid,...,N], nss:[#valid,#valid,...,n], sigmas:[float,float,...,n], hs[int,int,...,n])
+    -- (Ns:valid-float, ns:valid-float, sigma:float, h:int)
+    -- (MO_fsts:[float,float,...,hmax], y_errors:[float,float,...,nan,nan,...,N], val_indss:[1,3,..,0,0,..,N])
+    -- (MO_fst:float, y_error:float/nan, val_inds:int)
     map (\ ( (Ns,ns,sigma, h), (MO_fst,y_error,val_inds) ) ->
-            let Nmn = N-n
+            let Nmn = N-n   -- Nmn:last part of the timeline
             let MO = map (\j -> if j >= Ns-ns then 0.0
                                 else if j == 0 then MO_fst
                                 else unsafe (-y_error[ns-h+j] + y_error[ns+j])
                          ) (iota Nmn) |> scan (+) 0.0
+            
+            -- [0,1,2,3,...,Nmn]
+            -- Makes some signal processing of the timeline/errors/predictions.
+            -- MO:[float,float,..,Nmn] (an accumulated value based on y_errors, Ns, ns, MO_fst and h.)
 
             let MO' = map (\mo -> mo / (sigma * (f32.sqrt (r32 ns))) ) MO
+            -- MO':[float,float,..,Nmn] (a new list of MO's that have been futher computed applying sigma and h.)
+
 	        let (is_break, fst_break) =
 		    map3 (\mo' b j ->  if j < Ns - ns && !(f32.isnan mo')
 				      then ( (f32.abs mo') > b, j )
@@ -261,8 +273,17 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
                                 else if b2 then (b2, i2)
                                 else (b1,i1)
               	      	     ) (false, -1)
+
+          -- MO':[float,float,..,Nmn] BOUND:[float,float,..,(N-n)] [j=0,1,2,3,..,Nmn]
+          -- map3:[(true,0),(false,1),(true,2),(false,3),...,(true,LEN)]
+          -- reduce:[(true,0),(true,0),(true,2),(true,2),...,(true,LEN)] -> (is_break:true,fst_break:LEN) -> LEN???
+
 	        let mean = map2 (\x j -> if j < Ns - ns then x else 0.0 ) MO' (iota Nmn)
 			    |> reduce (+) 0.0
+
+          -- MO':[float,float,..,Nmn] [j=0,1,2,3,..,Nmn]
+          -- mean: map2:   [x,x,x,...,0.0,0.0,Nmn]
+          -- mean: reduce: float
 
 	        let fst_break' = if !is_break then -1
                              else let adj_break = adjustValInds n ns Ns val_inds fst_break
@@ -272,9 +293,21 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
             let val_inds' = map (adjustValInds n ns Ns val_inds) (iota Nmn)
             let MO'' = scatter (replicate Nmn f32.nan) val_inds' MO'
             in (MO'', MO', fst_break', mean)
+
+            -- 1:fst_break':[int,-1,int,-1,...,LEN]
+            -- 2:fst_break':[int,-2,int,...,-2,-1,...,LEN]
+            -- val_inds':[int,int,int,...,Nmn] (another indexing)
+            -- MO':[float,float,..,Nmn] 
+            -- MO'':[MO',MO',nan,nan,MO',...,Nmn]
+
         ) |> unzip4
+        
+        -- return:(MO'':[MO',MO',nan,nan,MO',...,Nmn], MO':[float,float,..,Nmn], 
+        --         fst_break':[int,-2,int,...,-2,-1,...,LEN], mean:[float,float,...,Nmn])
 
   in (breaks, means)
+  -- (breaks:fst_break':[int,-2,int,...,-2,-1,...,LEN], means:mean:[float,float,...,Nmn])
+
 
 
 -- For Fabian: with debugging info, replace the result with the next line
