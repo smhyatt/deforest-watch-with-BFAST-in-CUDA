@@ -8,6 +8,7 @@
 
 -- output @ data/peru.out.gz
 
+-- if (x>2.71) then log_10 x else 1
 let logplus (x: f32) : f32 =
   if x > (f32.exp 1)
   then f32.log x else 1
@@ -15,15 +16,30 @@ let logplus (x: f32) : f32 =
 let adjustValInds [N] (n : i32) (ns : i32) (Ns : i32) (val_inds : [N]i32) (ind: i32) : i32 =
     if ind < Ns - ns then (unsafe val_inds[ind+ns]) - n else -1
 
+-- filterPadWithKeys (\y -> !(f32.isnan y)) (f32.nan) y_error_all
+-- Input:   p:(p->value:true or nan:false) dummy:nan arr:[nan,float,nan,float]
+-- Returns: ([(float,int),(float,int)],int)
 let filterPadWithKeys [n] 't
            (p : (t -> bool))
            (dummy : t)
            (arr : [n]t) : ([n](t,i32), i32) =
+  -- [0,1,0,1] <- [nan,float,nan,float]
   let tfs = map (\a -> if p a then 1 else 0) arr
+  -- number of valid
   let isT = scan (+) 0 tfs
   let i   = last isT
+  -- isT:  [0,1,1,2]
+  -- inds: [-1,0,-1,1]
   let inds= map2 (\a iT -> if p a then iT-1 else -1) arr isT
+  --X [nan,nan,nan,nan]
+  --I inds: [-1,0,-1,1]
+  --D [nan,float,nan,float]
+  --R [float,float,nan,nan]
   let rs  = scatter (replicate n dummy) inds arr
+  --X [0,0,0,0]
+  --I inds: [-1,0,-1,1]
+  --D [0,1,2,3]
+  --R [1,3,0,0]
   let ks  = scatter (replicate n 0) inds (iota n)
   in  (zip rs ks, i)
 
@@ -162,15 +178,19 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
   -- 5. filter etc.                          --
   ---------------------------------------------
   let (Nss, y_errors, val_indss) = ( intrinsics.opaque <| unzip3 <|
+    -- y p
     map2 (\y y_pred ->
             let y_error_all = zip y y_pred |>
                 map (\(ye,yep) -> if !(f32.isnan ye)
                                   then ye-yep else f32.nan )
+            -- [nan,dif,nan,dif]
             let (tups, Ns) = filterPadWithKeys (\y -> !(f32.isnan y)) (f32.nan) y_error_all
+            -- [false,] [nan,dif,nan,dif]
             let (y_error, val_inds) = unzip tups
             in  (Ns, y_error, val_inds)
          ) images y_preds )
 
+    -- outout: (2,[float,float,nan,nan],[1,3,0,0])
   ------------------------------------------------
   -- 6. ns and sigma (can be fused with above)  --
   ------------------------------------------------
@@ -185,21 +205,39 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
             in  (h, ns, sigma)
          ) Yh y_errors
 
+  -- map2 (\sample diff ->
+  --                    ns = map (\pixel -> [0,1,0,1]) -> reduce -> 2
+  --                    sigma = [float,float,0.0,0.0] -> [float^2,float^2,0.0,0.0] -> float
+  --                    sigma = float
+  --                    h = int
+  -- output: ([int,int,int,int],[valid0,valid1,valid2,valid3]:float,[float,float,flaot])
   ---------------------------------------------
   -- 7. moving sums first and bounds:        --
   ---------------------------------------------
+  -- ker9
   let hmax = reduce_comm (i32.max) 0 hs
+  -- sum(h)
   let MO_fsts = zip3 y_errors nss hs |>
     map (\(y_error, ns, h) -> unsafe
             map (\i -> if i < h then unsafe y_error[i + ns-h+1] else 0.0) (iota hmax)
+            -- [float,float,0,0]
             |> reduce (+) 0.0
-        ) |> intrinsics.opaque
+            -- float
+        )
+        |> intrinsics.opaque
+  -- [float,float,...]
 
+  -- ker10
   let BOUND = map (\q -> let t   = n+1+q
                          let time = unsafe mappingindices[t-1]
                          let tmp = logplus ((r32 time) / (r32 mappingindices[N-1]))
                          in  lam * (f32.sqrt tmp)
                   ) (iota (N-n))
+  -- [0,1,2,3,...,n]
+  -- [114+0,114+1,...,114+n]
+  -- time = [int,int,...]
+  -- tmp:float
+  -- lam:float that is our bound.
 
   ---------------------------------------------
   -- 8. moving sums computation:             --
