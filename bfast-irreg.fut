@@ -1,9 +1,14 @@
 -- BFAST-irregular: version handling obscured observations (e.g., clouds)
 -- ==
--- compiled input @ data/D1.in.gz
--- compiled input @ data/D2.in.gz
 -- compiled input @ data/sahara.in.gz
 -- output @ data/sahara.out.gz
+
+-- compiled input @ data/testin.in
+
+-- output @ data/test.out
+
+-- compiled input @ data/D1.in.gz
+-- compiled input @ data/D2.in.gz
 -- compiled input @ data/peru.in.gz
 
 -- output @ data/peru.out.gz
