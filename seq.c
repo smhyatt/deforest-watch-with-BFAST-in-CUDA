@@ -520,7 +520,7 @@ int main(int argc, char const *argv[]) {
     printf("\n");
 
     float* B = calloc(K*m,sizeof(float));
-    ker5(XsqrInv, K, B0, B);
+    ker5(XsqrInvLess, K, B0, B);
 
     printf("\n****** Printing B ******\n");
     for (uint i = 0; i < m; i++){
@@ -535,15 +535,15 @@ int main(int argc, char const *argv[]) {
     float* yhat = calloc(m*N,sizeof(float));
     ker6(XT, B, K, yhat);
 
-    // printf("\n****** Printing yhat ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < N; j++) {
-    //         uint index = i*N + j;
-    //         printf("%f, ", yhat[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    printf("\n****** Printing yhat ******\n");
+    for (uint i = 0; i < m; i++){
+        for (int j = 0; j < N; j++) {
+            uint index = i*N + j;
+            printf("%f, ", yhat[index]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 
     uint* valids     = calloc(m,sizeof(uint));
     float* diffs     = calloc(m*N,sizeof(float));
@@ -554,31 +554,31 @@ int main(int argc, char const *argv[]) {
     
     ker7(yhat, diffs, valids, errors, validIdxs);
 
-    // printf("\n****** Printing valids ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%d, ", valids[i]);
-    // }
-    // printf("\n");
+    printf("\n****** Printing valids ******\n");
+    for (uint i = 0; i < m; i++){
+        printf("%d, ", valids[i]);
+    }
+    printf("\n");
 
-    // printf("\n****** Printing errors ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < N; j++) {
-    //         uint index = i*N + j;
-    //         printf("%f, ", errors[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    printf("\n****** Printing errors ******\n");
+    for (uint i = 0; i < m; i++){
+        for (int j = 0; j < N; j++) {
+            uint index = i*N + j;
+            printf("%f, ", errors[index]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 
-    // printf("\n****** Printing validIdxs ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < N; j++) {
-    //         uint index = i*N + j;
-    //         printf("%f, ", validIdxs[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    printf("\n****** Printing validIdxs ******\n");
+    for (uint i = 0; i < m; i++){
+        for (int j = 0; j < N; j++) {
+            uint index = i*N + j;
+            printf("%f, ", validIdxs[index]);
+        }
+        printf("\n");
+    }
+    printf("\n");
 
 
     free(X);
@@ -587,6 +587,7 @@ int main(int argc, char const *argv[]) {
     free(XsqrInv);
     free(B0);
     free(B);
+    free(yhat);
     free(diffs);
     free(valids);
     free(errors);
