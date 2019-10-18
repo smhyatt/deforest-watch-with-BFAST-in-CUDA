@@ -70,10 +70,9 @@ int64_t *futhark_shape_i32_1d(struct futhark_context *ctx,
 */
 
 int futhark_entry_main(struct futhark_context *ctx, int32_t *out0,
-                       int32_t *out1, int32_t *out2, int32_t *out3,
-                       int32_t *out4, float *out5, float *out6, float *out7,
-                       struct futhark_i32_1d **out8,
-                       struct futhark_f32_2d **out9, const int32_t in0, const
+                       int32_t *out1, int32_t *out2, float *out3, float *out4,
+                       float *out5, struct futhark_i32_1d **out6,
+                       struct futhark_f32_2d **out7, const int32_t in0, const
                        int32_t in1, const int32_t in2, const float in3, const
                        float in4, const float in5, const
                        struct futhark_i32_1d *in6, const
@@ -1101,72 +1100,70 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
     /* Declare and read input. */
     set_binary_mode(stdin);
     
-    int32_t read_value_4682;
+    int32_t read_value_4191;
     
-    if (read_scalar(&i32_info, &read_value_4682) != 0)
+    if (read_scalar(&i32_info, &read_value_4191) != 0)
         panic(1, "Error when reading input #%d of type %s (errno: %s).\n", 0,
               i32_info.type_name, strerror(errno));
     
-    int32_t read_value_4683;
+    int32_t read_value_4192;
     
-    if (read_scalar(&i32_info, &read_value_4683) != 0)
+    if (read_scalar(&i32_info, &read_value_4192) != 0)
         panic(1, "Error when reading input #%d of type %s (errno: %s).\n", 1,
               i32_info.type_name, strerror(errno));
     
-    int32_t read_value_4684;
+    int32_t read_value_4193;
     
-    if (read_scalar(&i32_info, &read_value_4684) != 0)
+    if (read_scalar(&i32_info, &read_value_4193) != 0)
         panic(1, "Error when reading input #%d of type %s (errno: %s).\n", 2,
               i32_info.type_name, strerror(errno));
     
-    float read_value_4685;
+    float read_value_4194;
     
-    if (read_scalar(&f32_info, &read_value_4685) != 0)
+    if (read_scalar(&f32_info, &read_value_4194) != 0)
         panic(1, "Error when reading input #%d of type %s (errno: %s).\n", 3,
               f32_info.type_name, strerror(errno));
     
-    float read_value_4686;
+    float read_value_4195;
     
-    if (read_scalar(&f32_info, &read_value_4686) != 0)
+    if (read_scalar(&f32_info, &read_value_4195) != 0)
         panic(1, "Error when reading input #%d of type %s (errno: %s).\n", 4,
               f32_info.type_name, strerror(errno));
     
-    float read_value_4687;
+    float read_value_4196;
     
-    if (read_scalar(&f32_info, &read_value_4687) != 0)
+    if (read_scalar(&f32_info, &read_value_4196) != 0)
         panic(1, "Error when reading input #%d of type %s (errno: %s).\n", 5,
               f32_info.type_name, strerror(errno));
     
-    struct futhark_i32_1d *read_value_4688;
-    int64_t read_shape_4689[1];
-    int32_t *read_arr_4690 = NULL;
+    struct futhark_i32_1d *read_value_4197;
+    int64_t read_shape_4198[1];
+    int32_t *read_arr_4199 = NULL;
     
     errno = 0;
-    if (read_array(&i32_info, (void **) &read_arr_4690, read_shape_4689, 1) !=
+    if (read_array(&i32_info, (void **) &read_arr_4199, read_shape_4198, 1) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 6, "[]",
               i32_info.type_name, strerror(errno));
     
-    struct futhark_f32_2d *read_value_4691;
-    int64_t read_shape_4692[2];
-    float *read_arr_4693 = NULL;
+    struct futhark_f32_2d *read_value_4200;
+    int64_t read_shape_4201[2];
+    float *read_arr_4202 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_4693, read_shape_4692, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_4202, read_shape_4201, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 7, "[][]",
               f32_info.type_name, strerror(errno));
     
-    int32_t result_4694;
-    int32_t result_4695;
-    int32_t result_4696;
-    int32_t result_4697;
-    int32_t result_4698;
-    float result_4699;
-    float result_4700;
-    float result_4701;
-    struct futhark_i32_1d *result_4702;
-    struct futhark_f32_2d *result_4703;
+    int32_t result_4203;
+    int32_t result_4204;
+    int32_t result_4205;
+    float result_4206;
+    float result_4207;
+    float result_4208;
+    struct futhark_i32_1d *result_4209;
+    struct futhark_f32_2d *result_4210;
     
     if (perform_warmup) {
         time_runs = 0;
@@ -1179,20 +1176,20 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
         ;
         ;
         ;
-        assert((read_value_4688 = futhark_new_i32_1d(ctx, read_arr_4690,
-                                                     read_shape_4689[0])) != 0);
-        assert((read_value_4691 = futhark_new_f32_2d(ctx, read_arr_4693,
-                                                     read_shape_4692[0],
-                                                     read_shape_4692[1])) != 0);
+        assert((read_value_4197 = futhark_new_i32_1d(ctx, read_arr_4199,
+                                                     read_shape_4198[0])) != 0);
+        assert((read_value_4200 = futhark_new_f32_2d(ctx, read_arr_4202,
+                                                     read_shape_4201[0],
+                                                     read_shape_4201[1])) != 0);
         assert(futhark_context_sync(ctx) == 0);
         t_start = get_wall_time();
-        r = futhark_entry_main(ctx, &result_4694, &result_4695, &result_4696,
-                               &result_4697, &result_4698, &result_4699,
-                               &result_4700, &result_4701, &result_4702,
-                               &result_4703, read_value_4682, read_value_4683,
-                               read_value_4684, read_value_4685,
-                               read_value_4686, read_value_4687,
-                               read_value_4688, read_value_4691);
+        r = futhark_entry_main(ctx, &result_4203, &result_4204, &result_4205,
+                               &result_4206, &result_4207, &result_4208,
+                               &result_4209, &result_4210, read_value_4191,
+                               read_value_4192, read_value_4193,
+                               read_value_4194, read_value_4195,
+                               read_value_4196, read_value_4197,
+                               read_value_4200);
         if (r != 0)
             panic(1, "%s", futhark_context_get_error(ctx));
         assert(futhark_context_sync(ctx) == 0);
@@ -1208,18 +1205,16 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
         ;
         ;
         ;
-        assert(futhark_free_i32_1d(ctx, read_value_4688) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_4691) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_4197) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_4200) == 0);
         ;
         ;
         ;
         ;
         ;
         ;
-        ;
-        ;
-        assert(futhark_free_i32_1d(ctx, result_4702) == 0);
-        assert(futhark_free_f32_2d(ctx, result_4703) == 0);
+        assert(futhark_free_i32_1d(ctx, result_4209) == 0);
+        assert(futhark_free_f32_2d(ctx, result_4210) == 0);
     }
     time_runs = 1;
     /* Proper run. */
@@ -1232,20 +1227,20 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
         ;
         ;
         ;
-        assert((read_value_4688 = futhark_new_i32_1d(ctx, read_arr_4690,
-                                                     read_shape_4689[0])) != 0);
-        assert((read_value_4691 = futhark_new_f32_2d(ctx, read_arr_4693,
-                                                     read_shape_4692[0],
-                                                     read_shape_4692[1])) != 0);
+        assert((read_value_4197 = futhark_new_i32_1d(ctx, read_arr_4199,
+                                                     read_shape_4198[0])) != 0);
+        assert((read_value_4200 = futhark_new_f32_2d(ctx, read_arr_4202,
+                                                     read_shape_4201[0],
+                                                     read_shape_4201[1])) != 0);
         assert(futhark_context_sync(ctx) == 0);
         t_start = get_wall_time();
-        r = futhark_entry_main(ctx, &result_4694, &result_4695, &result_4696,
-                               &result_4697, &result_4698, &result_4699,
-                               &result_4700, &result_4701, &result_4702,
-                               &result_4703, read_value_4682, read_value_4683,
-                               read_value_4684, read_value_4685,
-                               read_value_4686, read_value_4687,
-                               read_value_4688, read_value_4691);
+        r = futhark_entry_main(ctx, &result_4203, &result_4204, &result_4205,
+                               &result_4206, &result_4207, &result_4208,
+                               &result_4209, &result_4210, read_value_4191,
+                               read_value_4192, read_value_4193,
+                               read_value_4194, read_value_4195,
+                               read_value_4196, read_value_4197,
+                               read_value_4200);
         if (r != 0)
             panic(1, "%s", futhark_context_get_error(ctx));
         assert(futhark_context_sync(ctx) == 0);
@@ -1261,8 +1256,8 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
         ;
         ;
         ;
-        assert(futhark_free_i32_1d(ctx, read_value_4688) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_4691) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_4197) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_4200) == 0);
         if (run < num_runs - 1) {
             ;
             ;
@@ -1270,10 +1265,8 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
             ;
             ;
             ;
-            ;
-            ;
-            assert(futhark_free_i32_1d(ctx, result_4702) == 0);
-            assert(futhark_free_f32_2d(ctx, result_4703) == 0);
+            assert(futhark_free_i32_1d(ctx, result_4209) == 0);
+            assert(futhark_free_f32_2d(ctx, result_4210) == 0);
         }
     }
     ;
@@ -1282,46 +1275,42 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
     ;
     ;
     ;
-    free(read_arr_4690);
-    free(read_arr_4693);
+    free(read_arr_4199);
+    free(read_arr_4202);
     if (binary_output)
         set_binary_mode(stdout);
-    write_scalar(stdout, binary_output, &i32_info, &result_4694);
+    write_scalar(stdout, binary_output, &i32_info, &result_4203);
     printf("\n");
-    write_scalar(stdout, binary_output, &i32_info, &result_4695);
+    write_scalar(stdout, binary_output, &i32_info, &result_4204);
     printf("\n");
-    write_scalar(stdout, binary_output, &i32_info, &result_4696);
+    write_scalar(stdout, binary_output, &i32_info, &result_4205);
     printf("\n");
-    write_scalar(stdout, binary_output, &i32_info, &result_4697);
+    write_scalar(stdout, binary_output, &f32_info, &result_4206);
     printf("\n");
-    write_scalar(stdout, binary_output, &i32_info, &result_4698);
+    write_scalar(stdout, binary_output, &f32_info, &result_4207);
     printf("\n");
-    write_scalar(stdout, binary_output, &f32_info, &result_4699);
-    printf("\n");
-    write_scalar(stdout, binary_output, &f32_info, &result_4700);
-    printf("\n");
-    write_scalar(stdout, binary_output, &f32_info, &result_4701);
+    write_scalar(stdout, binary_output, &f32_info, &result_4208);
     printf("\n");
     {
         int32_t *arr = calloc(sizeof(int32_t), futhark_shape_i32_1d(ctx,
-                                                                    result_4702)[0]);
+                                                                    result_4209)[0]);
         
         assert(arr != NULL);
-        assert(futhark_values_i32_1d(ctx, result_4702, arr) == 0);
+        assert(futhark_values_i32_1d(ctx, result_4209, arr) == 0);
         write_array(stdout, binary_output, &i32_info, arr,
-                    futhark_shape_i32_1d(ctx, result_4702), 1);
+                    futhark_shape_i32_1d(ctx, result_4209), 1);
         free(arr);
     }
     printf("\n");
     {
         float *arr = calloc(sizeof(float), futhark_shape_f32_2d(ctx,
-                                                                result_4703)[0] *
-                            futhark_shape_f32_2d(ctx, result_4703)[1]);
+                                                                result_4210)[0] *
+                            futhark_shape_f32_2d(ctx, result_4210)[1]);
         
         assert(arr != NULL);
-        assert(futhark_values_f32_2d(ctx, result_4703, arr) == 0);
+        assert(futhark_values_f32_2d(ctx, result_4210, arr) == 0);
         write_array(stdout, binary_output, &f32_info, arr,
-                    futhark_shape_f32_2d(ctx, result_4703), 2);
+                    futhark_shape_f32_2d(ctx, result_4210), 2);
         free(arr);
     }
     printf("\n");
@@ -1331,10 +1320,8 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
     ;
     ;
     ;
-    ;
-    ;
-    assert(futhark_free_i32_1d(ctx, result_4702) == 0);
-    assert(futhark_free_f32_2d(ctx, result_4703) == 0);
+    assert(futhark_free_i32_1d(ctx, result_4209) == 0);
+    assert(futhark_free_f32_2d(ctx, result_4210) == 0);
 }
 typedef void entry_point_fun(struct futhark_context *);
 struct entry_point_entry {
@@ -1603,22 +1590,20 @@ void futhark_debugging_report(struct futhark_context *ctx)
     if (ctx->debugging) { }
 }
 static int futrts_main(struct futhark_context *ctx,
-                       int32_t *out_scalar_out_4669,
-                       int32_t *out_scalar_out_4670,
-                       int32_t *out_scalar_out_4671,
-                       int32_t *out_scalar_out_4672,
-                       int32_t *out_scalar_out_4673, float *out_scalar_out_4674,
-                       float *out_scalar_out_4675, float *out_scalar_out_4676,
-                       struct memblock *out_mem_p_4677,
-                       int32_t *out_out_arrsizze_4678,
-                       struct memblock *out_mem_p_4679,
-                       int32_t *out_out_arrsizze_4680,
-                       int32_t *out_out_arrsizze_4681,
-                       struct memblock mappingindices_mem_4635,
-                       struct memblock images_mem_4636, int32_t N_4570,
-                       int32_t m_4571, int32_t N_4572, int32_t trend_4573,
-                       int32_t k_4574, int32_t n_4575, float freq_4576,
-                       float hfrac_4577, float lam_4578);
+                       int32_t *out_scalar_out_4180,
+                       int32_t *out_scalar_out_4181,
+                       int32_t *out_scalar_out_4182, float *out_scalar_out_4183,
+                       float *out_scalar_out_4184, float *out_scalar_out_4185,
+                       struct memblock *out_mem_p_4186,
+                       int32_t *out_out_arrsizze_4187,
+                       struct memblock *out_mem_p_4188,
+                       int32_t *out_out_arrsizze_4189,
+                       int32_t *out_out_arrsizze_4190,
+                       struct memblock mappingindices_mem_4159,
+                       struct memblock images_mem_4160, int32_t N_4136,
+                       int32_t m_4137, int32_t N_4138, int32_t trend_4139,
+                       int32_t k_4140, int32_t n_4141, float freq_4142,
+                       float hfrac_4143, float lam_4144);
 static inline int8_t add8(int8_t x, int8_t y)
 {
     return x + y;
@@ -2512,143 +2497,123 @@ static inline double futrts_from_bits64(int64_t x)
     return p.t;
 }
 static int futrts_main(struct futhark_context *ctx,
-                       int32_t *out_scalar_out_4669,
-                       int32_t *out_scalar_out_4670,
-                       int32_t *out_scalar_out_4671,
-                       int32_t *out_scalar_out_4672,
-                       int32_t *out_scalar_out_4673, float *out_scalar_out_4674,
-                       float *out_scalar_out_4675, float *out_scalar_out_4676,
-                       struct memblock *out_mem_p_4677,
-                       int32_t *out_out_arrsizze_4678,
-                       struct memblock *out_mem_p_4679,
-                       int32_t *out_out_arrsizze_4680,
-                       int32_t *out_out_arrsizze_4681,
-                       struct memblock mappingindices_mem_4635,
-                       struct memblock images_mem_4636, int32_t N_4570,
-                       int32_t m_4571, int32_t N_4572, int32_t trend_4573,
-                       int32_t k_4574, int32_t n_4575, float freq_4576,
-                       float hfrac_4577, float lam_4578)
+                       int32_t *out_scalar_out_4180,
+                       int32_t *out_scalar_out_4181,
+                       int32_t *out_scalar_out_4182, float *out_scalar_out_4183,
+                       float *out_scalar_out_4184, float *out_scalar_out_4185,
+                       struct memblock *out_mem_p_4186,
+                       int32_t *out_out_arrsizze_4187,
+                       struct memblock *out_mem_p_4188,
+                       int32_t *out_out_arrsizze_4189,
+                       int32_t *out_out_arrsizze_4190,
+                       struct memblock mappingindices_mem_4159,
+                       struct memblock images_mem_4160, int32_t N_4136,
+                       int32_t m_4137, int32_t N_4138, int32_t trend_4139,
+                       int32_t k_4140, int32_t n_4141, float freq_4142,
+                       float hfrac_4143, float lam_4144)
 {
-    int32_t scalar_out_4654;
-    int32_t scalar_out_4655;
-    int32_t scalar_out_4656;
-    int32_t scalar_out_4657;
-    int32_t scalar_out_4658;
-    float scalar_out_4659;
-    float scalar_out_4660;
-    float scalar_out_4661;
-    struct memblock out_mem_4662;
+    int32_t scalar_out_4167;
+    int32_t scalar_out_4168;
+    int32_t scalar_out_4169;
+    float scalar_out_4170;
+    float scalar_out_4171;
+    float scalar_out_4172;
+    struct memblock out_mem_4173;
     
-    out_mem_4662.references = NULL;
+    out_mem_4173.references = NULL;
     
-    int32_t out_arrsizze_4663;
-    struct memblock out_mem_4664;
+    int32_t out_arrsizze_4174;
+    struct memblock out_mem_4175;
     
-    out_mem_4664.references = NULL;
+    out_mem_4175.references = NULL;
     
-    int32_t out_arrsizze_4665;
-    int32_t out_arrsizze_4666;
-    bool dim_zzero_4581 = 0 == m_4571;
-    bool dim_zzero_4582 = 0 == N_4572;
-    bool old_empty_4583 = dim_zzero_4581 || dim_zzero_4582;
-    bool dim_zzero_4584 = 0 == N_4570;
-    bool new_empty_4585 = dim_zzero_4581 || dim_zzero_4584;
-    bool both_empty_4586 = old_empty_4583 && new_empty_4585;
-    bool dim_match_4587 = N_4570 == N_4572;
-    bool empty_or_match_4588 = both_empty_4586 || dim_match_4587;
-    bool empty_or_match_cert_4589;
+    int32_t out_arrsizze_4176;
+    int32_t out_arrsizze_4177;
+    bool dim_zzero_4147 = 0 == m_4137;
+    bool dim_zzero_4148 = 0 == N_4138;
+    bool old_empty_4149 = dim_zzero_4147 || dim_zzero_4148;
+    bool dim_zzero_4150 = 0 == N_4136;
+    bool new_empty_4151 = dim_zzero_4147 || dim_zzero_4150;
+    bool both_empty_4152 = old_empty_4149 && new_empty_4151;
+    bool dim_match_4153 = N_4136 == N_4138;
+    bool empty_or_match_4154 = both_empty_4152 || dim_match_4153;
+    bool empty_or_match_cert_4155;
     
-    if (!empty_or_match_4588) {
-        ctx->error = msgprintf("Error at %s:\n%s\n", "insp-data.fut:3:1-15:61",
+    if (!empty_or_match_4154) {
+        ctx->error = msgprintf("Error at %s:\n%s\n", "insp-data.fut:3:1-16:60",
                                "function arguments of wrong shape");
-        if (memblock_unref(ctx, &out_mem_4664, "out_mem_4664") != 0)
+        if (memblock_unref(ctx, &out_mem_4175, "out_mem_4175") != 0)
             return 1;
-        if (memblock_unref(ctx, &out_mem_4662, "out_mem_4662") != 0)
+        if (memblock_unref(ctx, &out_mem_4173, "out_mem_4173") != 0)
             return 1;
         return 1;
     }
     
-    bool i_p_m_t_s_leq_w_4590 = slt32(1, m_4571);
-    bool index_certs_4591;
+    bool i_p_m_t_s_leq_w_4156 = slt32(1, m_4137);
+    bool index_certs_4157;
     
-    if (!i_p_m_t_s_leq_w_4590) {
+    if (!i_p_m_t_s_leq_w_4156) {
         ctx->error = msgprintf("Error at %s:\n%s%d%s%d%s%d%s\n",
-                               "insp-data.fut:3:1-15:61 -> insp-data.fut:13:7-17",
+                               "insp-data.fut:3:1-16:60 -> insp-data.fut:16:49-59",
                                "Index [", 0, ":", 2,
-                               "] out of bounds for array of shape [", m_4571,
+                               "] out of bounds for array of shape [", m_4137,
                                "].");
-        if (memblock_unref(ctx, &out_mem_4664, "out_mem_4664") != 0)
+        if (memblock_unref(ctx, &out_mem_4175, "out_mem_4175") != 0)
             return 1;
-        if (memblock_unref(ctx, &out_mem_4662, "out_mem_4662") != 0)
+        if (memblock_unref(ctx, &out_mem_4173, "out_mem_4173") != 0)
             return 1;
         return 1;
     }
     
-    int64_t binop_y_4639 = sext_i32_i64(N_4570);
-    int64_t binop_x_4640 = 2 * binop_y_4639;
-    int64_t bytes_4637 = 4 * binop_x_4640;
-    struct memblock mem_4641;
+    int64_t binop_y_4163 = sext_i32_i64(N_4136);
+    int64_t binop_x_4164 = 2 * binop_y_4163;
+    int64_t bytes_4161 = 4 * binop_x_4164;
+    struct memblock mem_4165;
     
-    mem_4641.references = NULL;
-    if (memblock_alloc(ctx, &mem_4641, bytes_4637, "mem_4641"))
+    mem_4165.references = NULL;
+    if (memblock_alloc(ctx, &mem_4165, bytes_4161, "mem_4165"))
         return 1;
-    for (int32_t i_4622 = 0; i_4622 < 2; i_4622++) {
-        for (int32_t i_4618 = 0; i_4618 < N_4570; i_4618++) {
-            float x_elem_4615 = ((float *) images_mem_4636.mem)[i_4622 *
-                                                                N_4572 +
-                                                                i_4618];
-            bool res_4613;
-            
-            res_4613 = futrts_isnan32(x_elem_4615);
-            
-            float res_4614;
-            
-            if (res_4613) {
-                res_4614 = -10000.0F;
-            } else {
-                res_4614 = x_elem_4615;
-            }
-            ((float *) mem_4641.mem)[i_4622 * N_4570 + i_4618] = res_4614;
+    for (int32_t i_4178 = 0; i_4178 < 2; i_4178++) {
+        for (int32_t i_4179 = 0; i_4179 < N_4136; i_4179++) {
+            ((float *) mem_4165.mem)[i_4178 * N_4136 + i_4179] =
+                ((float *) images_mem_4160.mem)[N_4138 * 0 + (i_4178 * N_4138 +
+                                                              i_4179)];
         }
     }
-    out_arrsizze_4663 = N_4570;
-    out_arrsizze_4665 = 2;
-    out_arrsizze_4666 = N_4570;
-    if (memblock_set(ctx, &out_mem_4662, &mappingindices_mem_4635,
-                     "mappingindices_mem_4635") != 0)
+    out_arrsizze_4174 = N_4136;
+    out_arrsizze_4176 = 2;
+    out_arrsizze_4177 = N_4136;
+    if (memblock_set(ctx, &out_mem_4173, &mappingindices_mem_4159,
+                     "mappingindices_mem_4159") != 0)
         return 1;
-    if (memblock_set(ctx, &out_mem_4664, &mem_4641, "mem_4641") != 0)
+    if (memblock_set(ctx, &out_mem_4175, &mem_4165, "mem_4165") != 0)
         return 1;
-    scalar_out_4654 = trend_4573;
-    scalar_out_4655 = k_4574;
-    scalar_out_4656 = m_4571;
-    scalar_out_4657 = n_4575;
-    scalar_out_4658 = N_4570;
-    scalar_out_4659 = freq_4576;
-    scalar_out_4660 = hfrac_4577;
-    scalar_out_4661 = lam_4578;
-    *out_scalar_out_4669 = scalar_out_4654;
-    *out_scalar_out_4670 = scalar_out_4655;
-    *out_scalar_out_4671 = scalar_out_4656;
-    *out_scalar_out_4672 = scalar_out_4657;
-    *out_scalar_out_4673 = scalar_out_4658;
-    *out_scalar_out_4674 = scalar_out_4659;
-    *out_scalar_out_4675 = scalar_out_4660;
-    *out_scalar_out_4676 = scalar_out_4661;
-    (*out_mem_p_4677).references = NULL;
-    if (memblock_set(ctx, &*out_mem_p_4677, &out_mem_4662, "out_mem_4662") != 0)
+    scalar_out_4167 = trend_4139;
+    scalar_out_4168 = k_4140;
+    scalar_out_4169 = n_4141;
+    scalar_out_4170 = freq_4142;
+    scalar_out_4171 = hfrac_4143;
+    scalar_out_4172 = lam_4144;
+    *out_scalar_out_4180 = scalar_out_4167;
+    *out_scalar_out_4181 = scalar_out_4168;
+    *out_scalar_out_4182 = scalar_out_4169;
+    *out_scalar_out_4183 = scalar_out_4170;
+    *out_scalar_out_4184 = scalar_out_4171;
+    *out_scalar_out_4185 = scalar_out_4172;
+    (*out_mem_p_4186).references = NULL;
+    if (memblock_set(ctx, &*out_mem_p_4186, &out_mem_4173, "out_mem_4173") != 0)
         return 1;
-    *out_out_arrsizze_4678 = out_arrsizze_4663;
-    (*out_mem_p_4679).references = NULL;
-    if (memblock_set(ctx, &*out_mem_p_4679, &out_mem_4664, "out_mem_4664") != 0)
+    *out_out_arrsizze_4187 = out_arrsizze_4174;
+    (*out_mem_p_4188).references = NULL;
+    if (memblock_set(ctx, &*out_mem_p_4188, &out_mem_4175, "out_mem_4175") != 0)
         return 1;
-    *out_out_arrsizze_4680 = out_arrsizze_4665;
-    *out_out_arrsizze_4681 = out_arrsizze_4666;
-    if (memblock_unref(ctx, &mem_4641, "mem_4641") != 0)
+    *out_out_arrsizze_4189 = out_arrsizze_4176;
+    *out_out_arrsizze_4190 = out_arrsizze_4177;
+    if (memblock_unref(ctx, &mem_4165, "mem_4165") != 0)
         return 1;
-    if (memblock_unref(ctx, &out_mem_4664, "out_mem_4664") != 0)
+    if (memblock_unref(ctx, &out_mem_4175, "out_mem_4175") != 0)
         return 1;
-    if (memblock_unref(ctx, &out_mem_4662, "out_mem_4662") != 0)
+    if (memblock_unref(ctx, &out_mem_4173, "out_mem_4173") != 0)
         return 1;
     return 0;
 }
@@ -2793,94 +2758,88 @@ int64_t *futhark_shape_i32_1d(struct futhark_context *ctx,
     return arr->shape;
 }
 int futhark_entry_main(struct futhark_context *ctx, int32_t *out0,
-                       int32_t *out1, int32_t *out2, int32_t *out3,
-                       int32_t *out4, float *out5, float *out6, float *out7,
-                       struct futhark_i32_1d **out8,
-                       struct futhark_f32_2d **out9, const int32_t in0, const
+                       int32_t *out1, int32_t *out2, float *out3, float *out4,
+                       float *out5, struct futhark_i32_1d **out6,
+                       struct futhark_f32_2d **out7, const int32_t in0, const
                        int32_t in1, const int32_t in2, const float in3, const
                        float in4, const float in5, const
                        struct futhark_i32_1d *in6, const
                        struct futhark_f32_2d *in7)
 {
-    struct memblock mappingindices_mem_4635;
+    struct memblock mappingindices_mem_4159;
     
-    mappingindices_mem_4635.references = NULL;
+    mappingindices_mem_4159.references = NULL;
     
-    struct memblock images_mem_4636;
+    struct memblock images_mem_4160;
     
-    images_mem_4636.references = NULL;
+    images_mem_4160.references = NULL;
     
-    int32_t N_4570;
-    int32_t m_4571;
-    int32_t N_4572;
-    int32_t trend_4573;
-    int32_t k_4574;
-    int32_t n_4575;
-    float freq_4576;
-    float hfrac_4577;
-    float lam_4578;
-    int32_t scalar_out_4654;
-    int32_t scalar_out_4655;
-    int32_t scalar_out_4656;
-    int32_t scalar_out_4657;
-    int32_t scalar_out_4658;
-    float scalar_out_4659;
-    float scalar_out_4660;
-    float scalar_out_4661;
-    struct memblock out_mem_4662;
+    int32_t N_4136;
+    int32_t m_4137;
+    int32_t N_4138;
+    int32_t trend_4139;
+    int32_t k_4140;
+    int32_t n_4141;
+    float freq_4142;
+    float hfrac_4143;
+    float lam_4144;
+    int32_t scalar_out_4167;
+    int32_t scalar_out_4168;
+    int32_t scalar_out_4169;
+    float scalar_out_4170;
+    float scalar_out_4171;
+    float scalar_out_4172;
+    struct memblock out_mem_4173;
     
-    out_mem_4662.references = NULL;
+    out_mem_4173.references = NULL;
     
-    int32_t out_arrsizze_4663;
-    struct memblock out_mem_4664;
+    int32_t out_arrsizze_4174;
+    struct memblock out_mem_4175;
     
-    out_mem_4664.references = NULL;
+    out_mem_4175.references = NULL;
     
-    int32_t out_arrsizze_4665;
-    int32_t out_arrsizze_4666;
+    int32_t out_arrsizze_4176;
+    int32_t out_arrsizze_4177;
     
     lock_lock(&ctx->lock);
-    trend_4573 = in0;
-    k_4574 = in1;
-    n_4575 = in2;
-    freq_4576 = in3;
-    hfrac_4577 = in4;
-    lam_4578 = in5;
-    mappingindices_mem_4635 = in6->mem;
-    N_4570 = in6->shape[0];
-    images_mem_4636 = in7->mem;
-    m_4571 = in7->shape[0];
-    N_4572 = in7->shape[1];
+    trend_4139 = in0;
+    k_4140 = in1;
+    n_4141 = in2;
+    freq_4142 = in3;
+    hfrac_4143 = in4;
+    lam_4144 = in5;
+    mappingindices_mem_4159 = in6->mem;
+    N_4136 = in6->shape[0];
+    images_mem_4160 = in7->mem;
+    m_4137 = in7->shape[0];
+    N_4138 = in7->shape[1];
     
-    int ret = futrts_main(ctx, &scalar_out_4654, &scalar_out_4655,
-                          &scalar_out_4656, &scalar_out_4657, &scalar_out_4658,
-                          &scalar_out_4659, &scalar_out_4660, &scalar_out_4661,
-                          &out_mem_4662, &out_arrsizze_4663, &out_mem_4664,
-                          &out_arrsizze_4665, &out_arrsizze_4666,
-                          mappingindices_mem_4635, images_mem_4636, N_4570,
-                          m_4571, N_4572, trend_4573, k_4574, n_4575, freq_4576,
-                          hfrac_4577, lam_4578);
+    int ret = futrts_main(ctx, &scalar_out_4167, &scalar_out_4168,
+                          &scalar_out_4169, &scalar_out_4170, &scalar_out_4171,
+                          &scalar_out_4172, &out_mem_4173, &out_arrsizze_4174,
+                          &out_mem_4175, &out_arrsizze_4176, &out_arrsizze_4177,
+                          mappingindices_mem_4159, images_mem_4160, N_4136,
+                          m_4137, N_4138, trend_4139, k_4140, n_4141, freq_4142,
+                          hfrac_4143, lam_4144);
     
     if (ret == 0) {
-        *out0 = scalar_out_4654;
-        *out1 = scalar_out_4655;
-        *out2 = scalar_out_4656;
-        *out3 = scalar_out_4657;
-        *out4 = scalar_out_4658;
-        *out5 = scalar_out_4659;
-        *out6 = scalar_out_4660;
-        *out7 = scalar_out_4661;
-        assert((*out8 =
+        *out0 = scalar_out_4167;
+        *out1 = scalar_out_4168;
+        *out2 = scalar_out_4169;
+        *out3 = scalar_out_4170;
+        *out4 = scalar_out_4171;
+        *out5 = scalar_out_4172;
+        assert((*out6 =
                 (struct futhark_i32_1d *) malloc(sizeof(struct futhark_i32_1d))) !=
             NULL);
-        (*out8)->mem = out_mem_4662;
-        (*out8)->shape[0] = out_arrsizze_4663;
-        assert((*out9 =
+        (*out6)->mem = out_mem_4173;
+        (*out6)->shape[0] = out_arrsizze_4174;
+        assert((*out7 =
                 (struct futhark_f32_2d *) malloc(sizeof(struct futhark_f32_2d))) !=
             NULL);
-        (*out9)->mem = out_mem_4664;
-        (*out9)->shape[0] = out_arrsizze_4665;
-        (*out9)->shape[1] = out_arrsizze_4666;
+        (*out7)->mem = out_mem_4175;
+        (*out7)->shape[0] = out_arrsizze_4176;
+        (*out7)->shape[1] = out_arrsizze_4177;
     }
     lock_unlock(&ctx->lock);
     return ret;

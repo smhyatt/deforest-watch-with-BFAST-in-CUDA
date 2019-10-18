@@ -12,4 +12,5 @@ let sample = map (\row -> map(\j -> let pixel = row[j] in
         ) (iota N)
     ) images[0:2]
 in
-(trend, k, m, n, N, freq, hfrac, lam, mappingindices, sample)
+-- (trend, k, m, n, N, freq, hfrac, lam, mappingindices, sample)
+(trend, k, n, freq, hfrac, lam, mappingindices, images[0:2])

@@ -20,7 +20,7 @@ let logplus (x: f32) : f32 =
 
 let adjustValInds [N] (n : i32) (ns : i32) (Ns : i32) (val_inds : [N]i32) (ind: i32) : i32 =
     if ind < Ns - ns then (unsafe val_inds[ind+ns]) - n else -1
--- returns some sort of indexing (for a scatter). 
+-- returns some sort of indexing (for a scatter).
 
 
 -- filterPadWithKeys (\y -> !(f32.isnan y)) (f32.nan) y_error_all
@@ -260,7 +260,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
                                 else if j == 0 then MO_fst
                                 else unsafe (-y_error[ns-h+j] + y_error[ns+j])
                          ) (iota Nmn) |> scan (+) 0.0
-            
+
             -- [0,1,2,3,...,Nmn]
             -- Makes some signal processing of the timeline/errors/predictions.
             -- MO:[float,float,..,Nmn] (an accumulated value based on y_errors, Ns, ns, MO_fst and h.)
@@ -302,15 +302,16 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
             -- 1:fst_break':[int,-1,int,-1,...,LEN]
             -- 2:fst_break':[int,-2,int,...,-2,-1,...,LEN]
             -- val_inds':[int,int,int,...,Nmn] (another indexing)
-            -- MO':[float,float,..,Nmn] 
+            -- MO':[float,float,..,Nmn]
             -- MO'':[MO',MO',nan,nan,MO',...,Nmn]
 
         ) |> unzip4
-        
-        -- return:(MO'':[MO',MO',nan,nan,MO',...,Nmn], MO':[float,float,..,Nmn], 
+
+        -- return:(MO'':[MO',MO',nan,nan,MO',...,Nmn], MO':[float,float,..,Nmn],
         --         fst_break':[int,-2,int,...,-2,-1,...,LEN], mean:[float,float,...,Nmn])
 
-  in (breaks, means)
+    --                                            yhat   , errors,   Valids, validIdxs
+  in (breaks, means, Xt, Xsqr, Xinv, beta0, beta, y_preds, y_errors, Nss, val_indss)
   -- (breaks:fst_break':[int,-2,int,...,-2,-1,...,LEN], means:mean:[float,float,...,Nmn])
 
 

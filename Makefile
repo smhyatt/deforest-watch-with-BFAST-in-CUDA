@@ -8,7 +8,7 @@ cmd:
 
 insp:
 	futhark c insp-data.fut
-	./insp-data < data/peru.in > data/testset.in
+	./insp-data < data/peru.in > data/testset_peru_2pix.in
 
 gaussjordan: gaussjordan.c
 	$(CC) $(CFLAGS) gaussjordan.c
