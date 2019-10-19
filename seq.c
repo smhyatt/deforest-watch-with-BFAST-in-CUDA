@@ -83,7 +83,7 @@ float dotProdFilt(float* Xvct, float* XTvct, float* yvct) {
     for (uint i = 0; i < n; i++) {
         if (yvct[i] != F32_MIN) {
             acc += Xvct[i] * XTvct[i];
-        } 
+        }
     }
     return acc;
 }
@@ -226,7 +226,7 @@ void doubleDown(float* XsqrInv, float* XsqrInvLess, uint K) {
 void mkXsqr(float* Xsqr, float* XsqrInv, uint K) {
     uint cols = 2*K;        // 2*8=16
     uint identIdx = K*cols; // 8*16=128
-    
+
     for (uint i = 0; i < K; i++){
         for (uint j = 0; j < K; j++){
             // 1*8+0
@@ -344,7 +344,7 @@ void ker6(float* XT, float* B, uint K, float* yhat) {
     for (uint pix = 0; pix < m; pix++) {
         mvMul(XT, &B[pix*K], N, K, &yhat[pix*N]);
     }
-    
+
 }
 
 
@@ -385,12 +385,12 @@ void filterNaNsWKeys(float* diffVct, uint* valid, float* y_errors, float* val_in
         uint check = (diffVct[i] != F32_MIN);
         *valid  += check;
         uint ind = (check * (*valid) - 1);
-        
+
         if (ind != -1) {
             y_errors[idx]    = diffVct[i];
             val_indss[idx] = i;
             idx++;
-        } 
+        }
     }
 
     // for (int i = 0; i < N; i++) {
@@ -463,14 +463,14 @@ void comp(float* yh, float* y_errors, uint K, int* hs, uint* nss, float* sigmas)
 void ker8(float* y_errors, uint K, int* hs, uint* nss, float* sigmas) {
     for (uint pix = 0; pix < m; pix++) {
         comp(&sample[pix][0], &y_errors[pix*N], K, &hs[pix], &nss[pix], &sigmas[pix]);
-    }    
+    }
 }
 
 
-void MOcomp(int hmax, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
+void MO_fsts_comp(int hmax, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
 
     for (int i = 0; i < hmax; i++) {
-        
+
         if (i < *hs) {
             uint idx = i + *nss - *hs + 1;
             *MO_fsts += y_errors[idx];
@@ -489,10 +489,54 @@ void ker9(int* hs, float* y_errors, uint* nss, float* MO_fsts) {
     }
 
     for (uint pix = 0; pix < m; pix++) {
-        MOcomp(hmax, &hs[pix], &y_errors[pix*N], &nss[pix], &MO_fsts[pix]);
+        MO_fsts_comp(hmax, &hs[pix], &y_errors[pix*N], &nss[pix], &MO_fsts[pix]);
     }
 }
 
+float logplus(float x){
+    if(x>exp(1.0)){
+        return log(x);
+    } else {
+        return 1.0;
+    }
+}
+
+
+void compBound(float* b){
+    for (uint i = 0; i < (N-n); i++){
+        uint t = n+i;
+        int time = mappingindices[t];
+        float tmp = logplus((float)time / (float)mappingindices[N-1]);
+        b[i] = lam * sqrt(tmp);
+    }
+}
+
+void MO_comp(uint Nmn, int* h, float* MO_fst, float* y_error, uint* Ns, uint* ns, float* MO){
+    float acc = 0.0;
+    for (uint i = 0; i < Nmn; i++){
+        if(i >= *Ns-*ns){
+            MO[i] = acc;
+        } else if(i==0) {
+            acc += *MO_fst;
+            MO[i] = acc;
+        } else {
+            acc += - y_error[*ns - *h + i] + y_error[*ns + i];
+            MO[i] = acc;
+        }
+    }
+}
+
+void ker10(float* bound, uint* Nss, uint* nss, float* sigmas, int* hs,
+           float* MO_fsts, float* y_errors, uint* val_inds){
+    compBound(bound);
+    uint Nmn = N-n;
+    float* MO = calloc(Nmn*m,sizeof(float));
+    for (uint pix = 0; pix < m; pix++){
+        MO_comp(Nmn, &hs[pix], &MO_fsts[pix], &y_errors[pix*N], &Nss[pix], &nss[pix], &MO[pix*Nmn]);
+    }
+
+    free(MO);
+}
 
 
 int main(int argc, char const *argv[]) {
@@ -537,7 +581,7 @@ int main(int argc, char const *argv[]) {
     //         printf(" %lf ", sample[i][j]);
     //     }
     //     printf("\n");
-    // }    
+    // }
 
     // printf("\n****** Printing XT ******\n");
     // for (size_t i = 0; i < N; i++){
@@ -640,9 +684,9 @@ int main(int argc, char const *argv[]) {
     float* y_errors_all = calloc(m*N,sizeof(float));
     float* val_indss    = calloc(m*N,sizeof(float));
     float* y_errors     = calloc(m*N,sizeof(float));
-    
-    for (int i = 0; i < m*N; i++) { y_errors[i] = F32_MIN; }   
-    
+
+    for (int i = 0; i < m*N; i++) { y_errors[i] = F32_MIN; }
+
     ker7(yhat, y_errors_all, Nss, y_errors, val_indss);
 
     printf("\n****** Printing Nss ******\n");
@@ -696,6 +740,15 @@ int main(int argc, char const *argv[]) {
 
     float* MO_fsts = calloc(m,sizeof(float));
     ker9(hs, y_errors, nss, MO_fsts);
+
+    printf("\n****** Printing MO_fsts ******\n");
+    for (uint i = 0; i < m; i++){
+        printf("%f, ", MO_fsts[i]);
+    }
+    printf("\n");
+
+    float* bound = calloc(N-n,sizeof(float));
+    ker10(bound);
 
     printf("\n****** Printing MO_fsts ******\n");
     for (uint i = 0; i < m; i++){
