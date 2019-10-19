@@ -348,7 +348,7 @@ void ker6(float* XT, float* B, uint K, float* yhat) {
 //   in  (zip rs ks, i)
 
 
-void filterNaNsWKeys(float* diffVct, uint* valid, float* errors, float* validIdxs) {
+void filterNaNsWKeys(float* diffVct, uint* valid, float* y_errors, float* val_indss) {
     uint idx = 0;
     *valid   = 0;
 
@@ -358,8 +358,8 @@ void filterNaNsWKeys(float* diffVct, uint* valid, float* errors, float* validIdx
         uint ind = (check * (*valid) - 1);
         
         if (ind != -1) {
-            errors[idx]    = diffVct[i];
-            validIdxs[idx] = i;
+            y_errors[idx]    = diffVct[i];
+            val_indss[idx] = i;
             idx++;
         } 
     }
@@ -369,8 +369,8 @@ void filterNaNsWKeys(float* diffVct, uint* valid, float* errors, float* validIdx
     //     acc    += tfs[i];
     //     inds[i] = tfs[i] * acc - 1;
     //     if (inds[i] != -1) {
-    //         errors[idx]    = diffVct[i];
-    //         validIdxs[idx] = i;
+    //         y_errors[idx]    = diffVct[i];
+    //         val_indss[idx] = i;
     //         idx++;
     //     }
     // }
@@ -379,7 +379,7 @@ void filterNaNsWKeys(float* diffVct, uint* valid, float* errors, float* validIdx
 
 
 
-  // let (Nss, y_errors, val_indss) = ( intrinsics.opaque <| unzip3 <|
+  // let (Nss, y_y_errors, val_indss) = ( intrinsics.opaque <| unzip3 <|
   //   -- y p
   //   map2 (\y y_pred ->
   //           let y_error_all = zip y y_pred |>
@@ -394,20 +394,20 @@ void filterNaNsWKeys(float* diffVct, uint* valid, float* errors, float* validIdx
 
 
 // let (N,r,I)= map2 (-) y yˆ |> filterNaNsWKeys
-void ker7(float* yhat, float* diffs, uint* valids, float* errors, float* validIdxs) {
+void ker7(float* yhat, float* y_errors_all, uint* Nss, float* y_errors, float* val_indss) {
     for (uint pix = 0; pix < m; pix++) {
         for (uint i = 0; i < N; i++) {
             float y  = sample[pix][i];
             float yh = yhat[pix*N + i];
 
             if (y != F32_MIN) {
-                diffs[pix*N + i] = y-yh;
+                y_errors_all[pix*N + i] = y-yh;
             } else {
-                diffs[pix*N + i] = F32_MIN;
+                y_errors_all[pix*N + i] = F32_MIN;
             }
         }
 
-        filterNaNsWKeys(&diffs[pix*N], &valids[pix], &errors[pix*N], &validIdxs[pix*N]);
+        filterNaNsWKeys(&y_errors_all[pix*N], &Nss[pix], &y_errors[pix*N], &val_indss[pix*N]);
 
     }
 }
@@ -545,36 +545,36 @@ int main(int argc, char const *argv[]) {
     }
     printf("\n");
 
-    uint* valids     = calloc(m,sizeof(uint));
-    float* diffs     = calloc(m*N,sizeof(float));
-    float* validIdxs = calloc(m*N,sizeof(float));
-    float* errors    = calloc(m*N,sizeof(float));
+    uint* Nss     = calloc(m,sizeof(uint));
+    float* y_errors_all     = calloc(m*N,sizeof(float));
+    float* val_indss = calloc(m*N,sizeof(float));
+    float* y_errors    = calloc(m*N,sizeof(float));
     
-    for (int i = 0; i < m*N; i++) { errors[i] = F32_MIN; }   
+    for (int i = 0; i < m*N; i++) { y_errors[i] = F32_MIN; }   
     
-    ker7(yhat, diffs, valids, errors, validIdxs);
+    ker7(yhat, y_errors_all, Nss, y_errors, val_indss);
 
-    printf("\n****** Printing valids ******\n");
+    printf("\n****** Printing Nss ******\n");
     for (uint i = 0; i < m; i++){
-        printf("%d, ", valids[i]);
+        printf("%d, ", Nss[i]);
     }
     printf("\n");
 
-    printf("\n****** Printing errors ******\n");
+    printf("\n****** Printing y_errors ******\n");
     for (uint i = 0; i < m; i++){
         for (int j = 0; j < N; j++) {
             uint index = i*N + j;
-            printf("%f, ", errors[index]);
+            printf("%f, ", y_errors[index]);
         }
         printf("\n");
     }
     printf("\n");
 
-    printf("\n****** Printing validIdxs ******\n");
+    printf("\n****** Printing val_indss ******\n");
     for (uint i = 0; i < m; i++){
         for (int j = 0; j < N; j++) {
             uint index = i*N + j;
-            printf("%f, ", validIdxs[index]);
+            printf("%f, ", val_indss[index]);
         }
         printf("\n");
     }
@@ -588,10 +588,10 @@ int main(int argc, char const *argv[]) {
     free(B0);
     free(B);
     free(yhat);
-    free(diffs);
-    free(valids);
-    free(errors);
-    free(validIdxs);
+    free(y_errors_all);
+    free(Nss);
+    free(y_errors);
+    free(val_indss);
 
 	return 0;
 }
