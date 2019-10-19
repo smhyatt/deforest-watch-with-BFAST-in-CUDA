@@ -2540,7 +2540,7 @@ static int futrts_main(struct futhark_context *ctx,
     bool empty_or_match_cert_4155;
     
     if (!empty_or_match_4154) {
-        ctx->error = msgprintf("Error at %s:\n%s\n", "insp-data.fut:3:1-16:60",
+        ctx->error = msgprintf("Error at %s:\n%s\n", "insp-data.fut:3:1-15:60",
                                "function arguments of wrong shape");
         if (memblock_unref(ctx, &out_mem_4175, "out_mem_4175") != 0)
             return 1;
@@ -2554,7 +2554,7 @@ static int futrts_main(struct futhark_context *ctx,
     
     if (!i_p_m_t_s_leq_w_4156) {
         ctx->error = msgprintf("Error at %s:\n%s%d%s%d%s%d%s\n",
-                               "insp-data.fut:3:1-16:60 -> insp-data.fut:16:49-59",
+                               "insp-data.fut:3:1-15:60 -> insp-data.fut:15:49-59",
                                "Index [", 0, ":", 2,
                                "] out of bounds for array of shape [", m_4137,
                                "].");
