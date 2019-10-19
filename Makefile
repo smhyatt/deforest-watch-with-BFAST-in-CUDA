@@ -15,3 +15,6 @@ gaussjordan: gaussjordan.c
 
 clean:
 	rm a.out
+
+filtertypes:
+	python3 filtertypes.py
