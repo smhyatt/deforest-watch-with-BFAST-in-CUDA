@@ -495,8 +495,6 @@ void ker9(int* hs, float* y_errors, uint* nss, float* MO_fsts) {
 
 
 
-
-
 int main(int argc, char const *argv[]) {
 
 	if (argc > 1) {
