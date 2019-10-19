@@ -223,7 +223,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
   ---------------------------------------------
   -- ker9
   let hmax = reduce_comm (i32.max) 0 hs
-  -- sum(h)
+  -- find max h value
   let MO_fsts = zip3 y_errors nss hs |>
     map (\(y_error, ns, h) -> unsafe
             map (\i -> if i < h then unsafe y_error[i + ns-h+1] else 0.0) (iota hmax)
@@ -232,7 +232,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
             -- float
         )
         |> intrinsics.opaque
-  -- [float,float,...]
+  -- [float,float,...,m]
 
   -- ker10
   let BOUND = map (\q -> let t   = n+1+q

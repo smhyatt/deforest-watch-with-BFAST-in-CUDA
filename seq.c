@@ -5,6 +5,7 @@
 
 #define PI 3.14159265
 #define F32_MIN -FLT_MAX
+#define I32_MIN -2147483648
 typedef unsigned int uint;
 
 // (trend: i32) (k: i32) (n: i32) (freq: f32) (hfrac: f32) (lam: f32) (mappingindices : [N]i32) (images : [m][N]f32)
@@ -264,7 +265,7 @@ void ker3(float* Xsqr, float* XsqrInv, uint K){
     uint identIdx = K*cols; // 8*16=128
 
     for (int pix = 0; pix < m; pix++) {
-        mkXsqr(&Xsqr[pix*K], &XsqrInv[pix*identIdx], K);
+        mkXsqr(&Xsqr[pix*(K*K)], &XsqrInv[pix*identIdx], K);
         gaussJordan(&XsqrInv[pix*identIdx], cols, K);
     }
 
@@ -330,9 +331,9 @@ void mvMul(float* M, float* v, uint rows, uint cols, float* res_v) {
 
 
 // let β = mvMul Xsqr−1 β0
-void ker5(float* XsqrInv, uint K, float* B0, float* B){
+void ker5(float* XsqrInvLess, uint K, float* B0, float* B){
     for (uint pix = 0; pix < m; pix++) {
-        mvMul(XsqrInv, &B0[pix*K], K, K, &B[pix*K]);
+        mvMul(&XsqrInvLess[pix*(K*K)], &B0[pix*K], K, K, &B[pix*K]);
     }
 }
 
@@ -405,8 +406,6 @@ void filterNaNsWKeys(float* diffVct, uint* valid, float* y_errors, float* val_in
 
 }
 
-
-
   // let (Nss, y_y_errors, val_indss) = ( intrinsics.opaque <| unzip3 <|
   //   -- y p
   //   map2 (\y y_pred ->
@@ -440,6 +439,64 @@ void ker7(float* yhat, float* y_errors_all, uint* Nss, float* y_errors, float* v
     }
 }
 
+
+
+void comp(float* yh, float* y_errors, uint K, int* hs, uint* nss, float* sigmas) {
+    float acc = 0.0;
+
+    for (uint i = 0; i < n; i++) {
+        *nss += (yh[i] != F32_MIN);
+    }
+
+    for (uint j = 0; j < n; j++) {
+        if (j < *nss) {
+            float y_err = y_errors[j];
+            acc += y_err*y_err;
+        }
+    }
+    *sigmas = sqrt(acc/((float)(*nss-K)));
+    *hs = (int)(((float)*nss) * hfrac);
+}
+
+
+
+void ker8(float* y_errors, uint K, int* hs, uint* nss, float* sigmas) {
+    for (uint pix = 0; pix < m; pix++) {
+        comp(&sample[pix][0], &y_errors[pix*N], K, &hs[pix], &nss[pix], &sigmas[pix]);
+    }    
+}
+
+
+void MOcomp(int hmax, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
+
+    for (int i = 0; i < hmax; i++) {
+        
+        if (i < *hs) {
+            uint idx = i + *nss - *hs + 1;
+            *MO_fsts += y_errors[idx];
+        }
+    }
+}
+
+
+void ker9(int* hs, float* y_errors, uint* nss, float* MO_fsts) {
+    int hmax = I32_MIN;
+    for (int i = 0; i < m; i++) {
+        int cur = hs[i];
+        if (cur >= hmax) {
+            hmax = cur;
+        }
+    }
+
+    for (uint pix = 0; pix < m; pix++) {
+        MOcomp(hmax, &hs[pix], &y_errors[pix*N], &nss[pix], &MO_fsts[pix]);
+    }
+}
+
+
+
+
+
 int main(int argc, char const *argv[]) {
 
 	if (argc > 1) {
@@ -466,14 +523,14 @@ int main(int argc, char const *argv[]) {
     ker1(K,freq,X);
     transpose(K,X,XT);
 
-    printf("\n****** Printing X ******\n");
-    for (size_t i = 0; i < 1; i++){ // i < K
-        for (size_t j = 0; j < n; j++){
-            uint index = i*N + j;
-            printf(" %f ", X[index]);
-        }
-        printf("\n");
-    }
+    // printf("\n****** Printing X ******\n");
+    // for (size_t i = 0; i < 1; i++){ // i < K
+    //     for (size_t j = 0; j < n; j++){
+    //         uint index = i*N + j;
+    //         printf(" %f ", X[index]);
+    //     }
+    //     printf("\n");
+    // }
 
     // printf("\n****** Printing Y ******\n");
     // uint Ylen = sizeof(sample)/sizeof(sample[0]);
@@ -581,10 +638,10 @@ int main(int argc, char const *argv[]) {
     }
     printf("\n");
 
-    uint* Nss     = calloc(m,sizeof(uint));
-    float* y_errors_all     = calloc(m*N,sizeof(float));
-    float* val_indss = calloc(m*N,sizeof(float));
-    float* y_errors    = calloc(m*N,sizeof(float));
+    uint* Nss           = calloc(m,sizeof(uint));
+    float* y_errors_all = calloc(m*N,sizeof(float));
+    float* val_indss    = calloc(m*N,sizeof(float));
+    float* y_errors     = calloc(m*N,sizeof(float));
     
     for (int i = 0; i < m*N; i++) { y_errors[i] = F32_MIN; }   
     
@@ -616,6 +673,38 @@ int main(int argc, char const *argv[]) {
     }
     printf("\n");
 
+    int* hs       = calloc(m,sizeof(int));
+    uint* nss     = calloc(m,sizeof(uint));
+    float* sigmas = calloc(m,sizeof(float));
+    ker8(y_errors, K, hs, nss, sigmas);
+
+    printf("\n****** Printing hs ******\n");
+    for (uint i = 0; i < m; i++){
+        printf("%d, ", hs[i]);
+    }
+    printf("\n");
+
+    printf("\n****** Printing nss ******\n");
+    for (uint i = 0; i < m; i++){
+        printf("%u, ", nss[i]);
+    }
+    printf("\n");
+
+    printf("\n****** Printing sigmas ******\n");
+    for (uint i = 0; i < m; i++){
+        printf("%f, ", sigmas[i]);
+    }
+    printf("\n");
+
+    float* MO_fsts = calloc(m,sizeof(float));
+    ker9(hs, y_errors, nss, MO_fsts);
+
+    printf("\n****** Printing MO_fsts ******\n");
+    for (uint i = 0; i < m; i++){
+        printf("%f, ", MO_fsts[i]);
+    }
+    printf("\n");
+
 
     free(X);
     free(XT);
@@ -628,6 +717,10 @@ int main(int argc, char const *argv[]) {
     free(Nss);
     free(y_errors);
     free(val_indss);
+    free(hs);
+    free(nss);
+    free(sigmas);
+    free(MO_fsts);
 
 	return 0;
 }
