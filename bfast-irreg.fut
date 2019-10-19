@@ -311,7 +311,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
         --         fst_break':[int,-2,int,...,-2,-1,...,LEN], mean:[float,float,...,Nmn])
 
     --                                            yhat   , errors,   Valids, validIdxs
-  in (breaks, means, Xt, Xsqr, Xinv, beta0, beta, y_preds, y_errors, Nss, val_indss)
+  in (breaks, means, Xt, Xsqr, Xinv, beta0, beta, y_preds, y_errors, Nss, val_indss, hs, nss, sigmas, MO_fsts)
   -- (breaks:fst_break':[int,-2,int,...,-2,-1,...,LEN], means:mean:[float,float,...,Nmn])
 
 

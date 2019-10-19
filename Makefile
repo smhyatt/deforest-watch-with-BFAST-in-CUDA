@@ -19,3 +19,6 @@ clean:
 
 filtertypes:
 	python3 filtertypes.py
+
+decompress:
+	gzip -k -d data/sahara.in
