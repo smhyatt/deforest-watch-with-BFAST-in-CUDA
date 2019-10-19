@@ -511,7 +511,8 @@ void compBound(float* b){
     }
 }
 
-void MO_comp(uint Nmn, int* h, float* MO_fst, float* y_error, uint* Ns, uint* ns, float* MO){
+void MO_comp(uint Nmn, int* h, float* MO_fst, float* y_error, uint* Ns,
+             uint* ns, float* MO){
     float acc = 0.0;
     for (uint i = 0; i < Nmn; i++){
         if(i >= *Ns-*ns){
@@ -526,13 +527,53 @@ void MO_comp(uint Nmn, int* h, float* MO_fst, float* y_error, uint* Ns, uint* ns
     }
 }
 
+void MO_prime_comp(float* MO, uint* ns, float sigma, float* MOp){
+    for (uint i = 0; i < N-n; i++){
+        float mo = MO[i];
+        MOp[i] = mo / (sigma * (sqrt( (float)ns ));
+    }
+}
+
+void breaks(float* MOp, float* bound, uint Ns, uint ns, uint Nmn, int* isBreak, int* fstBreak){
+    int* isB = calloc(Nmn, sizeof(int));
+    int* fstB = calloc(Nmn, sizeof(int));
+
+    for (uint i = 0; i < Nmn; i++){
+        float mop = MOp[i];
+        fstB[i] = i
+        if(i < Ns-ns && mop != F32_MIN){
+            isB[i] = abs(mop) > bound[i];
+        } else {
+            isB[i] = 0;
+        }
+    }
+
+    for (uint i = 0; i < Nmn; i++){
+        if(isB[i] == 1) {
+            fstBreak += fstB[i];
+            isBreak = 1;
+        } else if(isB[i+1] == 1) {
+            fstBreak += fstB[i+1];
+            isBreak = 1;
+        } else {
+            fstBreak += fstB[i];
+            isBreak = isB[i];
+        }
+    }
+}
+
 void ker10(float* bound, uint* Nss, uint* nss, float* sigmas, int* hs,
-           float* MO_fsts, float* y_errors, uint* val_inds){
+           float* MO_fsts, float* y_errors, uint* val_inds, float* MOp){
     compBound(bound);
     uint Nmn = N-n;
     float* MO = calloc(Nmn*m,sizeof(float));
+    int* isBreak = calloc(m,sizeof(int));
+    int* fstBreak = calloc(m,sizeof(int));
+
     for (uint pix = 0; pix < m; pix++){
         MO_comp(Nmn, &hs[pix], &MO_fsts[pix], &y_errors[pix*N], &Nss[pix], &nss[pix], &MO[pix*Nmn]);
+        MO_prime_comp(&MO[pix*Nmn], &nss[pix], sigmas[pix], &MOp[pix*Nmn]);
+        breaks(&MOp[pix*Nmn], bound, Nss[pix], nss[pix], Nmn, &isBreak[pix], &fstBreak[pix]);
     }
 
     free(MO);
@@ -748,7 +789,8 @@ int main(int argc, char const *argv[]) {
     printf("\n");
 
     float* bound = calloc(N-n,sizeof(float));
-    ker10(bound);
+    float* MOp = calloc(m*(N-n)),sizeof(float));
+    ker10(bound, Nss, nss, sigmas, hs, MO_fsts, y_errors, val_inds, MOp);
 
     printf("\n****** Printing MO_fsts ******\n");
     for (uint i = 0; i < m; i++){
@@ -772,6 +814,8 @@ int main(int argc, char const *argv[]) {
     free(nss);
     free(sigmas);
     free(MO_fsts);
+    free(bound);
+    free(MOp);
 
 	return 0;
 }
