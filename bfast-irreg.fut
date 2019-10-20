@@ -249,7 +249,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
   ---------------------------------------------
   -- 8. moving sums computation:             --
   ---------------------------------------------
-  let (_MOs, _MOs_NN, breaks, means) = zip (zip4 Nss nss sigmas hs) (zip3 MO_fsts y_errors val_indss) |>
+  let (MOs, MOs_NN, breaks, means) = zip (zip4 Nss nss sigmas hs) (zip3 MO_fsts y_errors val_indss) |>
     -- (Nss:[#valid,#valid,...,N], nss:[#valid,#valid,...,n], sigmas:[float,float,...,n], hs[int,int,...,n])
     -- (Ns:valid-float, ns:valid-float, sigma:float, h:int)
     -- (MO_fsts:[float,float,...,hmax], y_errors:[float,float,...,nan,nan,...,N], val_indss:[1,3,..,0,0,..,N])
@@ -311,7 +311,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
         --         fst_break':[int,-2,int,...,-2,-1,...,LEN], mean:[float,float,...,Nmn])
 
     --                                            yhat   , errors,   Valids, validIdxs
-  in (breaks, means, Xt, Xsqr, Xinv, beta0, beta, y_preds, y_errors, Nss, val_indss, hs, nss, sigmas, MO_fsts)
+  in (MOs, MOs_NN, breaks, means, Xt, Xsqr, Xinv, beta0, beta, y_preds, y_errors, Nss, val_indss, hs, nss, sigmas, MO_fsts)
   -- (breaks:fst_break':[int,-2,int,...,-2,-1,...,LEN], means:mean:[float,float,...,Nmn])
 
 
