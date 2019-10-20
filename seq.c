@@ -620,16 +620,21 @@ void valIndsPComp(uint Nmn, uint ns, uint Ns, int* fstBreak, uint* val_inds, uin
 
 
 void MOppComp(uint Nmn, float* MOp, uint* val_indsP, float* MOpp) {
+     printf("Nmn: %u\n", Nmn);
     for (int i = 0; i < Nmn; i++) {
-        if (val_indsP[i] != -1 || val_indsP[i] != -2) {
-            MOpp[ val_indsP[i] ] = MOp[i];
+        uint currIdx = val_indsP[i];
+        // if (currIdx != -1 || currIdx != -2) {
+        printf("1: currIdx: %u, MOpp: %f, MOp: %f\n",currIdx, MOpp[ currIdx ], MOp[i]);
+        if (currIdx != -1 ) {
+            MOpp[ currIdx ] = MOp[i];
+            // printf("2: currIdx: %u, MOpp: %f, MOp: %f\n",currIdx, MOpp[ currIdx ], MOp[i]);
         }
     }
 }
 
 
-void ker10(float* bound, uint* Nss, uint* nss, float* sigmas, int* hs, 
-           float* MO_fsts, float* y_errors, uint* val_indss, float* MOp, 
+void ker10(float* bound, uint* Nss, uint* nss, float* sigmas, int* hs,
+           float* MO_fsts, float* y_errors, uint* val_indss, float* MOp,
            float* means, int* fstBreakP, float* MOpp){
 
     compBound(bound);
@@ -641,19 +646,25 @@ void ker10(float* bound, uint* Nss, uint* nss, float* sigmas, int* hs,
     uint* val_indssP = calloc(m*Nmn,sizeof(uint));
 
     for (uint pix = 0; pix < m; pix++){
+        printf("\n---0----\n");
         MO_comp(Nmn, &hs[pix], &MO_fsts[pix], &y_errors[pix*N], &Nss[pix], &nss[pix], &MO[pix*Nmn]);
-
+        printf("\n---1----\n");
         MO_prime_comp(&MO[pix*Nmn], &nss[pix], sigmas[pix], &MOp[pix*Nmn]);
-        
+
         breaks(&MOp[pix*Nmn], bound, Nss[pix], nss[pix], Nmn, &isBreak[pix], &fstBreak[pix]);
-        
+
         meanComp(Nss[pix], nss[pix], Nmn, &MOp[pix*Nmn], means[pix]);
-        
+        printf("\n---4----\n");
+
         fstPComp(nss[pix], Nss[pix], &val_indss[pix*N], &isBreak[pix], &fstBreak[pix], &adjBreak[pix], &fstBreakP[pix]);
+        printf("\n---5----\n");
 
         valIndsPComp(Nmn, nss[pix], Nss[pix], &fstBreak[pix], &val_indss[pix*N], &val_indssP[pix*Nmn]);
+        printf("\n---6----\n");
+        printf("MOp: %f,  val_indssP: %u \n", MOp[pix*Nmn], val_indssP[pix*Nmn]);
 
         MOppComp(Nmn, &MOp[pix*Nmn], &val_indssP[pix*Nmn], &MOpp[pix*Nmn]);
+        printf("\n---7----\n");
     }
 
     free(MO);
