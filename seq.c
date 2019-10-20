@@ -377,17 +377,17 @@ void ker6(float* XT, float* B, uint K, float* yhat) {
 //   in  (zip rs ks, i)
 
 
-void filterNaNsWKeys(float* diffVct, uint* valid, float* y_errors, uint* val_indss) {
+void filterNaNsWKeys(float* diffVct, uint* valid, float* y_errors, int* val_indss) {
     uint idx = 0;
     *valid   = 0;
 
-    for (uint i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++) {
         uint check = (diffVct[i] != F32_MIN);
-        *valid  += check;
-        uint ind = (check * (*valid) - 1);
+        *valid    += check;
+        uint ind   = (check * (*valid) - 1);
 
         if (ind != -1) {
-            y_errors[idx]    = diffVct[i];
+            y_errors[idx]  = diffVct[i];
             val_indss[idx] = i;
             idx++;
         }
@@ -421,7 +421,7 @@ void filterNaNsWKeys(float* diffVct, uint* valid, float* y_errors, uint* val_ind
 
 
 // let (N,r,I)= map2 (-) y yˆ |> filterNaNsWKeys
-void ker7(float* yhat, float* y_errors_all, uint* Nss, float* y_errors, uint* val_indss) {
+void ker7(float* yhat, float* y_errors_all, uint* Nss, float* y_errors, int* val_indss) {
     for (uint pix = 0; pix < m; pix++) {
         for (uint i = 0; i < N; i++) {
             float y  = sample[pix][i];
@@ -536,42 +536,31 @@ void MO_prime_comp(float* MO, uint* ns, float sigma, float* MOp){
 }
 
 
+//           let fst_break' = if !is_break then -1
+//                              else let adj_break = adjustValInds n ns Ns val_inds fst_break
+//                                   in  ((adj_break-1) / 2) * 2 + 1  -- Cosmin's validation hack
+//             let fst_break' = if ns <=5 || Ns-ns <= 5 then -2 else fst_break'
 void breaks(float* MOp, float* bound, uint Ns, uint ns, uint Nmn, int* isBreak, int* fstBreak){
-    int* isB  = calloc(Nmn, sizeof(int));
-    int* fstB = calloc(Nmn, sizeof(int));
+    int i = 0;
 
     for (uint i = 0; i < Nmn; i++){
         float mop = MOp[i];
-        fstB[i] = i;
-        if(i < Ns-ns && mop != F32_MIN){
-            isB[i] = fabsf(mop) > bound[i];
-        } else {
-            isB[i] = 0;
+        
+        if(i < (Ns-ns) && mop != F32_MIN){
+            if (fabsf(mop) > bound[i] == 1) {
+                *isBreak  = 1;
+                *fstBreak = i;
+                break;
+            }
         }
     }
-
-    for (uint i = 0; i < Nmn; i++){
-        if(isB[i] == 1) {
-            *fstBreak += fstB[i];
-            *isBreak = 1;
-        } else if(isB[i+1] == 1) {
-            *fstBreak += fstB[i+1];
-            *isBreak = 1;
-        } else {
-            *fstBreak += fstB[i];
-            *isBreak = isB[i];
-        }
-    }
-
-    free(isB);
-    free(fstB);
 }
 
 
-void meanComp(uint Ns, uint ns, uint Nmn, float* MOp, float mean) {
+void meanComp(uint Ns, uint ns, uint Nmn, float* MOp, float* mean) {
     for (uint i = 0; i < Nmn; i++) {
         if (i < (Ns-ns)) {
-            mean += MOp[i];
+            *mean += MOp[i];
         }
     }
 }
@@ -579,26 +568,21 @@ void meanComp(uint Ns, uint ns, uint Nmn, float* MOp, float mean) {
 
 // let adjustValInds [N] (n : i32) (ns : i32) (Ns : i32) (val_inds : [N]i32) (ind: i32) : i32 =
 //     if ind < Ns - ns then (unsafe val_inds[ind+ns]) - n else -1
-
-int adjustValInds(uint ns, uint Ns, uint* val_inds, int fstBreak) {
+int adjustValInds(uint ns, uint Ns, int* val_inds, int fstBreak) {
     if (fstBreak < Ns-ns) {
-        return val_inds[fstBreak+ns]-n;
+        return (val_inds[fstBreak+ns]-n);
     } else {
         return -1;
     }
 }
 
 
-//           let fst_break' = if !is_break then -1
-//                              else let adj_break = adjustValInds n ns Ns val_inds fst_break
-//                                   in  ((adj_break-1) / 2) * 2 + 1  -- Cosmin's validation hack
-//             let fst_break' = if ns <=5 || Ns-ns <= 5 then -2 else fst_break'
 
 //             let val_inds' = map (adjustValInds n ns Ns val_inds) (iota Nmn)
 //             let MO'' = scatter (replicate Nmn f32.nan) val_inds' MO'
 //             in (MO'', MO', fst_break', mean)
-
-void fstPComp(uint ns, uint Ns, uint* val_inds, int* isBreak, int* fstBreak, int* adjBreak, int* fstBreakP) {
+void fstPComp(uint ns, uint Ns, int* val_inds, int* isBreak, int* fstBreak, int* adjBreak, int* fstBreakP) {
+    // printf("\n\n\n---------------------- %d -----------------------\n\n\n", *isBreak);
     if (!isBreak){
         *fstBreakP = -1;
     } else {
@@ -612,19 +596,19 @@ void fstPComp(uint ns, uint Ns, uint* val_inds, int* isBreak, int* fstBreak, int
 }
 
 
-void valIndsPComp(uint Nmn, uint ns, uint Ns, int* fstBreak, uint* val_inds, uint* val_indsP) {
+void valIndsPComp(uint Nmn, uint* ns, uint* Ns, int* fstBreak, int* val_inds, int* val_indsP) {
     for (int i = 0; i < Nmn; i++) {
-        val_indsP[i] = adjustValInds(ns, Ns, val_inds, i);
+        val_indsP[i] = adjustValInds(*ns, *Ns, val_inds, i);
     }
 }
 
 
-void MOppComp(uint Nmn, float* MOp, uint* val_indsP, float* MOpp) {
-     printf("Nmn: %u\n", Nmn);
+void MOppComp(uint Nmn, float* MOp, int* val_indsP, float* MOpp) {
+     // printf("Nmn: %u\n", Nmn);
     for (int i = 0; i < Nmn; i++) {
-        uint currIdx = val_indsP[i];
+        int currIdx = val_indsP[i];
         // if (currIdx != -1 || currIdx != -2) {
-        printf("1: currIdx: %u, MOpp: %f, MOp: %f\n",currIdx, MOpp[ currIdx ], MOp[i]);
+        // printf("1: currIdx: %u, MOpp: %f, MOp: %f\n",currIdx, MOpp[ currIdx ], MOp[i]);
         if (currIdx != -1 ) {
             MOpp[ currIdx ] = MOp[i];
             // printf("2: currIdx: %u, MOpp: %f, MOp: %f\n",currIdx, MOpp[ currIdx ], MOp[i]);
@@ -634,7 +618,7 @@ void MOppComp(uint Nmn, float* MOp, uint* val_indsP, float* MOpp) {
 
 
 void ker10(float* bound, uint* Nss, uint* nss, float* sigmas, int* hs,
-           float* MO_fsts, float* y_errors, uint* val_indss, float* MOp,
+           float* MO_fsts, float* y_errors, int* val_indss, float* MOp,
            float* means, int* fstBreakP, float* MOpp){
 
     compBound(bound);
@@ -643,28 +627,28 @@ void ker10(float* bound, uint* Nss, uint* nss, float* sigmas, int* hs,
     int* isBreak     = calloc(m,sizeof(int));
     int* fstBreak    = calloc(m,sizeof(int));
     int* adjBreak    = calloc(m,sizeof(int));
-    uint* val_indssP = calloc(m*Nmn,sizeof(uint));
+    int* val_indssP  = calloc(m*Nmn,sizeof(int));
 
     for (uint pix = 0; pix < m; pix++){
-        printf("\n---0----\n");
+        // printf("\n---0----\n");
         MO_comp(Nmn, &hs[pix], &MO_fsts[pix], &y_errors[pix*N], &Nss[pix], &nss[pix], &MO[pix*Nmn]);
-        printf("\n---1----\n");
+        // printf("\n---1----\n");
         MO_prime_comp(&MO[pix*Nmn], &nss[pix], sigmas[pix], &MOp[pix*Nmn]);
 
         breaks(&MOp[pix*Nmn], bound, Nss[pix], nss[pix], Nmn, &isBreak[pix], &fstBreak[pix]);
 
-        meanComp(Nss[pix], nss[pix], Nmn, &MOp[pix*Nmn], means[pix]);
-        printf("\n---4----\n");
+        meanComp(Nss[pix], nss[pix], Nmn, &MOp[pix*Nmn], &means[pix]);
+        // printf("\n---4----\n");
 
         fstPComp(nss[pix], Nss[pix], &val_indss[pix*N], &isBreak[pix], &fstBreak[pix], &adjBreak[pix], &fstBreakP[pix]);
-        printf("\n---5----\n");
+        // printf("\n---5----\n");
 
-        valIndsPComp(Nmn, nss[pix], Nss[pix], &fstBreak[pix], &val_indss[pix*N], &val_indssP[pix*Nmn]);
-        printf("\n---6----\n");
-        printf("MOp: %f,  val_indssP: %u \n", MOp[pix*Nmn], val_indssP[pix*Nmn]);
+        valIndsPComp(Nmn, &nss[pix], &Nss[pix], &fstBreak[pix], &val_indss[pix*N], &val_indssP[pix*Nmn]);
+        // printf("\n---6----\n");
+        // printf("MOp: %f,  val_indssP: %u \n", MOp[pix*Nmn], val_indssP[pix*Nmn]);
 
         MOppComp(Nmn, &MOp[pix*Nmn], &val_indssP[pix*Nmn], &MOpp[pix*Nmn]);
-        printf("\n---7----\n");
+        // printf("\n---7----\n");
     }
 
     free(MO);
@@ -818,7 +802,7 @@ int main(int argc, char const *argv[]) {
 
     uint* Nss           = calloc(m,sizeof(uint));
     float* y_errors_all = calloc(m*N,sizeof(float));
-    uint* val_indss     = calloc(m*N,sizeof(uint));
+    int* val_indss      = calloc(m*N,sizeof(uint));
     float* y_errors     = calloc(m*N,sizeof(float));
 
     for (int i = 0; i < m*N; i++) { y_errors[i] = F32_MIN; }
@@ -845,7 +829,7 @@ int main(int argc, char const *argv[]) {
     for (uint i = 0; i < m; i++){
         for (int j = 0; j < N; j++) {
             uint index = i*N + j;
-            printf("%u, ", val_indss[index]);
+            printf("%d, ", val_indss[index]);
         }
         printf("\n");
     }
