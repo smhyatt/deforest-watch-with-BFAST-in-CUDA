@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-print('Filtering types information out for C/C++/CUDA input')
+import sys
 
-with open('data/testset_sahara_2pix.in') as f:
-    read_data = f.read()
+if (sys.argv[1] == "peru"):
+	with open('data/pflat.in') as f:
+		data = f.read()
+else:
+	with open('data/sflat.in') as f:
+		data = f.read()
 
-print(read_data)
-
-filteredData = read_data.replace("i32", "").replace("f32", "")
-
+filteredData = data.replace("i32", "").replace("f32", "").replace("[", "").replace("]", "")
 print(filteredData)
-
