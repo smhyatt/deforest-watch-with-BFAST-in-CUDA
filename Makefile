@@ -7,6 +7,11 @@ cmd:
 	$(CC) $(CFLAGS) seq.c && ./a.out
 	rm a.out
 
+sarah:
+	$(CC) $(CFLAGS) seq-parse.c 
+	./a.out
+	rm a.out
+
 insp:
 	futhark c insp-data.fut
 	# ./insp-data < data/peru.in.gz > data/testset_peru_2pix.in
