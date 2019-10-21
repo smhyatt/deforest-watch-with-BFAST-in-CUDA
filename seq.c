@@ -666,14 +666,14 @@ int main(int argc, char const *argv[]) {
       	return -1;
 	}
 
-	printf("%d\n", trend);
-	printf("%d\n", k);
-	printf("%d\n", m);
-	printf("%d\n", n);
-	printf("%d\n", N);
-	printf("%f\n", freq);
-	printf("%f\n", hfrac);
-	printf("%f\n", lam);
+	// printf("%d\n", trend);
+	// printf("%d\n", k);
+	// printf("%d\n", m);
+	// printf("%d\n", n);
+	// printf("%d\n", N);
+	// printf("%f\n", freq);
+	// printf("%f\n", hfrac);
+	// printf("%f\n", lam);
 
     int K = 2*k +2;
     float* X  = calloc(K*N,sizeof(float));
