@@ -30,6 +30,20 @@ char *futhark_context_get_error(struct futhark_context *ctx);
  * Arrays
 */
 
+struct futhark_f32_1d ;
+struct futhark_f32_1d *futhark_new_f32_1d(struct futhark_context *ctx,
+                                          float *data, int64_t dim0);
+struct futhark_f32_1d *futhark_new_raw_f32_1d(struct futhark_context *ctx,
+                                              char *data, int offset,
+                                              int64_t dim0);
+int futhark_free_f32_1d(struct futhark_context *ctx,
+                        struct futhark_f32_1d *arr);
+int futhark_values_f32_1d(struct futhark_context *ctx,
+                          struct futhark_f32_1d *arr, float *data);
+char *futhark_values_raw_f32_1d(struct futhark_context *ctx,
+                                struct futhark_f32_1d *arr);
+int64_t *futhark_shape_f32_1d(struct futhark_context *ctx,
+                              struct futhark_f32_1d *arr);
 struct futhark_f32_2d ;
 struct futhark_f32_2d *futhark_new_f32_2d(struct futhark_context *ctx,
                                           float *data, int64_t dim0,
@@ -102,7 +116,9 @@ int64_t *futhark_shape_i32_2d(struct futhark_context *ctx,
 
 int futhark_entry_main(struct futhark_context *ctx, bool *out0, bool *out1,
                        bool *out2, bool *out3, bool *out4, bool *out5,
-                       bool *out6, bool *out7, bool *out8, const
+                       bool *out6, bool *out7, bool *out8, bool *out9,
+                       bool *out10, bool *out11, bool *out12, bool *out13,
+                       bool *out14, bool *out15, bool *out16, const
                        struct futhark_f32_2d *in0, const
                        struct futhark_f32_3d *in1, const
                        struct futhark_f32_3d *in2, const
@@ -112,15 +128,31 @@ int futhark_entry_main(struct futhark_context *ctx, bool *out0, bool *out1,
                        struct futhark_i32_1d *in6, const
                        struct futhark_f32_2d *in7, const
                        struct futhark_i32_2d *in8, const
-                       struct futhark_f32_2d *in9, const
-                       struct futhark_f32_3d *in10, const
-                       struct futhark_f32_3d *in11, const
-                       struct futhark_f32_2d *in12, const
+                       struct futhark_i32_1d *in9, const
+                       struct futhark_i32_1d *in10, const
+                       struct futhark_f32_1d *in11, const
+                       struct futhark_f32_1d *in12, const
                        struct futhark_f32_2d *in13, const
                        struct futhark_f32_2d *in14, const
                        struct futhark_i32_1d *in15, const
-                       struct futhark_f32_2d *in16, const
-                       struct futhark_i32_2d *in17);
+                       struct futhark_f32_1d *in16, const
+                       struct futhark_f32_2d *in17, const
+                       struct futhark_f32_3d *in18, const
+                       struct futhark_f32_3d *in19, const
+                       struct futhark_f32_2d *in20, const
+                       struct futhark_f32_2d *in21, const
+                       struct futhark_f32_2d *in22, const
+                       struct futhark_i32_1d *in23, const
+                       struct futhark_f32_2d *in24, const
+                       struct futhark_i32_2d *in25, const
+                       struct futhark_i32_1d *in26, const
+                       struct futhark_i32_1d *in27, const
+                       struct futhark_f32_1d *in28, const
+                       struct futhark_f32_1d *in29, const
+                       struct futhark_f32_2d *in30, const
+                       struct futhark_f32_2d *in31, const
+                       struct futhark_i32_1d *in32, const
+                       struct futhark_f32_1d *in33);
 
 /*
  * Miscellaneous
@@ -1144,289 +1176,520 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
     /* Declare and read input. */
     set_binary_mode(stdin);
     
-    struct futhark_f32_2d *read_value_26688;
-    int64_t read_shape_26689[2];
-    float *read_arr_26690 = NULL;
+    struct futhark_f32_2d *read_value_36250;
+    int64_t read_shape_36251[2];
+    float *read_arr_36252 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26690, read_shape_26689, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_36252, read_shape_36251, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 0, "[][]",
               f32_info.type_name, strerror(errno));
     
-    struct futhark_f32_3d *read_value_26691;
-    int64_t read_shape_26692[3];
-    float *read_arr_26693 = NULL;
+    struct futhark_f32_3d *read_value_36253;
+    int64_t read_shape_36254[3];
+    float *read_arr_36255 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26693, read_shape_26692, 3) !=
+    if (read_array(&f32_info, (void **) &read_arr_36255, read_shape_36254, 3) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 1,
               "[][][]", f32_info.type_name, strerror(errno));
     
-    struct futhark_f32_3d *read_value_26694;
-    int64_t read_shape_26695[3];
-    float *read_arr_26696 = NULL;
+    struct futhark_f32_3d *read_value_36256;
+    int64_t read_shape_36257[3];
+    float *read_arr_36258 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26696, read_shape_26695, 3) !=
+    if (read_array(&f32_info, (void **) &read_arr_36258, read_shape_36257, 3) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 2,
               "[][][]", f32_info.type_name, strerror(errno));
     
-    struct futhark_f32_2d *read_value_26697;
-    int64_t read_shape_26698[2];
-    float *read_arr_26699 = NULL;
+    struct futhark_f32_2d *read_value_36259;
+    int64_t read_shape_36260[2];
+    float *read_arr_36261 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26699, read_shape_26698, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_36261, read_shape_36260, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 3, "[][]",
               f32_info.type_name, strerror(errno));
     
-    struct futhark_f32_2d *read_value_26700;
-    int64_t read_shape_26701[2];
-    float *read_arr_26702 = NULL;
+    struct futhark_f32_2d *read_value_36262;
+    int64_t read_shape_36263[2];
+    float *read_arr_36264 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26702, read_shape_26701, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_36264, read_shape_36263, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 4, "[][]",
               f32_info.type_name, strerror(errno));
     
-    struct futhark_f32_2d *read_value_26703;
-    int64_t read_shape_26704[2];
-    float *read_arr_26705 = NULL;
+    struct futhark_f32_2d *read_value_36265;
+    int64_t read_shape_36266[2];
+    float *read_arr_36267 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26705, read_shape_26704, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_36267, read_shape_36266, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 5, "[][]",
               f32_info.type_name, strerror(errno));
     
-    struct futhark_i32_1d *read_value_26706;
-    int64_t read_shape_26707[1];
-    int32_t *read_arr_26708 = NULL;
+    struct futhark_i32_1d *read_value_36268;
+    int64_t read_shape_36269[1];
+    int32_t *read_arr_36270 = NULL;
     
     errno = 0;
-    if (read_array(&i32_info, (void **) &read_arr_26708, read_shape_26707, 1) !=
+    if (read_array(&i32_info, (void **) &read_arr_36270, read_shape_36269, 1) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 6, "[]",
               i32_info.type_name, strerror(errno));
     
-    struct futhark_f32_2d *read_value_26709;
-    int64_t read_shape_26710[2];
-    float *read_arr_26711 = NULL;
+    struct futhark_f32_2d *read_value_36271;
+    int64_t read_shape_36272[2];
+    float *read_arr_36273 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26711, read_shape_26710, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_36273, read_shape_36272, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 7, "[][]",
               f32_info.type_name, strerror(errno));
     
-    struct futhark_i32_2d *read_value_26712;
-    int64_t read_shape_26713[2];
-    int32_t *read_arr_26714 = NULL;
+    struct futhark_i32_2d *read_value_36274;
+    int64_t read_shape_36275[2];
+    int32_t *read_arr_36276 = NULL;
     
     errno = 0;
-    if (read_array(&i32_info, (void **) &read_arr_26714, read_shape_26713, 2) !=
+    if (read_array(&i32_info, (void **) &read_arr_36276, read_shape_36275, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 8, "[][]",
               i32_info.type_name, strerror(errno));
     
-    struct futhark_f32_2d *read_value_26715;
-    int64_t read_shape_26716[2];
-    float *read_arr_26717 = NULL;
+    struct futhark_i32_1d *read_value_36277;
+    int64_t read_shape_36278[1];
+    int32_t *read_arr_36279 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26717, read_shape_26716, 2) !=
+    if (read_array(&i32_info, (void **) &read_arr_36279, read_shape_36278, 1) !=
         0)
-        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 9, "[][]",
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 9, "[]",
+              i32_info.type_name, strerror(errno));
+    
+    struct futhark_i32_1d *read_value_36280;
+    int64_t read_shape_36281[1];
+    int32_t *read_arr_36282 = NULL;
+    
+    errno = 0;
+    if (read_array(&i32_info, (void **) &read_arr_36282, read_shape_36281, 1) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 10, "[]",
+              i32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_1d *read_value_36283;
+    int64_t read_shape_36284[1];
+    float *read_arr_36285 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36285, read_shape_36284, 1) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 11, "[]",
               f32_info.type_name, strerror(errno));
     
-    struct futhark_f32_3d *read_value_26718;
-    int64_t read_shape_26719[3];
-    float *read_arr_26720 = NULL;
+    struct futhark_f32_1d *read_value_36286;
+    int64_t read_shape_36287[1];
+    float *read_arr_36288 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26720, read_shape_26719, 3) !=
+    if (read_array(&f32_info, (void **) &read_arr_36288, read_shape_36287, 1) !=
         0)
-        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 10,
-              "[][][]", f32_info.type_name, strerror(errno));
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 12, "[]",
+              f32_info.type_name, strerror(errno));
     
-    struct futhark_f32_3d *read_value_26721;
-    int64_t read_shape_26722[3];
-    float *read_arr_26723 = NULL;
-    
-    errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26723, read_shape_26722, 3) !=
-        0)
-        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 11,
-              "[][][]", f32_info.type_name, strerror(errno));
-    
-    struct futhark_f32_2d *read_value_26724;
-    int64_t read_shape_26725[2];
-    float *read_arr_26726 = NULL;
+    struct futhark_f32_2d *read_value_36289;
+    int64_t read_shape_36290[2];
+    float *read_arr_36291 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26726, read_shape_26725, 2) !=
-        0)
-        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 12,
-              "[][]", f32_info.type_name, strerror(errno));
-    
-    struct futhark_f32_2d *read_value_26727;
-    int64_t read_shape_26728[2];
-    float *read_arr_26729 = NULL;
-    
-    errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26729, read_shape_26728, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_36291, read_shape_36290, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 13,
               "[][]", f32_info.type_name, strerror(errno));
     
-    struct futhark_f32_2d *read_value_26730;
-    int64_t read_shape_26731[2];
-    float *read_arr_26732 = NULL;
+    struct futhark_f32_2d *read_value_36292;
+    int64_t read_shape_36293[2];
+    float *read_arr_36294 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26732, read_shape_26731, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_36294, read_shape_36293, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 14,
               "[][]", f32_info.type_name, strerror(errno));
     
-    struct futhark_i32_1d *read_value_26733;
-    int64_t read_shape_26734[1];
-    int32_t *read_arr_26735 = NULL;
+    struct futhark_i32_1d *read_value_36295;
+    int64_t read_shape_36296[1];
+    int32_t *read_arr_36297 = NULL;
     
     errno = 0;
-    if (read_array(&i32_info, (void **) &read_arr_26735, read_shape_26734, 1) !=
+    if (read_array(&i32_info, (void **) &read_arr_36297, read_shape_36296, 1) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 15, "[]",
               i32_info.type_name, strerror(errno));
     
-    struct futhark_f32_2d *read_value_26736;
-    int64_t read_shape_26737[2];
-    float *read_arr_26738 = NULL;
+    struct futhark_f32_1d *read_value_36298;
+    int64_t read_shape_36299[1];
+    float *read_arr_36300 = NULL;
     
     errno = 0;
-    if (read_array(&f32_info, (void **) &read_arr_26738, read_shape_26737, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_36300, read_shape_36299, 1) !=
         0)
-        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 16,
-              "[][]", f32_info.type_name, strerror(errno));
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 16, "[]",
+              f32_info.type_name, strerror(errno));
     
-    struct futhark_i32_2d *read_value_26739;
-    int64_t read_shape_26740[2];
-    int32_t *read_arr_26741 = NULL;
+    struct futhark_f32_2d *read_value_36301;
+    int64_t read_shape_36302[2];
+    float *read_arr_36303 = NULL;
     
     errno = 0;
-    if (read_array(&i32_info, (void **) &read_arr_26741, read_shape_26740, 2) !=
+    if (read_array(&f32_info, (void **) &read_arr_36303, read_shape_36302, 2) !=
         0)
         panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 17,
+              "[][]", f32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_3d *read_value_36304;
+    int64_t read_shape_36305[3];
+    float *read_arr_36306 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36306, read_shape_36305, 3) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 18,
+              "[][][]", f32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_3d *read_value_36307;
+    int64_t read_shape_36308[3];
+    float *read_arr_36309 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36309, read_shape_36308, 3) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 19,
+              "[][][]", f32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_2d *read_value_36310;
+    int64_t read_shape_36311[2];
+    float *read_arr_36312 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36312, read_shape_36311, 2) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 20,
+              "[][]", f32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_2d *read_value_36313;
+    int64_t read_shape_36314[2];
+    float *read_arr_36315 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36315, read_shape_36314, 2) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 21,
+              "[][]", f32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_2d *read_value_36316;
+    int64_t read_shape_36317[2];
+    float *read_arr_36318 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36318, read_shape_36317, 2) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 22,
+              "[][]", f32_info.type_name, strerror(errno));
+    
+    struct futhark_i32_1d *read_value_36319;
+    int64_t read_shape_36320[1];
+    int32_t *read_arr_36321 = NULL;
+    
+    errno = 0;
+    if (read_array(&i32_info, (void **) &read_arr_36321, read_shape_36320, 1) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 23, "[]",
+              i32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_2d *read_value_36322;
+    int64_t read_shape_36323[2];
+    float *read_arr_36324 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36324, read_shape_36323, 2) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 24,
+              "[][]", f32_info.type_name, strerror(errno));
+    
+    struct futhark_i32_2d *read_value_36325;
+    int64_t read_shape_36326[2];
+    int32_t *read_arr_36327 = NULL;
+    
+    errno = 0;
+    if (read_array(&i32_info, (void **) &read_arr_36327, read_shape_36326, 2) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 25,
               "[][]", i32_info.type_name, strerror(errno));
     
-    bool result_26742;
-    bool result_26743;
-    bool result_26744;
-    bool result_26745;
-    bool result_26746;
-    bool result_26747;
-    bool result_26748;
-    bool result_26749;
-    bool result_26750;
+    struct futhark_i32_1d *read_value_36328;
+    int64_t read_shape_36329[1];
+    int32_t *read_arr_36330 = NULL;
+    
+    errno = 0;
+    if (read_array(&i32_info, (void **) &read_arr_36330, read_shape_36329, 1) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 26, "[]",
+              i32_info.type_name, strerror(errno));
+    
+    struct futhark_i32_1d *read_value_36331;
+    int64_t read_shape_36332[1];
+    int32_t *read_arr_36333 = NULL;
+    
+    errno = 0;
+    if (read_array(&i32_info, (void **) &read_arr_36333, read_shape_36332, 1) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 27, "[]",
+              i32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_1d *read_value_36334;
+    int64_t read_shape_36335[1];
+    float *read_arr_36336 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36336, read_shape_36335, 1) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 28, "[]",
+              f32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_1d *read_value_36337;
+    int64_t read_shape_36338[1];
+    float *read_arr_36339 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36339, read_shape_36338, 1) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 29, "[]",
+              f32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_2d *read_value_36340;
+    int64_t read_shape_36341[2];
+    float *read_arr_36342 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36342, read_shape_36341, 2) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 30,
+              "[][]", f32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_2d *read_value_36343;
+    int64_t read_shape_36344[2];
+    float *read_arr_36345 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36345, read_shape_36344, 2) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 31,
+              "[][]", f32_info.type_name, strerror(errno));
+    
+    struct futhark_i32_1d *read_value_36346;
+    int64_t read_shape_36347[1];
+    int32_t *read_arr_36348 = NULL;
+    
+    errno = 0;
+    if (read_array(&i32_info, (void **) &read_arr_36348, read_shape_36347, 1) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 32, "[]",
+              i32_info.type_name, strerror(errno));
+    
+    struct futhark_f32_1d *read_value_36349;
+    int64_t read_shape_36350[1];
+    float *read_arr_36351 = NULL;
+    
+    errno = 0;
+    if (read_array(&f32_info, (void **) &read_arr_36351, read_shape_36350, 1) !=
+        0)
+        panic(1, "Cannot read input #%d of type %s%s (errno: %s).\n", 33, "[]",
+              f32_info.type_name, strerror(errno));
+    
+    bool result_36352;
+    bool result_36353;
+    bool result_36354;
+    bool result_36355;
+    bool result_36356;
+    bool result_36357;
+    bool result_36358;
+    bool result_36359;
+    bool result_36360;
+    bool result_36361;
+    bool result_36362;
+    bool result_36363;
+    bool result_36364;
+    bool result_36365;
+    bool result_36366;
+    bool result_36367;
+    bool result_36368;
     
     if (perform_warmup) {
         time_runs = 0;
         
         int r;
         
-        assert((read_value_26688 = futhark_new_f32_2d(ctx, read_arr_26690,
-                                                      read_shape_26689[0],
-                                                      read_shape_26689[1])) !=
+        assert((read_value_36250 = futhark_new_f32_2d(ctx, read_arr_36252,
+                                                      read_shape_36251[0],
+                                                      read_shape_36251[1])) !=
             0);
-        assert((read_value_26691 = futhark_new_f32_3d(ctx, read_arr_26693,
-                                                      read_shape_26692[0],
-                                                      read_shape_26692[1],
-                                                      read_shape_26692[2])) !=
+        assert((read_value_36253 = futhark_new_f32_3d(ctx, read_arr_36255,
+                                                      read_shape_36254[0],
+                                                      read_shape_36254[1],
+                                                      read_shape_36254[2])) !=
             0);
-        assert((read_value_26694 = futhark_new_f32_3d(ctx, read_arr_26696,
-                                                      read_shape_26695[0],
-                                                      read_shape_26695[1],
-                                                      read_shape_26695[2])) !=
+        assert((read_value_36256 = futhark_new_f32_3d(ctx, read_arr_36258,
+                                                      read_shape_36257[0],
+                                                      read_shape_36257[1],
+                                                      read_shape_36257[2])) !=
             0);
-        assert((read_value_26697 = futhark_new_f32_2d(ctx, read_arr_26699,
-                                                      read_shape_26698[0],
-                                                      read_shape_26698[1])) !=
+        assert((read_value_36259 = futhark_new_f32_2d(ctx, read_arr_36261,
+                                                      read_shape_36260[0],
+                                                      read_shape_36260[1])) !=
             0);
-        assert((read_value_26700 = futhark_new_f32_2d(ctx, read_arr_26702,
-                                                      read_shape_26701[0],
-                                                      read_shape_26701[1])) !=
+        assert((read_value_36262 = futhark_new_f32_2d(ctx, read_arr_36264,
+                                                      read_shape_36263[0],
+                                                      read_shape_36263[1])) !=
             0);
-        assert((read_value_26703 = futhark_new_f32_2d(ctx, read_arr_26705,
-                                                      read_shape_26704[0],
-                                                      read_shape_26704[1])) !=
+        assert((read_value_36265 = futhark_new_f32_2d(ctx, read_arr_36267,
+                                                      read_shape_36266[0],
+                                                      read_shape_36266[1])) !=
             0);
-        assert((read_value_26706 = futhark_new_i32_1d(ctx, read_arr_26708,
-                                                      read_shape_26707[0])) !=
+        assert((read_value_36268 = futhark_new_i32_1d(ctx, read_arr_36270,
+                                                      read_shape_36269[0])) !=
             0);
-        assert((read_value_26709 = futhark_new_f32_2d(ctx, read_arr_26711,
-                                                      read_shape_26710[0],
-                                                      read_shape_26710[1])) !=
+        assert((read_value_36271 = futhark_new_f32_2d(ctx, read_arr_36273,
+                                                      read_shape_36272[0],
+                                                      read_shape_36272[1])) !=
             0);
-        assert((read_value_26712 = futhark_new_i32_2d(ctx, read_arr_26714,
-                                                      read_shape_26713[0],
-                                                      read_shape_26713[1])) !=
+        assert((read_value_36274 = futhark_new_i32_2d(ctx, read_arr_36276,
+                                                      read_shape_36275[0],
+                                                      read_shape_36275[1])) !=
             0);
-        assert((read_value_26715 = futhark_new_f32_2d(ctx, read_arr_26717,
-                                                      read_shape_26716[0],
-                                                      read_shape_26716[1])) !=
+        assert((read_value_36277 = futhark_new_i32_1d(ctx, read_arr_36279,
+                                                      read_shape_36278[0])) !=
             0);
-        assert((read_value_26718 = futhark_new_f32_3d(ctx, read_arr_26720,
-                                                      read_shape_26719[0],
-                                                      read_shape_26719[1],
-                                                      read_shape_26719[2])) !=
+        assert((read_value_36280 = futhark_new_i32_1d(ctx, read_arr_36282,
+                                                      read_shape_36281[0])) !=
             0);
-        assert((read_value_26721 = futhark_new_f32_3d(ctx, read_arr_26723,
-                                                      read_shape_26722[0],
-                                                      read_shape_26722[1],
-                                                      read_shape_26722[2])) !=
+        assert((read_value_36283 = futhark_new_f32_1d(ctx, read_arr_36285,
+                                                      read_shape_36284[0])) !=
             0);
-        assert((read_value_26724 = futhark_new_f32_2d(ctx, read_arr_26726,
-                                                      read_shape_26725[0],
-                                                      read_shape_26725[1])) !=
+        assert((read_value_36286 = futhark_new_f32_1d(ctx, read_arr_36288,
+                                                      read_shape_36287[0])) !=
             0);
-        assert((read_value_26727 = futhark_new_f32_2d(ctx, read_arr_26729,
-                                                      read_shape_26728[0],
-                                                      read_shape_26728[1])) !=
+        assert((read_value_36289 = futhark_new_f32_2d(ctx, read_arr_36291,
+                                                      read_shape_36290[0],
+                                                      read_shape_36290[1])) !=
             0);
-        assert((read_value_26730 = futhark_new_f32_2d(ctx, read_arr_26732,
-                                                      read_shape_26731[0],
-                                                      read_shape_26731[1])) !=
+        assert((read_value_36292 = futhark_new_f32_2d(ctx, read_arr_36294,
+                                                      read_shape_36293[0],
+                                                      read_shape_36293[1])) !=
             0);
-        assert((read_value_26733 = futhark_new_i32_1d(ctx, read_arr_26735,
-                                                      read_shape_26734[0])) !=
+        assert((read_value_36295 = futhark_new_i32_1d(ctx, read_arr_36297,
+                                                      read_shape_36296[0])) !=
             0);
-        assert((read_value_26736 = futhark_new_f32_2d(ctx, read_arr_26738,
-                                                      read_shape_26737[0],
-                                                      read_shape_26737[1])) !=
+        assert((read_value_36298 = futhark_new_f32_1d(ctx, read_arr_36300,
+                                                      read_shape_36299[0])) !=
             0);
-        assert((read_value_26739 = futhark_new_i32_2d(ctx, read_arr_26741,
-                                                      read_shape_26740[0],
-                                                      read_shape_26740[1])) !=
+        assert((read_value_36301 = futhark_new_f32_2d(ctx, read_arr_36303,
+                                                      read_shape_36302[0],
+                                                      read_shape_36302[1])) !=
+            0);
+        assert((read_value_36304 = futhark_new_f32_3d(ctx, read_arr_36306,
+                                                      read_shape_36305[0],
+                                                      read_shape_36305[1],
+                                                      read_shape_36305[2])) !=
+            0);
+        assert((read_value_36307 = futhark_new_f32_3d(ctx, read_arr_36309,
+                                                      read_shape_36308[0],
+                                                      read_shape_36308[1],
+                                                      read_shape_36308[2])) !=
+            0);
+        assert((read_value_36310 = futhark_new_f32_2d(ctx, read_arr_36312,
+                                                      read_shape_36311[0],
+                                                      read_shape_36311[1])) !=
+            0);
+        assert((read_value_36313 = futhark_new_f32_2d(ctx, read_arr_36315,
+                                                      read_shape_36314[0],
+                                                      read_shape_36314[1])) !=
+            0);
+        assert((read_value_36316 = futhark_new_f32_2d(ctx, read_arr_36318,
+                                                      read_shape_36317[0],
+                                                      read_shape_36317[1])) !=
+            0);
+        assert((read_value_36319 = futhark_new_i32_1d(ctx, read_arr_36321,
+                                                      read_shape_36320[0])) !=
+            0);
+        assert((read_value_36322 = futhark_new_f32_2d(ctx, read_arr_36324,
+                                                      read_shape_36323[0],
+                                                      read_shape_36323[1])) !=
+            0);
+        assert((read_value_36325 = futhark_new_i32_2d(ctx, read_arr_36327,
+                                                      read_shape_36326[0],
+                                                      read_shape_36326[1])) !=
+            0);
+        assert((read_value_36328 = futhark_new_i32_1d(ctx, read_arr_36330,
+                                                      read_shape_36329[0])) !=
+            0);
+        assert((read_value_36331 = futhark_new_i32_1d(ctx, read_arr_36333,
+                                                      read_shape_36332[0])) !=
+            0);
+        assert((read_value_36334 = futhark_new_f32_1d(ctx, read_arr_36336,
+                                                      read_shape_36335[0])) !=
+            0);
+        assert((read_value_36337 = futhark_new_f32_1d(ctx, read_arr_36339,
+                                                      read_shape_36338[0])) !=
+            0);
+        assert((read_value_36340 = futhark_new_f32_2d(ctx, read_arr_36342,
+                                                      read_shape_36341[0],
+                                                      read_shape_36341[1])) !=
+            0);
+        assert((read_value_36343 = futhark_new_f32_2d(ctx, read_arr_36345,
+                                                      read_shape_36344[0],
+                                                      read_shape_36344[1])) !=
+            0);
+        assert((read_value_36346 = futhark_new_i32_1d(ctx, read_arr_36348,
+                                                      read_shape_36347[0])) !=
+            0);
+        assert((read_value_36349 = futhark_new_f32_1d(ctx, read_arr_36351,
+                                                      read_shape_36350[0])) !=
             0);
         assert(futhark_context_sync(ctx) == 0);
         t_start = get_wall_time();
-        r = futhark_entry_main(ctx, &result_26742, &result_26743, &result_26744,
-                               &result_26745, &result_26746, &result_26747,
-                               &result_26748, &result_26749, &result_26750,
-                               read_value_26688, read_value_26691,
-                               read_value_26694, read_value_26697,
-                               read_value_26700, read_value_26703,
-                               read_value_26706, read_value_26709,
-                               read_value_26712, read_value_26715,
-                               read_value_26718, read_value_26721,
-                               read_value_26724, read_value_26727,
-                               read_value_26730, read_value_26733,
-                               read_value_26736, read_value_26739);
+        r = futhark_entry_main(ctx, &result_36352, &result_36353, &result_36354,
+                               &result_36355, &result_36356, &result_36357,
+                               &result_36358, &result_36359, &result_36360,
+                               &result_36361, &result_36362, &result_36363,
+                               &result_36364, &result_36365, &result_36366,
+                               &result_36367, &result_36368, read_value_36250,
+                               read_value_36253, read_value_36256,
+                               read_value_36259, read_value_36262,
+                               read_value_36265, read_value_36268,
+                               read_value_36271, read_value_36274,
+                               read_value_36277, read_value_36280,
+                               read_value_36283, read_value_36286,
+                               read_value_36289, read_value_36292,
+                               read_value_36295, read_value_36298,
+                               read_value_36301, read_value_36304,
+                               read_value_36307, read_value_36310,
+                               read_value_36313, read_value_36316,
+                               read_value_36319, read_value_36322,
+                               read_value_36325, read_value_36328,
+                               read_value_36331, read_value_36334,
+                               read_value_36337, read_value_36340,
+                               read_value_36343, read_value_36346,
+                               read_value_36349);
         if (r != 0)
             panic(1, "%s", futhark_context_get_error(ctx));
         assert(futhark_context_sync(ctx) == 0);
@@ -1436,24 +1699,48 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
         
         if (time_runs && runtime_file != NULL)
             fprintf(runtime_file, "%lld\n", (long long) elapsed_usec);
-        assert(futhark_free_f32_2d(ctx, read_value_26688) == 0);
-        assert(futhark_free_f32_3d(ctx, read_value_26691) == 0);
-        assert(futhark_free_f32_3d(ctx, read_value_26694) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26697) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26700) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26703) == 0);
-        assert(futhark_free_i32_1d(ctx, read_value_26706) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26709) == 0);
-        assert(futhark_free_i32_2d(ctx, read_value_26712) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26715) == 0);
-        assert(futhark_free_f32_3d(ctx, read_value_26718) == 0);
-        assert(futhark_free_f32_3d(ctx, read_value_26721) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26724) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26727) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26730) == 0);
-        assert(futhark_free_i32_1d(ctx, read_value_26733) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26736) == 0);
-        assert(futhark_free_i32_2d(ctx, read_value_26739) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36250) == 0);
+        assert(futhark_free_f32_3d(ctx, read_value_36253) == 0);
+        assert(futhark_free_f32_3d(ctx, read_value_36256) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36259) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36262) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36265) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36268) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36271) == 0);
+        assert(futhark_free_i32_2d(ctx, read_value_36274) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36277) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36280) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36283) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36286) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36289) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36292) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36295) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36298) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36301) == 0);
+        assert(futhark_free_f32_3d(ctx, read_value_36304) == 0);
+        assert(futhark_free_f32_3d(ctx, read_value_36307) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36310) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36313) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36316) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36319) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36322) == 0);
+        assert(futhark_free_i32_2d(ctx, read_value_36325) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36328) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36331) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36334) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36337) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36340) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36343) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36346) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36349) == 0);
+        ;
+        ;
+        ;
+        ;
+        ;
+        ;
+        ;
+        ;
         ;
         ;
         ;
@@ -1469,94 +1756,157 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
     for (int run = 0; run < num_runs; run++) {
         int r;
         
-        assert((read_value_26688 = futhark_new_f32_2d(ctx, read_arr_26690,
-                                                      read_shape_26689[0],
-                                                      read_shape_26689[1])) !=
+        assert((read_value_36250 = futhark_new_f32_2d(ctx, read_arr_36252,
+                                                      read_shape_36251[0],
+                                                      read_shape_36251[1])) !=
             0);
-        assert((read_value_26691 = futhark_new_f32_3d(ctx, read_arr_26693,
-                                                      read_shape_26692[0],
-                                                      read_shape_26692[1],
-                                                      read_shape_26692[2])) !=
+        assert((read_value_36253 = futhark_new_f32_3d(ctx, read_arr_36255,
+                                                      read_shape_36254[0],
+                                                      read_shape_36254[1],
+                                                      read_shape_36254[2])) !=
             0);
-        assert((read_value_26694 = futhark_new_f32_3d(ctx, read_arr_26696,
-                                                      read_shape_26695[0],
-                                                      read_shape_26695[1],
-                                                      read_shape_26695[2])) !=
+        assert((read_value_36256 = futhark_new_f32_3d(ctx, read_arr_36258,
+                                                      read_shape_36257[0],
+                                                      read_shape_36257[1],
+                                                      read_shape_36257[2])) !=
             0);
-        assert((read_value_26697 = futhark_new_f32_2d(ctx, read_arr_26699,
-                                                      read_shape_26698[0],
-                                                      read_shape_26698[1])) !=
+        assert((read_value_36259 = futhark_new_f32_2d(ctx, read_arr_36261,
+                                                      read_shape_36260[0],
+                                                      read_shape_36260[1])) !=
             0);
-        assert((read_value_26700 = futhark_new_f32_2d(ctx, read_arr_26702,
-                                                      read_shape_26701[0],
-                                                      read_shape_26701[1])) !=
+        assert((read_value_36262 = futhark_new_f32_2d(ctx, read_arr_36264,
+                                                      read_shape_36263[0],
+                                                      read_shape_36263[1])) !=
             0);
-        assert((read_value_26703 = futhark_new_f32_2d(ctx, read_arr_26705,
-                                                      read_shape_26704[0],
-                                                      read_shape_26704[1])) !=
+        assert((read_value_36265 = futhark_new_f32_2d(ctx, read_arr_36267,
+                                                      read_shape_36266[0],
+                                                      read_shape_36266[1])) !=
             0);
-        assert((read_value_26706 = futhark_new_i32_1d(ctx, read_arr_26708,
-                                                      read_shape_26707[0])) !=
+        assert((read_value_36268 = futhark_new_i32_1d(ctx, read_arr_36270,
+                                                      read_shape_36269[0])) !=
             0);
-        assert((read_value_26709 = futhark_new_f32_2d(ctx, read_arr_26711,
-                                                      read_shape_26710[0],
-                                                      read_shape_26710[1])) !=
+        assert((read_value_36271 = futhark_new_f32_2d(ctx, read_arr_36273,
+                                                      read_shape_36272[0],
+                                                      read_shape_36272[1])) !=
             0);
-        assert((read_value_26712 = futhark_new_i32_2d(ctx, read_arr_26714,
-                                                      read_shape_26713[0],
-                                                      read_shape_26713[1])) !=
+        assert((read_value_36274 = futhark_new_i32_2d(ctx, read_arr_36276,
+                                                      read_shape_36275[0],
+                                                      read_shape_36275[1])) !=
             0);
-        assert((read_value_26715 = futhark_new_f32_2d(ctx, read_arr_26717,
-                                                      read_shape_26716[0],
-                                                      read_shape_26716[1])) !=
+        assert((read_value_36277 = futhark_new_i32_1d(ctx, read_arr_36279,
+                                                      read_shape_36278[0])) !=
             0);
-        assert((read_value_26718 = futhark_new_f32_3d(ctx, read_arr_26720,
-                                                      read_shape_26719[0],
-                                                      read_shape_26719[1],
-                                                      read_shape_26719[2])) !=
+        assert((read_value_36280 = futhark_new_i32_1d(ctx, read_arr_36282,
+                                                      read_shape_36281[0])) !=
             0);
-        assert((read_value_26721 = futhark_new_f32_3d(ctx, read_arr_26723,
-                                                      read_shape_26722[0],
-                                                      read_shape_26722[1],
-                                                      read_shape_26722[2])) !=
+        assert((read_value_36283 = futhark_new_f32_1d(ctx, read_arr_36285,
+                                                      read_shape_36284[0])) !=
             0);
-        assert((read_value_26724 = futhark_new_f32_2d(ctx, read_arr_26726,
-                                                      read_shape_26725[0],
-                                                      read_shape_26725[1])) !=
+        assert((read_value_36286 = futhark_new_f32_1d(ctx, read_arr_36288,
+                                                      read_shape_36287[0])) !=
             0);
-        assert((read_value_26727 = futhark_new_f32_2d(ctx, read_arr_26729,
-                                                      read_shape_26728[0],
-                                                      read_shape_26728[1])) !=
+        assert((read_value_36289 = futhark_new_f32_2d(ctx, read_arr_36291,
+                                                      read_shape_36290[0],
+                                                      read_shape_36290[1])) !=
             0);
-        assert((read_value_26730 = futhark_new_f32_2d(ctx, read_arr_26732,
-                                                      read_shape_26731[0],
-                                                      read_shape_26731[1])) !=
+        assert((read_value_36292 = futhark_new_f32_2d(ctx, read_arr_36294,
+                                                      read_shape_36293[0],
+                                                      read_shape_36293[1])) !=
             0);
-        assert((read_value_26733 = futhark_new_i32_1d(ctx, read_arr_26735,
-                                                      read_shape_26734[0])) !=
+        assert((read_value_36295 = futhark_new_i32_1d(ctx, read_arr_36297,
+                                                      read_shape_36296[0])) !=
             0);
-        assert((read_value_26736 = futhark_new_f32_2d(ctx, read_arr_26738,
-                                                      read_shape_26737[0],
-                                                      read_shape_26737[1])) !=
+        assert((read_value_36298 = futhark_new_f32_1d(ctx, read_arr_36300,
+                                                      read_shape_36299[0])) !=
             0);
-        assert((read_value_26739 = futhark_new_i32_2d(ctx, read_arr_26741,
-                                                      read_shape_26740[0],
-                                                      read_shape_26740[1])) !=
+        assert((read_value_36301 = futhark_new_f32_2d(ctx, read_arr_36303,
+                                                      read_shape_36302[0],
+                                                      read_shape_36302[1])) !=
+            0);
+        assert((read_value_36304 = futhark_new_f32_3d(ctx, read_arr_36306,
+                                                      read_shape_36305[0],
+                                                      read_shape_36305[1],
+                                                      read_shape_36305[2])) !=
+            0);
+        assert((read_value_36307 = futhark_new_f32_3d(ctx, read_arr_36309,
+                                                      read_shape_36308[0],
+                                                      read_shape_36308[1],
+                                                      read_shape_36308[2])) !=
+            0);
+        assert((read_value_36310 = futhark_new_f32_2d(ctx, read_arr_36312,
+                                                      read_shape_36311[0],
+                                                      read_shape_36311[1])) !=
+            0);
+        assert((read_value_36313 = futhark_new_f32_2d(ctx, read_arr_36315,
+                                                      read_shape_36314[0],
+                                                      read_shape_36314[1])) !=
+            0);
+        assert((read_value_36316 = futhark_new_f32_2d(ctx, read_arr_36318,
+                                                      read_shape_36317[0],
+                                                      read_shape_36317[1])) !=
+            0);
+        assert((read_value_36319 = futhark_new_i32_1d(ctx, read_arr_36321,
+                                                      read_shape_36320[0])) !=
+            0);
+        assert((read_value_36322 = futhark_new_f32_2d(ctx, read_arr_36324,
+                                                      read_shape_36323[0],
+                                                      read_shape_36323[1])) !=
+            0);
+        assert((read_value_36325 = futhark_new_i32_2d(ctx, read_arr_36327,
+                                                      read_shape_36326[0],
+                                                      read_shape_36326[1])) !=
+            0);
+        assert((read_value_36328 = futhark_new_i32_1d(ctx, read_arr_36330,
+                                                      read_shape_36329[0])) !=
+            0);
+        assert((read_value_36331 = futhark_new_i32_1d(ctx, read_arr_36333,
+                                                      read_shape_36332[0])) !=
+            0);
+        assert((read_value_36334 = futhark_new_f32_1d(ctx, read_arr_36336,
+                                                      read_shape_36335[0])) !=
+            0);
+        assert((read_value_36337 = futhark_new_f32_1d(ctx, read_arr_36339,
+                                                      read_shape_36338[0])) !=
+            0);
+        assert((read_value_36340 = futhark_new_f32_2d(ctx, read_arr_36342,
+                                                      read_shape_36341[0],
+                                                      read_shape_36341[1])) !=
+            0);
+        assert((read_value_36343 = futhark_new_f32_2d(ctx, read_arr_36345,
+                                                      read_shape_36344[0],
+                                                      read_shape_36344[1])) !=
+            0);
+        assert((read_value_36346 = futhark_new_i32_1d(ctx, read_arr_36348,
+                                                      read_shape_36347[0])) !=
+            0);
+        assert((read_value_36349 = futhark_new_f32_1d(ctx, read_arr_36351,
+                                                      read_shape_36350[0])) !=
             0);
         assert(futhark_context_sync(ctx) == 0);
         t_start = get_wall_time();
-        r = futhark_entry_main(ctx, &result_26742, &result_26743, &result_26744,
-                               &result_26745, &result_26746, &result_26747,
-                               &result_26748, &result_26749, &result_26750,
-                               read_value_26688, read_value_26691,
-                               read_value_26694, read_value_26697,
-                               read_value_26700, read_value_26703,
-                               read_value_26706, read_value_26709,
-                               read_value_26712, read_value_26715,
-                               read_value_26718, read_value_26721,
-                               read_value_26724, read_value_26727,
-                               read_value_26730, read_value_26733,
-                               read_value_26736, read_value_26739);
+        r = futhark_entry_main(ctx, &result_36352, &result_36353, &result_36354,
+                               &result_36355, &result_36356, &result_36357,
+                               &result_36358, &result_36359, &result_36360,
+                               &result_36361, &result_36362, &result_36363,
+                               &result_36364, &result_36365, &result_36366,
+                               &result_36367, &result_36368, read_value_36250,
+                               read_value_36253, read_value_36256,
+                               read_value_36259, read_value_36262,
+                               read_value_36265, read_value_36268,
+                               read_value_36271, read_value_36274,
+                               read_value_36277, read_value_36280,
+                               read_value_36283, read_value_36286,
+                               read_value_36289, read_value_36292,
+                               read_value_36295, read_value_36298,
+                               read_value_36301, read_value_36304,
+                               read_value_36307, read_value_36310,
+                               read_value_36313, read_value_36316,
+                               read_value_36319, read_value_36322,
+                               read_value_36325, read_value_36328,
+                               read_value_36331, read_value_36334,
+                               read_value_36337, read_value_36340,
+                               read_value_36343, read_value_36346,
+                               read_value_36349);
         if (r != 0)
             panic(1, "%s", futhark_context_get_error(ctx));
         assert(futhark_context_sync(ctx) == 0);
@@ -1566,25 +1916,49 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
         
         if (time_runs && runtime_file != NULL)
             fprintf(runtime_file, "%lld\n", (long long) elapsed_usec);
-        assert(futhark_free_f32_2d(ctx, read_value_26688) == 0);
-        assert(futhark_free_f32_3d(ctx, read_value_26691) == 0);
-        assert(futhark_free_f32_3d(ctx, read_value_26694) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26697) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26700) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26703) == 0);
-        assert(futhark_free_i32_1d(ctx, read_value_26706) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26709) == 0);
-        assert(futhark_free_i32_2d(ctx, read_value_26712) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26715) == 0);
-        assert(futhark_free_f32_3d(ctx, read_value_26718) == 0);
-        assert(futhark_free_f32_3d(ctx, read_value_26721) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26724) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26727) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26730) == 0);
-        assert(futhark_free_i32_1d(ctx, read_value_26733) == 0);
-        assert(futhark_free_f32_2d(ctx, read_value_26736) == 0);
-        assert(futhark_free_i32_2d(ctx, read_value_26739) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36250) == 0);
+        assert(futhark_free_f32_3d(ctx, read_value_36253) == 0);
+        assert(futhark_free_f32_3d(ctx, read_value_36256) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36259) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36262) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36265) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36268) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36271) == 0);
+        assert(futhark_free_i32_2d(ctx, read_value_36274) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36277) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36280) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36283) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36286) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36289) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36292) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36295) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36298) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36301) == 0);
+        assert(futhark_free_f32_3d(ctx, read_value_36304) == 0);
+        assert(futhark_free_f32_3d(ctx, read_value_36307) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36310) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36313) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36316) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36319) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36322) == 0);
+        assert(futhark_free_i32_2d(ctx, read_value_36325) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36328) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36331) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36334) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36337) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36340) == 0);
+        assert(futhark_free_f32_2d(ctx, read_value_36343) == 0);
+        assert(futhark_free_i32_1d(ctx, read_value_36346) == 0);
+        assert(futhark_free_f32_1d(ctx, read_value_36349) == 0);
         if (run < num_runs - 1) {
+            ;
+            ;
+            ;
+            ;
+            ;
+            ;
+            ;
+            ;
             ;
             ;
             ;
@@ -1596,44 +1970,84 @@ static void futrts_cli_entry_main(struct futhark_context *ctx)
             ;
         }
     }
-    free(read_arr_26690);
-    free(read_arr_26693);
-    free(read_arr_26696);
-    free(read_arr_26699);
-    free(read_arr_26702);
-    free(read_arr_26705);
-    free(read_arr_26708);
-    free(read_arr_26711);
-    free(read_arr_26714);
-    free(read_arr_26717);
-    free(read_arr_26720);
-    free(read_arr_26723);
-    free(read_arr_26726);
-    free(read_arr_26729);
-    free(read_arr_26732);
-    free(read_arr_26735);
-    free(read_arr_26738);
-    free(read_arr_26741);
+    free(read_arr_36252);
+    free(read_arr_36255);
+    free(read_arr_36258);
+    free(read_arr_36261);
+    free(read_arr_36264);
+    free(read_arr_36267);
+    free(read_arr_36270);
+    free(read_arr_36273);
+    free(read_arr_36276);
+    free(read_arr_36279);
+    free(read_arr_36282);
+    free(read_arr_36285);
+    free(read_arr_36288);
+    free(read_arr_36291);
+    free(read_arr_36294);
+    free(read_arr_36297);
+    free(read_arr_36300);
+    free(read_arr_36303);
+    free(read_arr_36306);
+    free(read_arr_36309);
+    free(read_arr_36312);
+    free(read_arr_36315);
+    free(read_arr_36318);
+    free(read_arr_36321);
+    free(read_arr_36324);
+    free(read_arr_36327);
+    free(read_arr_36330);
+    free(read_arr_36333);
+    free(read_arr_36336);
+    free(read_arr_36339);
+    free(read_arr_36342);
+    free(read_arr_36345);
+    free(read_arr_36348);
+    free(read_arr_36351);
     if (binary_output)
         set_binary_mode(stdout);
-    write_scalar(stdout, binary_output, &bool_info, &result_26742);
+    write_scalar(stdout, binary_output, &bool_info, &result_36352);
     printf("\n");
-    write_scalar(stdout, binary_output, &bool_info, &result_26743);
+    write_scalar(stdout, binary_output, &bool_info, &result_36353);
     printf("\n");
-    write_scalar(stdout, binary_output, &bool_info, &result_26744);
+    write_scalar(stdout, binary_output, &bool_info, &result_36354);
     printf("\n");
-    write_scalar(stdout, binary_output, &bool_info, &result_26745);
+    write_scalar(stdout, binary_output, &bool_info, &result_36355);
     printf("\n");
-    write_scalar(stdout, binary_output, &bool_info, &result_26746);
+    write_scalar(stdout, binary_output, &bool_info, &result_36356);
     printf("\n");
-    write_scalar(stdout, binary_output, &bool_info, &result_26747);
+    write_scalar(stdout, binary_output, &bool_info, &result_36357);
     printf("\n");
-    write_scalar(stdout, binary_output, &bool_info, &result_26748);
+    write_scalar(stdout, binary_output, &bool_info, &result_36358);
     printf("\n");
-    write_scalar(stdout, binary_output, &bool_info, &result_26749);
+    write_scalar(stdout, binary_output, &bool_info, &result_36359);
     printf("\n");
-    write_scalar(stdout, binary_output, &bool_info, &result_26750);
+    write_scalar(stdout, binary_output, &bool_info, &result_36360);
     printf("\n");
+    write_scalar(stdout, binary_output, &bool_info, &result_36361);
+    printf("\n");
+    write_scalar(stdout, binary_output, &bool_info, &result_36362);
+    printf("\n");
+    write_scalar(stdout, binary_output, &bool_info, &result_36363);
+    printf("\n");
+    write_scalar(stdout, binary_output, &bool_info, &result_36364);
+    printf("\n");
+    write_scalar(stdout, binary_output, &bool_info, &result_36365);
+    printf("\n");
+    write_scalar(stdout, binary_output, &bool_info, &result_36366);
+    printf("\n");
+    write_scalar(stdout, binary_output, &bool_info, &result_36367);
+    printf("\n");
+    write_scalar(stdout, binary_output, &bool_info, &result_36368);
+    printf("\n");
+    ;
+    ;
+    ;
+    ;
+    ;
+    ;
+    ;
+    ;
     ;
     ;
     ;
@@ -1910,48 +2324,78 @@ void futhark_debugging_report(struct futhark_context *ctx)
     }
     if (ctx->debugging) { }
 }
-static int futrts_main(struct futhark_context *ctx, bool *out_scalar_out_26679,
-                       bool *out_scalar_out_26680, bool *out_scalar_out_26681,
-                       bool *out_scalar_out_26682, bool *out_scalar_out_26683,
-                       bool *out_scalar_out_26684, bool *out_scalar_out_26685,
-                       bool *out_scalar_out_26686, bool *out_scalar_out_26687,
-                       struct memblock X_mem_26633,
-                       struct memblock Xsqr_mem_26634,
-                       struct memblock Xinv_mem_26635,
-                       struct memblock beta0_mem_26636,
-                       struct memblock beta_mem_26637,
-                       struct memblock y_preds_mem_26638,
-                       struct memblock Nss_mem_26639,
-                       struct memblock y_errors_mem_26640,
-                       struct memblock val_indss_mem_26641,
-                       struct memblock Xseq_mem_26642,
-                       struct memblock Xsqrseq_mem_26643,
-                       struct memblock Xinvseq_mem_26644,
-                       struct memblock beta0seq_mem_26645,
-                       struct memblock betaseq_mem_26646,
-                       struct memblock y_predsseq_mem_26647,
-                       struct memblock Nssseq_mem_26648,
-                       struct memblock y_errorsseq_mem_26649,
-                       struct memblock val_indssseq_mem_26650,
-                       int32_t sizze_26195, int32_t sizze_26196,
-                       int32_t sizze_26197, int32_t sizze_26198,
-                       int32_t sizze_26199, int32_t sizze_26200,
-                       int32_t sizze_26201, int32_t sizze_26202,
-                       int32_t sizze_26203, int32_t sizze_26204,
-                       int32_t sizze_26205, int32_t sizze_26206,
-                       int32_t sizze_26207, int32_t sizze_26208,
-                       int32_t sizze_26209, int32_t sizze_26210,
-                       int32_t sizze_26211, int32_t sizze_26212,
-                       int32_t sizze_26213, int32_t sizze_26214,
-                       int32_t sizze_26215, int32_t sizze_26216,
-                       int32_t sizze_26217, int32_t sizze_26218,
-                       int32_t sizze_26219, int32_t sizze_26220,
-                       int32_t sizze_26221, int32_t sizze_26222,
-                       int32_t sizze_26223, int32_t sizze_26224,
-                       int32_t sizze_26225, int32_t sizze_26226,
-                       int32_t sizze_26227, int32_t sizze_26228,
-                       int32_t sizze_26229, int32_t sizze_26230,
-                       int32_t sizze_26231, int32_t sizze_26232);
+static int futrts_main(struct futhark_context *ctx, bool *out_scalar_out_36233,
+                       bool *out_scalar_out_36234, bool *out_scalar_out_36235,
+                       bool *out_scalar_out_36236, bool *out_scalar_out_36237,
+                       bool *out_scalar_out_36238, bool *out_scalar_out_36239,
+                       bool *out_scalar_out_36240, bool *out_scalar_out_36241,
+                       bool *out_scalar_out_36242, bool *out_scalar_out_36243,
+                       bool *out_scalar_out_36244, bool *out_scalar_out_36245,
+                       bool *out_scalar_out_36246, bool *out_scalar_out_36247,
+                       bool *out_scalar_out_36248, bool *out_scalar_out_36249,
+                       struct memblock X_mem_36153,
+                       struct memblock Xsqr_mem_36154,
+                       struct memblock Xinv_mem_36155,
+                       struct memblock beta0_mem_36156,
+                       struct memblock beta_mem_36157,
+                       struct memblock y_preds_mem_36158,
+                       struct memblock Nss_mem_36159,
+                       struct memblock y_errors_mem_36160,
+                       struct memblock val_indss_mem_36161,
+                       struct memblock hs_mem_36162,
+                       struct memblock nss_mem_36163,
+                       struct memblock sigmas_mem_36164,
+                       struct memblock MO_fsts_mem_36165,
+                       struct memblock MOpp_mem_36166,
+                       struct memblock MOp_mem_36167,
+                       struct memblock breaks_mem_36168,
+                       struct memblock means_mem_36169,
+                       struct memblock Xseq_mem_36170,
+                       struct memblock Xsqrseq_mem_36171,
+                       struct memblock Xinvseq_mem_36172,
+                       struct memblock beta0seq_mem_36173,
+                       struct memblock betaseq_mem_36174,
+                       struct memblock y_predsseq_mem_36175,
+                       struct memblock Nssseq_mem_36176,
+                       struct memblock y_errorsseq_mem_36177,
+                       struct memblock val_indssseq_mem_36178,
+                       struct memblock hsseq_mem_36179,
+                       struct memblock nssseq_mem_36180,
+                       struct memblock sigmasseq_mem_36181,
+                       struct memblock MO_fstsseq_mem_36182,
+                       struct memblock MOppseq_mem_36183,
+                       struct memblock MOpseq_mem_36184,
+                       struct memblock breaksseq_mem_36185,
+                       struct memblock meansseq_mem_36186, int32_t sizze_35491,
+                       int32_t sizze_35492, int32_t sizze_35493,
+                       int32_t sizze_35494, int32_t sizze_35495,
+                       int32_t sizze_35496, int32_t sizze_35497,
+                       int32_t sizze_35498, int32_t sizze_35499,
+                       int32_t sizze_35500, int32_t sizze_35501,
+                       int32_t sizze_35502, int32_t sizze_35503,
+                       int32_t sizze_35504, int32_t sizze_35505,
+                       int32_t sizze_35506, int32_t sizze_35507,
+                       int32_t sizze_35508, int32_t sizze_35509,
+                       int32_t sizze_35510, int32_t sizze_35511,
+                       int32_t sizze_35512, int32_t sizze_35513,
+                       int32_t sizze_35514, int32_t sizze_35515,
+                       int32_t sizze_35516, int32_t sizze_35517,
+                       int32_t sizze_35518, int32_t sizze_35519,
+                       int32_t sizze_35520, int32_t sizze_35521,
+                       int32_t sizze_35522, int32_t sizze_35523,
+                       int32_t sizze_35524, int32_t sizze_35525,
+                       int32_t sizze_35526, int32_t sizze_35527,
+                       int32_t sizze_35528, int32_t sizze_35529,
+                       int32_t sizze_35530, int32_t sizze_35531,
+                       int32_t sizze_35532, int32_t sizze_35533,
+                       int32_t sizze_35534, int32_t sizze_35535,
+                       int32_t sizze_35536, int32_t sizze_35537,
+                       int32_t sizze_35538, int32_t sizze_35539,
+                       int32_t sizze_35540, int32_t sizze_35541,
+                       int32_t sizze_35542, int32_t sizze_35543,
+                       int32_t sizze_35544, int32_t sizze_35545,
+                       int32_t sizze_35546, int32_t sizze_35547,
+                       int32_t sizze_35548);
 static inline int8_t add8(int8_t x, int8_t y)
 {
     return x + y;
@@ -2844,664 +3288,1096 @@ static inline double futrts_from_bits64(int64_t x)
     p.f = x;
     return p.t;
 }
-static int futrts_main(struct futhark_context *ctx, bool *out_scalar_out_26679,
-                       bool *out_scalar_out_26680, bool *out_scalar_out_26681,
-                       bool *out_scalar_out_26682, bool *out_scalar_out_26683,
-                       bool *out_scalar_out_26684, bool *out_scalar_out_26685,
-                       bool *out_scalar_out_26686, bool *out_scalar_out_26687,
-                       struct memblock X_mem_26633,
-                       struct memblock Xsqr_mem_26634,
-                       struct memblock Xinv_mem_26635,
-                       struct memblock beta0_mem_26636,
-                       struct memblock beta_mem_26637,
-                       struct memblock y_preds_mem_26638,
-                       struct memblock Nss_mem_26639,
-                       struct memblock y_errors_mem_26640,
-                       struct memblock val_indss_mem_26641,
-                       struct memblock Xseq_mem_26642,
-                       struct memblock Xsqrseq_mem_26643,
-                       struct memblock Xinvseq_mem_26644,
-                       struct memblock beta0seq_mem_26645,
-                       struct memblock betaseq_mem_26646,
-                       struct memblock y_predsseq_mem_26647,
-                       struct memblock Nssseq_mem_26648,
-                       struct memblock y_errorsseq_mem_26649,
-                       struct memblock val_indssseq_mem_26650,
-                       int32_t sizze_26195, int32_t sizze_26196,
-                       int32_t sizze_26197, int32_t sizze_26198,
-                       int32_t sizze_26199, int32_t sizze_26200,
-                       int32_t sizze_26201, int32_t sizze_26202,
-                       int32_t sizze_26203, int32_t sizze_26204,
-                       int32_t sizze_26205, int32_t sizze_26206,
-                       int32_t sizze_26207, int32_t sizze_26208,
-                       int32_t sizze_26209, int32_t sizze_26210,
-                       int32_t sizze_26211, int32_t sizze_26212,
-                       int32_t sizze_26213, int32_t sizze_26214,
-                       int32_t sizze_26215, int32_t sizze_26216,
-                       int32_t sizze_26217, int32_t sizze_26218,
-                       int32_t sizze_26219, int32_t sizze_26220,
-                       int32_t sizze_26221, int32_t sizze_26222,
-                       int32_t sizze_26223, int32_t sizze_26224,
-                       int32_t sizze_26225, int32_t sizze_26226,
-                       int32_t sizze_26227, int32_t sizze_26228,
-                       int32_t sizze_26229, int32_t sizze_26230,
-                       int32_t sizze_26231, int32_t sizze_26232)
+static int futrts_main(struct futhark_context *ctx, bool *out_scalar_out_36233,
+                       bool *out_scalar_out_36234, bool *out_scalar_out_36235,
+                       bool *out_scalar_out_36236, bool *out_scalar_out_36237,
+                       bool *out_scalar_out_36238, bool *out_scalar_out_36239,
+                       bool *out_scalar_out_36240, bool *out_scalar_out_36241,
+                       bool *out_scalar_out_36242, bool *out_scalar_out_36243,
+                       bool *out_scalar_out_36244, bool *out_scalar_out_36245,
+                       bool *out_scalar_out_36246, bool *out_scalar_out_36247,
+                       bool *out_scalar_out_36248, bool *out_scalar_out_36249,
+                       struct memblock X_mem_36153,
+                       struct memblock Xsqr_mem_36154,
+                       struct memblock Xinv_mem_36155,
+                       struct memblock beta0_mem_36156,
+                       struct memblock beta_mem_36157,
+                       struct memblock y_preds_mem_36158,
+                       struct memblock Nss_mem_36159,
+                       struct memblock y_errors_mem_36160,
+                       struct memblock val_indss_mem_36161,
+                       struct memblock hs_mem_36162,
+                       struct memblock nss_mem_36163,
+                       struct memblock sigmas_mem_36164,
+                       struct memblock MO_fsts_mem_36165,
+                       struct memblock MOpp_mem_36166,
+                       struct memblock MOp_mem_36167,
+                       struct memblock breaks_mem_36168,
+                       struct memblock means_mem_36169,
+                       struct memblock Xseq_mem_36170,
+                       struct memblock Xsqrseq_mem_36171,
+                       struct memblock Xinvseq_mem_36172,
+                       struct memblock beta0seq_mem_36173,
+                       struct memblock betaseq_mem_36174,
+                       struct memblock y_predsseq_mem_36175,
+                       struct memblock Nssseq_mem_36176,
+                       struct memblock y_errorsseq_mem_36177,
+                       struct memblock val_indssseq_mem_36178,
+                       struct memblock hsseq_mem_36179,
+                       struct memblock nssseq_mem_36180,
+                       struct memblock sigmasseq_mem_36181,
+                       struct memblock MO_fstsseq_mem_36182,
+                       struct memblock MOppseq_mem_36183,
+                       struct memblock MOpseq_mem_36184,
+                       struct memblock breaksseq_mem_36185,
+                       struct memblock meansseq_mem_36186, int32_t sizze_35491,
+                       int32_t sizze_35492, int32_t sizze_35493,
+                       int32_t sizze_35494, int32_t sizze_35495,
+                       int32_t sizze_35496, int32_t sizze_35497,
+                       int32_t sizze_35498, int32_t sizze_35499,
+                       int32_t sizze_35500, int32_t sizze_35501,
+                       int32_t sizze_35502, int32_t sizze_35503,
+                       int32_t sizze_35504, int32_t sizze_35505,
+                       int32_t sizze_35506, int32_t sizze_35507,
+                       int32_t sizze_35508, int32_t sizze_35509,
+                       int32_t sizze_35510, int32_t sizze_35511,
+                       int32_t sizze_35512, int32_t sizze_35513,
+                       int32_t sizze_35514, int32_t sizze_35515,
+                       int32_t sizze_35516, int32_t sizze_35517,
+                       int32_t sizze_35518, int32_t sizze_35519,
+                       int32_t sizze_35520, int32_t sizze_35521,
+                       int32_t sizze_35522, int32_t sizze_35523,
+                       int32_t sizze_35524, int32_t sizze_35525,
+                       int32_t sizze_35526, int32_t sizze_35527,
+                       int32_t sizze_35528, int32_t sizze_35529,
+                       int32_t sizze_35530, int32_t sizze_35531,
+                       int32_t sizze_35532, int32_t sizze_35533,
+                       int32_t sizze_35534, int32_t sizze_35535,
+                       int32_t sizze_35536, int32_t sizze_35537,
+                       int32_t sizze_35538, int32_t sizze_35539,
+                       int32_t sizze_35540, int32_t sizze_35541,
+                       int32_t sizze_35542, int32_t sizze_35543,
+                       int32_t sizze_35544, int32_t sizze_35545,
+                       int32_t sizze_35546, int32_t sizze_35547,
+                       int32_t sizze_35548)
 {
-    bool scalar_out_26651;
-    bool scalar_out_26652;
-    bool scalar_out_26653;
-    bool scalar_out_26654;
-    bool scalar_out_26655;
-    bool scalar_out_26656;
-    bool scalar_out_26657;
-    bool scalar_out_26658;
-    bool scalar_out_26659;
-    bool dim_zzero_26251 = 0 == sizze_26214;
-    bool dim_zzero_26252 = 0 == sizze_26215;
-    bool old_empty_26253 = dim_zzero_26251 || dim_zzero_26252;
-    bool dim_zzero_26254 = 0 == sizze_26195;
-    bool new_empty_26255 = dim_zzero_26252 || dim_zzero_26254;
-    bool both_empty_26256 = old_empty_26253 && new_empty_26255;
-    bool dim_match_26257 = sizze_26195 == sizze_26214;
-    bool empty_or_match_26258 = both_empty_26256 || dim_match_26257;
-    bool empty_or_match_cert_26259;
+    bool scalar_out_36187;
+    bool scalar_out_36188;
+    bool scalar_out_36189;
+    bool scalar_out_36190;
+    bool scalar_out_36191;
+    bool scalar_out_36192;
+    bool scalar_out_36193;
+    bool scalar_out_36194;
+    bool scalar_out_36195;
+    bool scalar_out_36196;
+    bool scalar_out_36197;
+    bool scalar_out_36198;
+    bool scalar_out_36199;
+    bool scalar_out_36200;
+    bool scalar_out_36201;
+    bool scalar_out_36202;
+    bool scalar_out_36203;
+    bool dim_zzero_35583 = 0 == sizze_35520;
+    bool dim_zzero_35584 = 0 == sizze_35521;
+    bool old_empty_35585 = dim_zzero_35583 || dim_zzero_35584;
+    bool dim_zzero_35586 = 0 == sizze_35491;
+    bool new_empty_35587 = dim_zzero_35584 || dim_zzero_35586;
+    bool both_empty_35588 = old_empty_35585 && new_empty_35587;
+    bool dim_match_35589 = sizze_35491 == sizze_35520;
+    bool empty_or_match_35590 = both_empty_35588 || dim_match_35589;
+    bool empty_or_match_cert_35591;
     
-    if (!empty_or_match_26258) {
+    if (!empty_or_match_35590) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:24:12-26:25",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:28:12-30:25",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26260 = 0 == sizze_26196;
-    bool both_empty_26261 = dim_zzero_26252 && dim_zzero_26260;
-    bool dim_match_26262 = sizze_26196 == sizze_26215;
-    bool empty_or_match_26263 = both_empty_26261 || dim_match_26262;
-    bool empty_or_match_cert_26264;
+    bool dim_zzero_35592 = 0 == sizze_35492;
+    bool both_empty_35593 = dim_zzero_35584 && dim_zzero_35592;
+    bool dim_match_35594 = sizze_35492 == sizze_35521;
+    bool empty_or_match_35595 = both_empty_35593 || dim_match_35594;
+    bool empty_or_match_cert_35596;
     
-    if (!empty_or_match_26263) {
+    if (!empty_or_match_35595) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:24:12-26:25 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:25:18-62",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:28:12-30:25 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:29:18-62",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool res_26266;
-    bool redout_26549 = 1;
+    bool res_35598;
+    bool redout_36041 = 1;
     
-    for (int32_t i_26550 = 0; i_26550 < sizze_26195; i_26550++) {
-        bool res_26273;
-        bool redout_26547 = 1;
+    for (int32_t i_36042 = 0; i_36042 < sizze_35491; i_36042++) {
+        bool res_35605;
+        bool redout_36039 = 1;
         
-        for (int32_t i_26548 = 0; i_26548 < sizze_26196; i_26548++) {
-            float x_26277 = ((float *) X_mem_26633.mem)[i_26550 * sizze_26196 +
-                                                        i_26548];
-            float x_26278 = ((float *) Xseq_mem_26642.mem)[i_26550 *
-                                                           sizze_26215 +
-                                                           i_26548];
-            float abs_arg_26279 = x_26277 - x_26278;
-            float res_26280 = (float) fabs(abs_arg_26279);
-            bool res_26281 = res_26280 < 1.0e-2F;
-            bool x_26276 = res_26281 && redout_26547;
-            bool redout_tmp_26661 = x_26276;
+        for (int32_t i_36040 = 0; i_36040 < sizze_35492; i_36040++) {
+            float x_35609 = ((float *) X_mem_36153.mem)[i_36042 * sizze_35492 +
+                                                        i_36040];
+            float x_35610 = ((float *) Xseq_mem_36170.mem)[i_36042 *
+                                                           sizze_35521 +
+                                                           i_36040];
+            float abs_arg_35611 = x_35609 - x_35610;
+            float res_35612 = (float) fabs(abs_arg_35611);
+            bool res_35613 = res_35612 < 1.0e-2F;
+            bool x_35608 = res_35613 && redout_36039;
+            bool redout_tmp_36205 = x_35608;
             
-            redout_26547 = redout_tmp_26661;
+            redout_36039 = redout_tmp_36205;
         }
-        res_26273 = redout_26547;
+        res_35605 = redout_36039;
         
-        bool x_26269 = res_26273 && redout_26549;
-        bool redout_tmp_26660 = x_26269;
+        bool x_35601 = res_35605 && redout_36041;
+        bool redout_tmp_36204 = x_35601;
         
-        redout_26549 = redout_tmp_26660;
+        redout_36041 = redout_tmp_36204;
     }
-    res_26266 = redout_26549;
+    res_35598 = redout_36041;
     
-    bool dim_zzero_26282 = 0 == sizze_26216;
-    bool dim_zzero_26283 = 0 == sizze_26217;
-    bool dim_zzero_26284 = 0 == sizze_26218;
-    bool y_26285 = dim_zzero_26283 || dim_zzero_26284;
-    bool old_empty_26286 = dim_zzero_26282 || y_26285;
-    bool dim_zzero_26287 = 0 == sizze_26197;
-    bool new_empty_26288 = y_26285 || dim_zzero_26287;
-    bool both_empty_26289 = old_empty_26286 && new_empty_26288;
-    bool dim_match_26290 = sizze_26197 == sizze_26216;
-    bool empty_or_match_26291 = both_empty_26289 || dim_match_26290;
-    bool empty_or_match_cert_26292;
+    bool dim_zzero_35614 = 0 == sizze_35522;
+    bool dim_zzero_35615 = 0 == sizze_35523;
+    bool dim_zzero_35616 = 0 == sizze_35524;
+    bool y_35617 = dim_zzero_35615 || dim_zzero_35616;
+    bool old_empty_35618 = dim_zzero_35614 || y_35617;
+    bool dim_zzero_35619 = 0 == sizze_35493;
+    bool new_empty_35620 = y_35617 || dim_zzero_35619;
+    bool both_empty_35621 = old_empty_35618 && new_empty_35620;
+    bool dim_match_35622 = sizze_35493 == sizze_35522;
+    bool empty_or_match_35623 = both_empty_35621 || dim_match_35622;
+    bool empty_or_match_cert_35624;
     
-    if (!empty_or_match_26291) {
+    if (!empty_or_match_35623) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:31:15-35:39",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:35:15-39:39",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26293 = 0 == sizze_26198;
-    bool new_empty_26294 = dim_zzero_26284 || dim_zzero_26293;
-    bool both_empty_26295 = y_26285 && new_empty_26294;
-    bool dim_match_26296 = sizze_26198 == sizze_26217;
-    bool empty_or_match_26297 = both_empty_26295 || dim_match_26296;
-    bool empty_or_match_cert_26298;
+    bool dim_zzero_35625 = 0 == sizze_35494;
+    bool new_empty_35626 = dim_zzero_35616 || dim_zzero_35625;
+    bool both_empty_35627 = y_35617 && new_empty_35626;
+    bool dim_match_35628 = sizze_35494 == sizze_35523;
+    bool empty_or_match_35629 = both_empty_35627 || dim_match_35628;
+    bool empty_or_match_cert_35630;
     
-    if (!empty_or_match_26297) {
+    if (!empty_or_match_35629) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:31:15-35:39 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:32:25-34:35",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:35:15-39:39 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:36:25-38:35",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26299 = 0 == sizze_26199;
-    bool both_empty_26300 = dim_zzero_26284 && dim_zzero_26299;
-    bool dim_match_26301 = sizze_26199 == sizze_26218;
-    bool empty_or_match_26302 = both_empty_26300 || dim_match_26301;
-    bool empty_or_match_cert_26303;
+    bool dim_zzero_35631 = 0 == sizze_35495;
+    bool both_empty_35632 = dim_zzero_35616 && dim_zzero_35631;
+    bool dim_match_35633 = sizze_35495 == sizze_35524;
+    bool empty_or_match_35634 = both_empty_35632 || dim_match_35633;
+    bool empty_or_match_cert_35635;
     
-    if (!empty_or_match_26302) {
+    if (!empty_or_match_35634) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:31:15-35:39 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:32:25-34:35 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:33:31-80",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:35:15-39:39 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:36:25-38:35 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:37:31-80",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool res_26305;
-    bool redout_26555 = 1;
+    bool res_35637;
+    bool redout_36047 = 1;
     
-    for (int32_t i_26556 = 0; i_26556 < sizze_26197; i_26556++) {
-        bool res_26312;
-        bool redout_26553 = 1;
+    for (int32_t i_36048 = 0; i_36048 < sizze_35493; i_36048++) {
+        bool res_35644;
+        bool redout_36045 = 1;
         
-        for (int32_t i_26554 = 0; i_26554 < sizze_26198; i_26554++) {
-            bool res_26319;
-            bool redout_26551 = 1;
+        for (int32_t i_36046 = 0; i_36046 < sizze_35494; i_36046++) {
+            bool res_35651;
+            bool redout_36043 = 1;
             
-            for (int32_t i_26552 = 0; i_26552 < sizze_26199; i_26552++) {
-                float x_26323 = ((float *) Xsqr_mem_26634.mem)[i_26556 *
-                                                               (sizze_26199 *
-                                                                sizze_26198) +
-                                                               i_26554 *
-                                                               sizze_26199 +
-                                                               i_26552];
-                float x_26324 = ((float *) Xsqrseq_mem_26643.mem)[i_26556 *
-                                                                  (sizze_26218 *
-                                                                   sizze_26217) +
-                                                                  i_26554 *
-                                                                  sizze_26218 +
-                                                                  i_26552];
-                float abs_arg_26325 = x_26323 - x_26324;
-                float res_26326 = (float) fabs(abs_arg_26325);
-                bool res_26327 = res_26326 < 0.1F;
-                bool x_26322 = res_26327 && redout_26551;
-                bool redout_tmp_26664 = x_26322;
+            for (int32_t i_36044 = 0; i_36044 < sizze_35495; i_36044++) {
+                float x_35655 = ((float *) Xsqr_mem_36154.mem)[i_36048 *
+                                                               (sizze_35495 *
+                                                                sizze_35494) +
+                                                               i_36046 *
+                                                               sizze_35495 +
+                                                               i_36044];
+                float x_35656 = ((float *) Xsqrseq_mem_36171.mem)[i_36048 *
+                                                                  (sizze_35524 *
+                                                                   sizze_35523) +
+                                                                  i_36046 *
+                                                                  sizze_35524 +
+                                                                  i_36044];
+                float abs_arg_35657 = x_35655 - x_35656;
+                float res_35658 = (float) fabs(abs_arg_35657);
+                bool res_35659 = res_35658 < 0.1F;
+                bool x_35654 = res_35659 && redout_36043;
+                bool redout_tmp_36208 = x_35654;
                 
-                redout_26551 = redout_tmp_26664;
+                redout_36043 = redout_tmp_36208;
             }
-            res_26319 = redout_26551;
+            res_35651 = redout_36043;
             
-            bool x_26315 = res_26319 && redout_26553;
-            bool redout_tmp_26663 = x_26315;
+            bool x_35647 = res_35651 && redout_36045;
+            bool redout_tmp_36207 = x_35647;
             
-            redout_26553 = redout_tmp_26663;
+            redout_36045 = redout_tmp_36207;
         }
-        res_26312 = redout_26553;
+        res_35644 = redout_36045;
         
-        bool x_26308 = res_26312 && redout_26555;
-        bool redout_tmp_26662 = x_26308;
+        bool x_35640 = res_35644 && redout_36047;
+        bool redout_tmp_36206 = x_35640;
         
-        redout_26555 = redout_tmp_26662;
+        redout_36047 = redout_tmp_36206;
     }
-    res_26305 = redout_26555;
+    res_35637 = redout_36047;
     
-    bool dim_zzero_26328 = 0 == sizze_26219;
-    bool dim_zzero_26329 = 0 == sizze_26220;
-    bool dim_zzero_26330 = 0 == sizze_26221;
-    bool y_26331 = dim_zzero_26329 || dim_zzero_26330;
-    bool old_empty_26332 = dim_zzero_26328 || y_26331;
-    bool dim_zzero_26333 = 0 == sizze_26200;
-    bool new_empty_26334 = y_26331 || dim_zzero_26333;
-    bool both_empty_26335 = old_empty_26332 && new_empty_26334;
-    bool dim_match_26336 = sizze_26200 == sizze_26219;
-    bool empty_or_match_26337 = both_empty_26335 || dim_match_26336;
-    bool empty_or_match_cert_26338;
+    bool dim_zzero_35660 = 0 == sizze_35525;
+    bool dim_zzero_35661 = 0 == sizze_35526;
+    bool dim_zzero_35662 = 0 == sizze_35527;
+    bool y_35663 = dim_zzero_35661 || dim_zzero_35662;
+    bool old_empty_35664 = dim_zzero_35660 || y_35663;
+    bool dim_zzero_35665 = 0 == sizze_35496;
+    bool new_empty_35666 = y_35663 || dim_zzero_35665;
+    bool both_empty_35667 = old_empty_35664 && new_empty_35666;
+    bool dim_match_35668 = sizze_35496 == sizze_35525;
+    bool empty_or_match_35669 = both_empty_35667 || dim_match_35668;
+    bool empty_or_match_cert_35670;
     
-    if (!empty_or_match_26337) {
+    if (!empty_or_match_35669) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:42:15-46:39",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:46:15-50:39",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26339 = 0 == sizze_26201;
-    bool new_empty_26340 = dim_zzero_26330 || dim_zzero_26339;
-    bool both_empty_26341 = y_26331 && new_empty_26340;
-    bool dim_match_26342 = sizze_26201 == sizze_26220;
-    bool empty_or_match_26343 = both_empty_26341 || dim_match_26342;
-    bool empty_or_match_cert_26344;
+    bool dim_zzero_35671 = 0 == sizze_35497;
+    bool new_empty_35672 = dim_zzero_35662 || dim_zzero_35671;
+    bool both_empty_35673 = y_35663 && new_empty_35672;
+    bool dim_match_35674 = sizze_35497 == sizze_35526;
+    bool empty_or_match_35675 = both_empty_35673 || dim_match_35674;
+    bool empty_or_match_cert_35676;
     
-    if (!empty_or_match_26343) {
+    if (!empty_or_match_35675) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:42:15-46:39 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:43:25-45:35",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:46:15-50:39 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:47:25-49:35",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26345 = 0 == sizze_26202;
-    bool both_empty_26346 = dim_zzero_26330 && dim_zzero_26345;
-    bool dim_match_26347 = sizze_26202 == sizze_26221;
-    bool empty_or_match_26348 = both_empty_26346 || dim_match_26347;
-    bool empty_or_match_cert_26349;
+    bool dim_zzero_35677 = 0 == sizze_35498;
+    bool both_empty_35678 = dim_zzero_35662 && dim_zzero_35677;
+    bool dim_match_35679 = sizze_35498 == sizze_35527;
+    bool empty_or_match_35680 = both_empty_35678 || dim_match_35679;
+    bool empty_or_match_cert_35681;
     
-    if (!empty_or_match_26348) {
+    if (!empty_or_match_35680) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:42:15-46:39 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:43:25-45:35 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:44:31-86",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:46:15-50:39 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:47:25-49:35 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:48:31-86",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool res_26351;
-    bool redout_26561 = 1;
+    bool res_35683;
+    bool redout_36053 = 1;
     
-    for (int32_t i_26562 = 0; i_26562 < sizze_26200; i_26562++) {
-        bool res_26358;
-        bool redout_26559 = 1;
+    for (int32_t i_36054 = 0; i_36054 < sizze_35496; i_36054++) {
+        bool res_35690;
+        bool redout_36051 = 1;
         
-        for (int32_t i_26560 = 0; i_26560 < sizze_26201; i_26560++) {
-            bool res_26365;
-            bool redout_26557 = 1;
+        for (int32_t i_36052 = 0; i_36052 < sizze_35497; i_36052++) {
+            bool res_35697;
+            bool redout_36049 = 1;
             
-            for (int32_t i_26558 = 0; i_26558 < sizze_26202; i_26558++) {
-                float x_26369 = ((float *) Xinv_mem_26635.mem)[i_26562 *
-                                                               (sizze_26202 *
-                                                                sizze_26201) +
-                                                               i_26560 *
-                                                               sizze_26202 +
-                                                               i_26558];
-                float x_26370 = ((float *) Xinvseq_mem_26644.mem)[i_26562 *
-                                                                  (sizze_26221 *
-                                                                   sizze_26220) +
-                                                                  i_26560 *
-                                                                  sizze_26221 +
-                                                                  i_26558];
-                float abs_arg_26371 = x_26369 - x_26370;
-                float res_26372 = (float) fabs(abs_arg_26371);
-                bool res_26373 = res_26372 < 1.0e-7F;
-                bool x_26368 = res_26373 && redout_26557;
-                bool redout_tmp_26667 = x_26368;
+            for (int32_t i_36050 = 0; i_36050 < sizze_35498; i_36050++) {
+                float x_35701 = ((float *) Xinv_mem_36155.mem)[i_36054 *
+                                                               (sizze_35498 *
+                                                                sizze_35497) +
+                                                               i_36052 *
+                                                               sizze_35498 +
+                                                               i_36050];
+                float x_35702 = ((float *) Xinvseq_mem_36172.mem)[i_36054 *
+                                                                  (sizze_35527 *
+                                                                   sizze_35526) +
+                                                                  i_36052 *
+                                                                  sizze_35527 +
+                                                                  i_36050];
+                float abs_arg_35703 = x_35701 - x_35702;
+                float res_35704 = (float) fabs(abs_arg_35703);
+                bool res_35705 = res_35704 < 1.0e-7F;
+                bool x_35700 = res_35705 && redout_36049;
+                bool redout_tmp_36211 = x_35700;
                 
-                redout_26557 = redout_tmp_26667;
+                redout_36049 = redout_tmp_36211;
             }
-            res_26365 = redout_26557;
+            res_35697 = redout_36049;
             
-            bool x_26361 = res_26365 && redout_26559;
-            bool redout_tmp_26666 = x_26361;
+            bool x_35693 = res_35697 && redout_36051;
+            bool redout_tmp_36210 = x_35693;
             
-            redout_26559 = redout_tmp_26666;
+            redout_36051 = redout_tmp_36210;
         }
-        res_26358 = redout_26559;
+        res_35690 = redout_36051;
         
-        bool x_26354 = res_26358 && redout_26561;
-        bool redout_tmp_26665 = x_26354;
+        bool x_35686 = res_35690 && redout_36053;
+        bool redout_tmp_36209 = x_35686;
         
-        redout_26561 = redout_tmp_26665;
+        redout_36053 = redout_tmp_36209;
     }
-    res_26351 = redout_26561;
+    res_35683 = redout_36053;
     
-    bool dim_zzero_26374 = 0 == sizze_26222;
-    bool dim_zzero_26375 = 0 == sizze_26223;
-    bool old_empty_26376 = dim_zzero_26374 || dim_zzero_26375;
-    bool dim_zzero_26377 = 0 == sizze_26203;
-    bool new_empty_26378 = dim_zzero_26375 || dim_zzero_26377;
-    bool both_empty_26379 = old_empty_26376 && new_empty_26378;
-    bool dim_match_26380 = sizze_26203 == sizze_26222;
-    bool empty_or_match_26381 = both_empty_26379 || dim_match_26380;
-    bool empty_or_match_cert_26382;
+    bool dim_zzero_35706 = 0 == sizze_35528;
+    bool dim_zzero_35707 = 0 == sizze_35529;
+    bool old_empty_35708 = dim_zzero_35706 || dim_zzero_35707;
+    bool dim_zzero_35709 = 0 == sizze_35499;
+    bool new_empty_35710 = dim_zzero_35707 || dim_zzero_35709;
+    bool both_empty_35711 = old_empty_35708 && new_empty_35710;
+    bool dim_match_35712 = sizze_35499 == sizze_35528;
+    bool empty_or_match_35713 = both_empty_35711 || dim_match_35712;
+    bool empty_or_match_cert_35714;
     
-    if (!empty_or_match_26381) {
+    if (!empty_or_match_35713) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:53:16-55:33",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:57:16-59:33",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26383 = 0 == sizze_26204;
-    bool both_empty_26384 = dim_zzero_26375 && dim_zzero_26383;
-    bool dim_match_26385 = sizze_26204 == sizze_26223;
-    bool empty_or_match_26386 = both_empty_26384 || dim_match_26385;
-    bool empty_or_match_cert_26387;
+    bool dim_zzero_35715 = 0 == sizze_35500;
+    bool both_empty_35716 = dim_zzero_35707 && dim_zzero_35715;
+    bool dim_match_35717 = sizze_35500 == sizze_35529;
+    bool empty_or_match_35718 = both_empty_35716 || dim_match_35717;
+    bool empty_or_match_cert_35719;
     
-    if (!empty_or_match_26386) {
+    if (!empty_or_match_35718) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:53:16-55:33 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:54:18-61",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:57:16-59:33 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:58:18-61",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool res_26389;
-    bool redout_26565 = 1;
+    bool res_35721;
+    bool redout_36057 = 1;
     
-    for (int32_t i_26566 = 0; i_26566 < sizze_26203; i_26566++) {
-        bool res_26396;
-        bool redout_26563 = 1;
+    for (int32_t i_36058 = 0; i_36058 < sizze_35499; i_36058++) {
+        bool res_35728;
+        bool redout_36055 = 1;
         
-        for (int32_t i_26564 = 0; i_26564 < sizze_26204; i_26564++) {
-            float x_26400 = ((float *) beta0_mem_26636.mem)[i_26566 *
-                                                            sizze_26204 +
-                                                            i_26564];
-            float x_26401 = ((float *) beta0seq_mem_26645.mem)[i_26566 *
-                                                               sizze_26223 +
-                                                               i_26564];
-            float abs_arg_26402 = x_26400 - x_26401;
-            float res_26403 = (float) fabs(abs_arg_26402);
-            bool res_26404 = res_26403 < 1.1F;
-            bool x_26399 = res_26404 && redout_26563;
-            bool redout_tmp_26669 = x_26399;
+        for (int32_t i_36056 = 0; i_36056 < sizze_35500; i_36056++) {
+            float x_35732 = ((float *) beta0_mem_36156.mem)[i_36058 *
+                                                            sizze_35500 +
+                                                            i_36056];
+            float x_35733 = ((float *) beta0seq_mem_36173.mem)[i_36058 *
+                                                               sizze_35529 +
+                                                               i_36056];
+            float abs_arg_35734 = x_35732 - x_35733;
+            float res_35735 = (float) fabs(abs_arg_35734);
+            bool res_35736 = res_35735 < 1.1F;
+            bool x_35731 = res_35736 && redout_36055;
+            bool redout_tmp_36213 = x_35731;
             
-            redout_26563 = redout_tmp_26669;
+            redout_36055 = redout_tmp_36213;
         }
-        res_26396 = redout_26563;
+        res_35728 = redout_36055;
         
-        bool x_26392 = res_26396 && redout_26565;
-        bool redout_tmp_26668 = x_26392;
+        bool x_35724 = res_35728 && redout_36057;
+        bool redout_tmp_36212 = x_35724;
         
-        redout_26565 = redout_tmp_26668;
+        redout_36057 = redout_tmp_36212;
     }
-    res_26389 = redout_26565;
+    res_35721 = redout_36057;
     
-    bool dim_zzero_26405 = 0 == sizze_26224;
-    bool dim_zzero_26406 = 0 == sizze_26225;
-    bool old_empty_26407 = dim_zzero_26405 || dim_zzero_26406;
-    bool dim_zzero_26408 = 0 == sizze_26205;
-    bool new_empty_26409 = dim_zzero_26406 || dim_zzero_26408;
-    bool both_empty_26410 = old_empty_26407 && new_empty_26409;
-    bool dim_match_26411 = sizze_26205 == sizze_26224;
-    bool empty_or_match_26412 = both_empty_26410 || dim_match_26411;
-    bool empty_or_match_cert_26413;
+    bool dim_zzero_35737 = 0 == sizze_35530;
+    bool dim_zzero_35738 = 0 == sizze_35531;
+    bool old_empty_35739 = dim_zzero_35737 || dim_zzero_35738;
+    bool dim_zzero_35740 = 0 == sizze_35501;
+    bool new_empty_35741 = dim_zzero_35738 || dim_zzero_35740;
+    bool both_empty_35742 = old_empty_35739 && new_empty_35741;
+    bool dim_match_35743 = sizze_35501 == sizze_35530;
+    bool empty_or_match_35744 = both_empty_35742 || dim_match_35743;
+    bool empty_or_match_cert_35745;
     
-    if (!empty_or_match_26412) {
+    if (!empty_or_match_35744) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:60:15-62:31",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:64:15-66:31",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26414 = 0 == sizze_26206;
-    bool both_empty_26415 = dim_zzero_26406 && dim_zzero_26414;
-    bool dim_match_26416 = sizze_26206 == sizze_26225;
-    bool empty_or_match_26417 = both_empty_26415 || dim_match_26416;
-    bool empty_or_match_cert_26418;
+    bool dim_zzero_35746 = 0 == sizze_35502;
+    bool both_empty_35747 = dim_zzero_35738 && dim_zzero_35746;
+    bool dim_match_35748 = sizze_35502 == sizze_35531;
+    bool empty_or_match_35749 = both_empty_35747 || dim_match_35748;
+    bool empty_or_match_cert_35750;
     
-    if (!empty_or_match_26417) {
+    if (!empty_or_match_35749) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:60:15-62:31 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:61:18-61",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:64:15-66:31 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:65:18-61",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool res_26420;
-    bool redout_26569 = 1;
+    bool res_35752;
+    bool redout_36061 = 1;
     
-    for (int32_t i_26570 = 0; i_26570 < sizze_26205; i_26570++) {
-        bool res_26427;
-        bool redout_26567 = 1;
+    for (int32_t i_36062 = 0; i_36062 < sizze_35501; i_36062++) {
+        bool res_35759;
+        bool redout_36059 = 1;
         
-        for (int32_t i_26568 = 0; i_26568 < sizze_26206; i_26568++) {
-            float x_26431 = ((float *) beta_mem_26637.mem)[i_26570 *
-                                                           sizze_26206 +
-                                                           i_26568];
-            float x_26432 = ((float *) betaseq_mem_26646.mem)[i_26570 *
-                                                              sizze_26225 +
-                                                              i_26568];
-            float abs_arg_26433 = x_26431 - x_26432;
-            float res_26434 = (float) fabs(abs_arg_26433);
-            bool res_26435 = res_26434 < 0.1F;
-            bool x_26430 = res_26435 && redout_26567;
-            bool redout_tmp_26671 = x_26430;
+        for (int32_t i_36060 = 0; i_36060 < sizze_35502; i_36060++) {
+            float x_35763 = ((float *) beta_mem_36157.mem)[i_36062 *
+                                                           sizze_35502 +
+                                                           i_36060];
+            float x_35764 = ((float *) betaseq_mem_36174.mem)[i_36062 *
+                                                              sizze_35531 +
+                                                              i_36060];
+            float abs_arg_35765 = x_35763 - x_35764;
+            float res_35766 = (float) fabs(abs_arg_35765);
+            bool res_35767 = res_35766 < 0.1F;
+            bool x_35762 = res_35767 && redout_36059;
+            bool redout_tmp_36215 = x_35762;
             
-            redout_26567 = redout_tmp_26671;
+            redout_36059 = redout_tmp_36215;
         }
-        res_26427 = redout_26567;
+        res_35759 = redout_36059;
         
-        bool x_26423 = res_26427 && redout_26569;
-        bool redout_tmp_26670 = x_26423;
+        bool x_35755 = res_35759 && redout_36061;
+        bool redout_tmp_36214 = x_35755;
         
-        redout_26569 = redout_tmp_26670;
+        redout_36061 = redout_tmp_36214;
     }
-    res_26420 = redout_26569;
+    res_35752 = redout_36061;
     
-    bool dim_zzero_26436 = 0 == sizze_26226;
-    bool dim_zzero_26437 = 0 == sizze_26227;
-    bool old_empty_26438 = dim_zzero_26436 || dim_zzero_26437;
-    bool dim_zzero_26439 = 0 == sizze_26207;
-    bool new_empty_26440 = dim_zzero_26437 || dim_zzero_26439;
-    bool both_empty_26441 = old_empty_26438 && new_empty_26440;
-    bool dim_match_26442 = sizze_26207 == sizze_26226;
-    bool empty_or_match_26443 = both_empty_26441 || dim_match_26442;
-    bool empty_or_match_cert_26444;
+    bool dim_zzero_35768 = 0 == sizze_35532;
+    bool dim_zzero_35769 = 0 == sizze_35533;
+    bool old_empty_35770 = dim_zzero_35768 || dim_zzero_35769;
+    bool dim_zzero_35771 = 0 == sizze_35503;
+    bool new_empty_35772 = dim_zzero_35769 || dim_zzero_35771;
+    bool both_empty_35773 = old_empty_35770 && new_empty_35772;
+    bool dim_match_35774 = sizze_35503 == sizze_35532;
+    bool empty_or_match_35775 = both_empty_35773 || dim_match_35774;
+    bool empty_or_match_cert_35776;
     
-    if (!empty_or_match_26443) {
+    if (!empty_or_match_35775) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:67:18-69:37",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:71:18-73:37",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26445 = 0 == sizze_26208;
-    bool both_empty_26446 = dim_zzero_26437 && dim_zzero_26445;
-    bool dim_match_26447 = sizze_26208 == sizze_26227;
-    bool empty_or_match_26448 = both_empty_26446 || dim_match_26447;
-    bool empty_or_match_cert_26449;
+    bool dim_zzero_35777 = 0 == sizze_35504;
+    bool both_empty_35778 = dim_zzero_35769 && dim_zzero_35777;
+    bool dim_match_35779 = sizze_35504 == sizze_35533;
+    bool empty_or_match_35780 = both_empty_35778 || dim_match_35779;
+    bool empty_or_match_cert_35781;
     
-    if (!empty_or_match_26448) {
+    if (!empty_or_match_35780) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:67:18-69:37 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:68:18-61",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:71:18-73:37 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:72:18-61",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool res_26451;
-    bool redout_26573 = 1;
+    bool res_35783;
+    bool redout_36065 = 1;
     
-    for (int32_t i_26574 = 0; i_26574 < sizze_26207; i_26574++) {
-        bool res_26458;
-        bool redout_26571 = 1;
+    for (int32_t i_36066 = 0; i_36066 < sizze_35503; i_36066++) {
+        bool res_35790;
+        bool redout_36063 = 1;
         
-        for (int32_t i_26572 = 0; i_26572 < sizze_26208; i_26572++) {
-            float x_26462 = ((float *) y_preds_mem_26638.mem)[i_26574 *
-                                                              sizze_26208 +
-                                                              i_26572];
-            float x_26463 = ((float *) y_predsseq_mem_26647.mem)[i_26574 *
-                                                                 sizze_26227 +
-                                                                 i_26572];
-            float abs_arg_26464 = x_26462 - x_26463;
-            float res_26465 = (float) fabs(abs_arg_26464);
-            bool res_26466 = res_26465 < 0.1F;
-            bool x_26461 = res_26466 && redout_26571;
-            bool redout_tmp_26673 = x_26461;
+        for (int32_t i_36064 = 0; i_36064 < sizze_35504; i_36064++) {
+            float x_35794 = ((float *) y_preds_mem_36158.mem)[i_36066 *
+                                                              sizze_35504 +
+                                                              i_36064];
+            float x_35795 = ((float *) y_predsseq_mem_36175.mem)[i_36066 *
+                                                                 sizze_35533 +
+                                                                 i_36064];
+            float abs_arg_35796 = x_35794 - x_35795;
+            float res_35797 = (float) fabs(abs_arg_35796);
+            bool res_35798 = res_35797 < 0.1F;
+            bool x_35793 = res_35798 && redout_36063;
+            bool redout_tmp_36217 = x_35793;
             
-            redout_26571 = redout_tmp_26673;
+            redout_36063 = redout_tmp_36217;
         }
-        res_26458 = redout_26571;
+        res_35790 = redout_36063;
         
-        bool x_26454 = res_26458 && redout_26573;
-        bool redout_tmp_26672 = x_26454;
+        bool x_35786 = res_35790 && redout_36065;
+        bool redout_tmp_36216 = x_35786;
         
-        redout_26573 = redout_tmp_26672;
+        redout_36065 = redout_tmp_36216;
     }
-    res_26451 = redout_26573;
+    res_35783 = redout_36065;
     
-    bool dim_zzero_26467 = 0 == sizze_26228;
-    bool dim_zzero_26468 = 0 == sizze_26209;
-    bool both_empty_26469 = dim_zzero_26467 && dim_zzero_26468;
-    bool dim_match_26470 = sizze_26209 == sizze_26228;
-    bool empty_or_match_26471 = both_empty_26469 || dim_match_26470;
-    bool empty_or_match_cert_26472;
+    bool dim_zzero_35799 = 0 == sizze_35534;
+    bool dim_zzero_35800 = 0 == sizze_35505;
+    bool both_empty_35801 = dim_zzero_35799 && dim_zzero_35800;
+    bool dim_match_35802 = sizze_35505 == sizze_35534;
+    bool empty_or_match_35803 = both_empty_35801 || dim_match_35802;
+    bool empty_or_match_cert_35804;
     
-    if (!empty_or_match_26471) {
+    if (!empty_or_match_35803) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:74:18-66",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:78:18-66",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool res_26474;
-    bool redout_26575 = 1;
+    bool res_35806;
+    bool redout_36067 = 1;
     
-    for (int32_t i_26576 = 0; i_26576 < sizze_26209; i_26576++) {
-        int32_t x_26478 = ((int32_t *) Nss_mem_26639.mem)[i_26576];
-        int32_t x_26479 = ((int32_t *) Nssseq_mem_26648.mem)[i_26576];
-        int32_t abs_arg_26480 = x_26478 - x_26479;
-        int32_t res_26481 = abs(abs_arg_26480);
-        bool res_26482 = slt32(res_26481, 1);
-        bool x_26477 = res_26482 && redout_26575;
-        bool redout_tmp_26674 = x_26477;
+    for (int32_t i_36068 = 0; i_36068 < sizze_35505; i_36068++) {
+        int32_t x_35810 = ((int32_t *) Nss_mem_36159.mem)[i_36068];
+        int32_t x_35811 = ((int32_t *) Nssseq_mem_36176.mem)[i_36068];
+        int32_t abs_arg_35812 = x_35810 - x_35811;
+        int32_t res_35813 = abs(abs_arg_35812);
+        bool res_35814 = slt32(res_35813, 1);
+        bool x_35809 = res_35814 && redout_36067;
+        bool redout_tmp_36218 = x_35809;
         
-        redout_26575 = redout_tmp_26674;
+        redout_36067 = redout_tmp_36218;
     }
-    res_26474 = redout_26575;
+    res_35806 = redout_36067;
     
-    bool dim_zzero_26483 = 0 == sizze_26229;
-    bool dim_zzero_26484 = 0 == sizze_26230;
-    bool old_empty_26485 = dim_zzero_26483 || dim_zzero_26484;
-    bool dim_zzero_26486 = 0 == sizze_26210;
-    bool new_empty_26487 = dim_zzero_26484 || dim_zzero_26486;
-    bool both_empty_26488 = old_empty_26485 && new_empty_26487;
-    bool dim_match_26489 = sizze_26210 == sizze_26229;
-    bool empty_or_match_26490 = both_empty_26488 || dim_match_26489;
-    bool empty_or_match_cert_26491;
+    bool dim_zzero_35815 = 0 == sizze_35535;
+    bool dim_zzero_35816 = 0 == sizze_35536;
+    bool old_empty_35817 = dim_zzero_35815 || dim_zzero_35816;
+    bool dim_zzero_35818 = 0 == sizze_35506;
+    bool new_empty_35819 = dim_zzero_35816 || dim_zzero_35818;
+    bool both_empty_35820 = old_empty_35817 && new_empty_35819;
+    bool dim_match_35821 = sizze_35506 == sizze_35535;
+    bool empty_or_match_35822 = both_empty_35820 || dim_match_35821;
+    bool empty_or_match_cert_35823;
     
-    if (!empty_or_match_26490) {
+    if (!empty_or_match_35822) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:76:19-80:46",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:80:19-84:46",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26492 = 0 == sizze_26211;
-    bool both_empty_26493 = dim_zzero_26484 && dim_zzero_26492;
-    bool dim_match_26494 = sizze_26211 == sizze_26230;
-    bool empty_or_match_26495 = both_empty_26493 || dim_match_26494;
-    bool empty_or_match_cert_26496;
+    bool dim_zzero_35824 = 0 == sizze_35507;
+    bool both_empty_35825 = dim_zzero_35816 && dim_zzero_35824;
+    bool dim_match_35826 = sizze_35507 == sizze_35536;
+    bool empty_or_match_35827 = both_empty_35825 || dim_match_35826;
+    bool empty_or_match_cert_35828;
     
-    if (!empty_or_match_26495) {
+    if (!empty_or_match_35827) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:76:19-80:46 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:77:25-79:73",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:80:19-84:46 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:81:25-83:73",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool res_26498;
-    bool redout_26579 = 1;
+    bool res_35830;
+    bool redout_36071 = 1;
     
-    for (int32_t i_26580 = 0; i_26580 < sizze_26210; i_26580++) {
-        bool res_26505;
-        bool redout_26577 = 1;
+    for (int32_t i_36072 = 0; i_36072 < sizze_35506; i_36072++) {
+        bool res_35837;
+        bool redout_36069 = 1;
         
-        for (int32_t i_26578 = 0; i_26578 < sizze_26211; i_26578++) {
-            float x_26509 = ((float *) y_errors_mem_26640.mem)[i_26580 *
-                                                               sizze_26211 +
-                                                               i_26578];
-            float x_26510 = ((float *) y_errorsseq_mem_26649.mem)[i_26580 *
-                                                                  sizze_26230 +
-                                                                  i_26578];
-            bool res_26511;
+        for (int32_t i_36070 = 0; i_36070 < sizze_35507; i_36070++) {
+            float x_35841 = ((float *) y_errors_mem_36160.mem)[i_36072 *
+                                                               sizze_35507 +
+                                                               i_36070];
+            float x_35842 = ((float *) y_errorsseq_mem_36177.mem)[i_36072 *
+                                                                  sizze_35536 +
+                                                                  i_36070];
+            bool res_35843;
             
-            res_26511 = futrts_isnan32(x_26509);
+            res_35843 = futrts_isnan32(x_35841);
             
-            float abs_arg_26512 = x_26509 - x_26510;
-            float res_26513 = (float) fabs(abs_arg_26512);
-            bool res_26514 = res_26513 < 0.1F;
-            bool x_26515 = !res_26511;
-            bool y_26516 = res_26514 && x_26515;
-            bool res_26517 = res_26511 || y_26516;
-            bool x_26508 = res_26517 && redout_26577;
-            bool redout_tmp_26676 = x_26508;
+            float abs_arg_35844 = x_35841 - x_35842;
+            float res_35845 = (float) fabs(abs_arg_35844);
+            bool res_35846 = res_35845 < 0.1F;
+            bool x_35847 = !res_35843;
+            bool y_35848 = res_35846 && x_35847;
+            bool res_35849 = res_35843 || y_35848;
+            bool x_35840 = res_35849 && redout_36069;
+            bool redout_tmp_36220 = x_35840;
             
-            redout_26577 = redout_tmp_26676;
+            redout_36069 = redout_tmp_36220;
         }
-        res_26505 = redout_26577;
+        res_35837 = redout_36069;
         
-        bool x_26501 = res_26505 && redout_26579;
-        bool redout_tmp_26675 = x_26501;
+        bool x_35833 = res_35837 && redout_36071;
+        bool redout_tmp_36219 = x_35833;
         
-        redout_26579 = redout_tmp_26675;
+        redout_36071 = redout_tmp_36219;
     }
-    res_26498 = redout_26579;
+    res_35830 = redout_36071;
     
-    bool dim_zzero_26518 = 0 == sizze_26231;
-    bool dim_zzero_26519 = 0 == sizze_26232;
-    bool old_empty_26520 = dim_zzero_26518 || dim_zzero_26519;
-    bool dim_zzero_26521 = 0 == sizze_26212;
-    bool new_empty_26522 = dim_zzero_26519 || dim_zzero_26521;
-    bool both_empty_26523 = old_empty_26520 && new_empty_26522;
-    bool dim_match_26524 = sizze_26212 == sizze_26231;
-    bool empty_or_match_26525 = both_empty_26523 || dim_match_26524;
-    bool empty_or_match_cert_26526;
+    bool dim_zzero_35850 = 0 == sizze_35537;
+    bool dim_zzero_35851 = 0 == sizze_35538;
+    bool old_empty_35852 = dim_zzero_35850 || dim_zzero_35851;
+    bool dim_zzero_35853 = 0 == sizze_35508;
+    bool new_empty_35854 = dim_zzero_35851 || dim_zzero_35853;
+    bool both_empty_35855 = old_empty_35852 && new_empty_35854;
+    bool dim_match_35856 = sizze_35508 == sizze_35537;
+    bool empty_or_match_35857 = both_empty_35855 || dim_match_35856;
+    bool empty_or_match_cert_35858;
     
-    if (!empty_or_match_26525) {
+    if (!empty_or_match_35857) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:84:20-86:48",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:88:20-90:48",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool dim_zzero_26527 = 0 == sizze_26213;
-    bool both_empty_26528 = dim_zzero_26519 && dim_zzero_26527;
-    bool dim_match_26529 = sizze_26213 == sizze_26232;
-    bool empty_or_match_26530 = both_empty_26528 || dim_match_26529;
-    bool empty_or_match_cert_26531;
+    bool dim_zzero_35859 = 0 == sizze_35509;
+    bool both_empty_35860 = dim_zzero_35851 && dim_zzero_35859;
+    bool dim_match_35861 = sizze_35509 == sizze_35538;
+    bool empty_or_match_35862 = both_empty_35860 || dim_match_35861;
+    bool empty_or_match_cert_35863;
     
-    if (!empty_or_match_26530) {
+    if (!empty_or_match_35862) {
         ctx->error = msgprintf("Error at %s:\n%s\n",
-                               "validation-benchmark.fut:8:1-100:4 -> validation-benchmark.fut:84:20-86:48 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:85:25-53",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:88:20-90:48 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:89:25-53",
                                "function arguments of wrong shape");
         return 1;
     }
     
-    bool res_26533;
-    bool redout_26583 = 1;
+    bool res_35865;
+    bool redout_36075 = 1;
     
-    for (int32_t i_26584 = 0; i_26584 < sizze_26212; i_26584++) {
-        bool res_26540;
-        bool redout_26581 = 1;
+    for (int32_t i_36076 = 0; i_36076 < sizze_35508; i_36076++) {
+        bool res_35872;
+        bool redout_36073 = 1;
         
-        for (int32_t i_26582 = 0; i_26582 < sizze_26213; i_26582++) {
-            int32_t x_26544 = ((int32_t *) val_indss_mem_26641.mem)[i_26584 *
-                                                                    sizze_26213 +
-                                                                    i_26582];
-            int32_t x_26545 = ((int32_t *) val_indssseq_mem_26650.mem)[i_26584 *
-                                                                       sizze_26232 +
-                                                                       i_26582];
-            bool res_26546 = x_26544 == x_26545;
-            bool x_26543 = res_26546 && redout_26581;
-            bool redout_tmp_26678 = x_26543;
+        for (int32_t i_36074 = 0; i_36074 < sizze_35509; i_36074++) {
+            int32_t x_35876 = ((int32_t *) val_indss_mem_36161.mem)[i_36076 *
+                                                                    sizze_35509 +
+                                                                    i_36074];
+            int32_t x_35877 = ((int32_t *) val_indssseq_mem_36178.mem)[i_36076 *
+                                                                       sizze_35538 +
+                                                                       i_36074];
+            bool res_35878 = x_35876 == x_35877;
+            bool x_35875 = res_35878 && redout_36073;
+            bool redout_tmp_36222 = x_35875;
             
-            redout_26581 = redout_tmp_26678;
+            redout_36073 = redout_tmp_36222;
         }
-        res_26540 = redout_26581;
+        res_35872 = redout_36073;
         
-        bool x_26536 = res_26540 && redout_26583;
-        bool redout_tmp_26677 = x_26536;
+        bool x_35868 = res_35872 && redout_36075;
+        bool redout_tmp_36221 = x_35868;
         
-        redout_26583 = redout_tmp_26677;
+        redout_36075 = redout_tmp_36221;
     }
-    res_26533 = redout_26583;
-    scalar_out_26651 = res_26266;
-    scalar_out_26652 = res_26305;
-    scalar_out_26653 = res_26351;
-    scalar_out_26654 = res_26389;
-    scalar_out_26655 = res_26420;
-    scalar_out_26656 = res_26451;
-    scalar_out_26657 = res_26474;
-    scalar_out_26658 = res_26498;
-    scalar_out_26659 = res_26533;
-    *out_scalar_out_26679 = scalar_out_26651;
-    *out_scalar_out_26680 = scalar_out_26652;
-    *out_scalar_out_26681 = scalar_out_26653;
-    *out_scalar_out_26682 = scalar_out_26654;
-    *out_scalar_out_26683 = scalar_out_26655;
-    *out_scalar_out_26684 = scalar_out_26656;
-    *out_scalar_out_26685 = scalar_out_26657;
-    *out_scalar_out_26686 = scalar_out_26658;
-    *out_scalar_out_26687 = scalar_out_26659;
+    res_35865 = redout_36075;
+    
+    bool dim_zzero_35879 = 0 == sizze_35539;
+    bool dim_zzero_35880 = 0 == sizze_35510;
+    bool both_empty_35881 = dim_zzero_35879 && dim_zzero_35880;
+    bool dim_match_35882 = sizze_35510 == sizze_35539;
+    bool empty_or_match_35883 = both_empty_35881 || dim_match_35882;
+    bool empty_or_match_cert_35884;
+    
+    if (!empty_or_match_35883) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:94:17-50",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool res_35886;
+    bool redout_36077 = 1;
+    
+    for (int32_t i_36078 = 0; i_36078 < sizze_35510; i_36078++) {
+        int32_t x_35890 = ((int32_t *) hs_mem_36162.mem)[i_36078];
+        int32_t x_35891 = ((int32_t *) hsseq_mem_36179.mem)[i_36078];
+        bool res_35892 = x_35890 == x_35891;
+        bool x_35889 = res_35892 && redout_36077;
+        bool redout_tmp_36223 = x_35889;
+        
+        redout_36077 = redout_tmp_36223;
+    }
+    res_35886 = redout_36077;
+    
+    bool dim_zzero_35893 = 0 == sizze_35540;
+    bool dim_zzero_35894 = 0 == sizze_35511;
+    bool both_empty_35895 = dim_zzero_35893 && dim_zzero_35894;
+    bool dim_match_35896 = sizze_35511 == sizze_35540;
+    bool empty_or_match_35897 = both_empty_35895 || dim_match_35896;
+    bool empty_or_match_cert_35898;
+    
+    if (!empty_or_match_35897) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:95:18-53",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool res_35900;
+    bool redout_36079 = 1;
+    
+    for (int32_t i_36080 = 0; i_36080 < sizze_35511; i_36080++) {
+        int32_t x_35904 = ((int32_t *) nss_mem_36163.mem)[i_36080];
+        int32_t x_35905 = ((int32_t *) nssseq_mem_36180.mem)[i_36080];
+        bool res_35906 = x_35904 == x_35905;
+        bool x_35903 = res_35906 && redout_36079;
+        bool redout_tmp_36224 = x_35903;
+        
+        redout_36079 = redout_tmp_36224;
+    }
+    res_35900 = redout_36079;
+    
+    bool dim_zzero_35907 = 0 == sizze_35541;
+    bool dim_zzero_35908 = 0 == sizze_35512;
+    bool both_empty_35909 = dim_zzero_35907 && dim_zzero_35908;
+    bool dim_match_35910 = sizze_35512 == sizze_35541;
+    bool empty_or_match_35911 = both_empty_35909 || dim_match_35910;
+    bool empty_or_match_cert_35912;
+    
+    if (!empty_or_match_35911) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:96:21-75",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool res_35914;
+    bool redout_36081 = 1;
+    
+    for (int32_t i_36082 = 0; i_36082 < sizze_35512; i_36082++) {
+        float x_35918 = ((float *) sigmas_mem_36164.mem)[i_36082];
+        float x_35919 = ((float *) sigmasseq_mem_36181.mem)[i_36082];
+        float abs_arg_35920 = x_35918 - x_35919;
+        float res_35921 = (float) fabs(abs_arg_35920);
+        bool res_35922 = res_35921 < 1.0F;
+        bool x_35917 = res_35922 && redout_36081;
+        bool redout_tmp_36225 = x_35917;
+        
+        redout_36081 = redout_tmp_36225;
+    }
+    res_35914 = redout_36081;
+    
+    bool dim_zzero_35923 = 0 == sizze_35542;
+    bool dim_zzero_35924 = 0 == sizze_35513;
+    bool both_empty_35925 = dim_zzero_35923 && dim_zzero_35924;
+    bool dim_match_35926 = sizze_35513 == sizze_35542;
+    bool empty_or_match_35927 = both_empty_35925 || dim_match_35926;
+    bool empty_or_match_cert_35928;
+    
+    if (!empty_or_match_35927) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:98:22-78",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool res_35930;
+    bool redout_36083 = 1;
+    
+    for (int32_t i_36084 = 0; i_36084 < sizze_35513; i_36084++) {
+        float x_35934 = ((float *) MO_fsts_mem_36165.mem)[i_36084];
+        float x_35935 = ((float *) MO_fstsseq_mem_36182.mem)[i_36084];
+        float abs_arg_35936 = x_35934 - x_35935;
+        float res_35937 = (float) fabs(abs_arg_35936);
+        bool res_35938 = res_35937 < 1.0F;
+        bool x_35933 = res_35938 && redout_36083;
+        bool redout_tmp_36226 = x_35933;
+        
+        redout_36083 = redout_tmp_36226;
+    }
+    res_35930 = redout_36083;
+    
+    bool dim_zzero_35939 = 0 == sizze_35543;
+    bool dim_zzero_35940 = 0 == sizze_35544;
+    bool old_empty_35941 = dim_zzero_35939 || dim_zzero_35940;
+    bool dim_zzero_35942 = 0 == sizze_35514;
+    bool new_empty_35943 = dim_zzero_35940 || dim_zzero_35942;
+    bool both_empty_35944 = old_empty_35941 && new_empty_35943;
+    bool dim_match_35945 = sizze_35514 == sizze_35543;
+    bool empty_or_match_35946 = both_empty_35944 || dim_match_35945;
+    bool empty_or_match_cert_35947;
+    
+    if (!empty_or_match_35946) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:100:15-104:38",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool dim_zzero_35948 = 0 == sizze_35515;
+    bool both_empty_35949 = dim_zzero_35940 && dim_zzero_35948;
+    bool dim_match_35950 = sizze_35515 == sizze_35544;
+    bool empty_or_match_35951 = both_empty_35949 || dim_match_35950;
+    bool empty_or_match_cert_35952;
+    
+    if (!empty_or_match_35951) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:100:15-104:38 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:101:25-103:73",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool res_35954;
+    bool redout_36087 = 1;
+    
+    for (int32_t i_36088 = 0; i_36088 < sizze_35514; i_36088++) {
+        bool res_35961;
+        bool redout_36085 = 1;
+        
+        for (int32_t i_36086 = 0; i_36086 < sizze_35515; i_36086++) {
+            float x_35965 = ((float *) MOpp_mem_36166.mem)[i_36088 *
+                                                           sizze_35515 +
+                                                           i_36086];
+            float x_35966 = ((float *) MOppseq_mem_36183.mem)[i_36088 *
+                                                              sizze_35544 +
+                                                              i_36086];
+            bool res_35967;
+            
+            res_35967 = futrts_isnan32(x_35965);
+            
+            float abs_arg_35968 = x_35965 - x_35966;
+            float res_35969 = (float) fabs(abs_arg_35968);
+            bool res_35970 = res_35969 < 0.1F;
+            bool x_35971 = !res_35967;
+            bool y_35972 = res_35970 && x_35971;
+            bool res_35973 = res_35967 || y_35972;
+            bool x_35964 = res_35973 && redout_36085;
+            bool redout_tmp_36228 = x_35964;
+            
+            redout_36085 = redout_tmp_36228;
+        }
+        res_35961 = redout_36085;
+        
+        bool x_35957 = res_35961 && redout_36087;
+        bool redout_tmp_36227 = x_35957;
+        
+        redout_36087 = redout_tmp_36227;
+    }
+    res_35954 = redout_36087;
+    
+    bool dim_zzero_35974 = 0 == sizze_35545;
+    bool dim_zzero_35975 = 0 == sizze_35546;
+    bool old_empty_35976 = dim_zzero_35974 || dim_zzero_35975;
+    bool dim_zzero_35977 = 0 == sizze_35516;
+    bool new_empty_35978 = dim_zzero_35975 || dim_zzero_35977;
+    bool both_empty_35979 = old_empty_35976 && new_empty_35978;
+    bool dim_match_35980 = sizze_35516 == sizze_35545;
+    bool empty_or_match_35981 = both_empty_35979 || dim_match_35980;
+    bool empty_or_match_cert_35982;
+    
+    if (!empty_or_match_35981) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:108:14-112:36",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool dim_zzero_35983 = 0 == sizze_35517;
+    bool both_empty_35984 = dim_zzero_35975 && dim_zzero_35983;
+    bool dim_match_35985 = sizze_35517 == sizze_35546;
+    bool empty_or_match_35986 = both_empty_35984 || dim_match_35985;
+    bool empty_or_match_cert_35987;
+    
+    if (!empty_or_match_35986) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:108:14-112:36 -> /futlib/soacs.fut:51:3-37 -> /futlib/soacs.fut:51:19-23 -> validation-benchmark.fut:109:25-111:73",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool res_35989;
+    bool redout_36091 = 1;
+    
+    for (int32_t i_36092 = 0; i_36092 < sizze_35516; i_36092++) {
+        bool res_35996;
+        bool redout_36089 = 1;
+        
+        for (int32_t i_36090 = 0; i_36090 < sizze_35517; i_36090++) {
+            float x_36000 = ((float *) MOp_mem_36167.mem)[i_36092 *
+                                                          sizze_35517 +
+                                                          i_36090];
+            float x_36001 = ((float *) MOpseq_mem_36184.mem)[i_36092 *
+                                                             sizze_35546 +
+                                                             i_36090];
+            bool res_36002;
+            
+            res_36002 = futrts_isnan32(x_36000);
+            
+            float abs_arg_36003 = x_36000 - x_36001;
+            float res_36004 = (float) fabs(abs_arg_36003);
+            bool res_36005 = res_36004 < 0.1F;
+            bool x_36006 = !res_36002;
+            bool y_36007 = res_36005 && x_36006;
+            bool res_36008 = res_36002 || y_36007;
+            bool x_35999 = res_36008 && redout_36089;
+            bool redout_tmp_36230 = x_35999;
+            
+            redout_36089 = redout_tmp_36230;
+        }
+        res_35996 = redout_36089;
+        
+        bool x_35992 = res_35996 && redout_36091;
+        bool redout_tmp_36229 = x_35992;
+        
+        redout_36091 = redout_tmp_36229;
+    }
+    res_35989 = redout_36091;
+    
+    bool dim_zzero_36009 = 0 == sizze_35547;
+    bool dim_zzero_36010 = 0 == sizze_35518;
+    bool both_empty_36011 = dim_zzero_36009 && dim_zzero_36010;
+    bool dim_match_36012 = sizze_35518 == sizze_35547;
+    bool empty_or_match_36013 = both_empty_36011 || dim_match_36012;
+    bool empty_or_match_cert_36014;
+    
+    if (!empty_or_match_36013) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:116:21-62",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool res_36016;
+    bool redout_36093 = 1;
+    
+    for (int32_t i_36094 = 0; i_36094 < sizze_35518; i_36094++) {
+        int32_t x_36020 = ((int32_t *) breaks_mem_36168.mem)[i_36094];
+        int32_t x_36021 = ((int32_t *) breaksseq_mem_36185.mem)[i_36094];
+        bool res_36022 = x_36020 == x_36021;
+        bool x_36019 = res_36022 && redout_36093;
+        bool redout_tmp_36231 = x_36019;
+        
+        redout_36093 = redout_tmp_36231;
+    }
+    res_36016 = redout_36093;
+    
+    bool dim_zzero_36023 = 0 == sizze_35548;
+    bool dim_zzero_36024 = 0 == sizze_35519;
+    bool both_empty_36025 = dim_zzero_36023 && dim_zzero_36024;
+    bool dim_match_36026 = sizze_35519 == sizze_35548;
+    bool empty_or_match_36027 = both_empty_36025 || dim_match_36026;
+    bool empty_or_match_cert_36028;
+    
+    if (!empty_or_match_36027) {
+        ctx->error = msgprintf("Error at %s:\n%s\n",
+                               "validation-benchmark.fut:8:1-136:17 -> validation-benchmark.fut:117:20-72",
+                               "function arguments of wrong shape");
+        return 1;
+    }
+    
+    bool res_36030;
+    bool redout_36095 = 1;
+    
+    for (int32_t i_36096 = 0; i_36096 < sizze_35519; i_36096++) {
+        float x_36034 = ((float *) means_mem_36169.mem)[i_36096];
+        float x_36035 = ((float *) meansseq_mem_36186.mem)[i_36096];
+        float abs_arg_36036 = x_36034 - x_36035;
+        float res_36037 = (float) fabs(abs_arg_36036);
+        bool res_36038 = res_36037 < 1.0F;
+        bool x_36033 = res_36038 && redout_36095;
+        bool redout_tmp_36232 = x_36033;
+        
+        redout_36095 = redout_tmp_36232;
+    }
+    res_36030 = redout_36095;
+    scalar_out_36187 = res_35598;
+    scalar_out_36188 = res_35637;
+    scalar_out_36189 = res_35683;
+    scalar_out_36190 = res_35721;
+    scalar_out_36191 = res_35752;
+    scalar_out_36192 = res_35783;
+    scalar_out_36193 = res_35806;
+    scalar_out_36194 = res_35830;
+    scalar_out_36195 = res_35865;
+    scalar_out_36196 = res_35886;
+    scalar_out_36197 = res_35900;
+    scalar_out_36198 = res_35914;
+    scalar_out_36199 = res_35930;
+    scalar_out_36200 = res_35954;
+    scalar_out_36201 = res_35989;
+    scalar_out_36202 = res_36016;
+    scalar_out_36203 = res_36030;
+    *out_scalar_out_36233 = scalar_out_36187;
+    *out_scalar_out_36234 = scalar_out_36188;
+    *out_scalar_out_36235 = scalar_out_36189;
+    *out_scalar_out_36236 = scalar_out_36190;
+    *out_scalar_out_36237 = scalar_out_36191;
+    *out_scalar_out_36238 = scalar_out_36192;
+    *out_scalar_out_36239 = scalar_out_36193;
+    *out_scalar_out_36240 = scalar_out_36194;
+    *out_scalar_out_36241 = scalar_out_36195;
+    *out_scalar_out_36242 = scalar_out_36196;
+    *out_scalar_out_36243 = scalar_out_36197;
+    *out_scalar_out_36244 = scalar_out_36198;
+    *out_scalar_out_36245 = scalar_out_36199;
+    *out_scalar_out_36246 = scalar_out_36200;
+    *out_scalar_out_36247 = scalar_out_36201;
+    *out_scalar_out_36248 = scalar_out_36202;
+    *out_scalar_out_36249 = scalar_out_36203;
     return 0;
+}
+struct futhark_f32_1d {
+    struct memblock mem;
+    int64_t shape[1];
+} ;
+struct futhark_f32_1d *futhark_new_f32_1d(struct futhark_context *ctx,
+                                          float *data, int64_t dim0)
+{
+    struct futhark_f32_1d *bad = NULL;
+    struct futhark_f32_1d *arr =
+                          (struct futhark_f32_1d *) malloc(sizeof(struct futhark_f32_1d));
+    
+    if (arr == NULL)
+        return bad;
+    lock_lock(&ctx->lock);
+    arr->mem.references = NULL;
+    if (memblock_alloc(ctx, &arr->mem, dim0 * sizeof(float), "arr->mem"))
+        return NULL;
+    arr->shape[0] = dim0;
+    memmove(arr->mem.mem + 0, data + 0, dim0 * sizeof(float));
+    lock_unlock(&ctx->lock);
+    return arr;
+}
+struct futhark_f32_1d *futhark_new_raw_f32_1d(struct futhark_context *ctx,
+                                              char *data, int offset,
+                                              int64_t dim0)
+{
+    struct futhark_f32_1d *bad = NULL;
+    struct futhark_f32_1d *arr =
+                          (struct futhark_f32_1d *) malloc(sizeof(struct futhark_f32_1d));
+    
+    if (arr == NULL)
+        return bad;
+    lock_lock(&ctx->lock);
+    arr->mem.references = NULL;
+    if (memblock_alloc(ctx, &arr->mem, dim0 * sizeof(float), "arr->mem"))
+        return NULL;
+    arr->shape[0] = dim0;
+    memmove(arr->mem.mem + 0, data + offset, dim0 * sizeof(float));
+    lock_unlock(&ctx->lock);
+    return arr;
+}
+int futhark_free_f32_1d(struct futhark_context *ctx, struct futhark_f32_1d *arr)
+{
+    lock_lock(&ctx->lock);
+    if (memblock_unref(ctx, &arr->mem, "arr->mem") != 0)
+        return 1;
+    lock_unlock(&ctx->lock);
+    free(arr);
+    return 0;
+}
+int futhark_values_f32_1d(struct futhark_context *ctx,
+                          struct futhark_f32_1d *arr, float *data)
+{
+    lock_lock(&ctx->lock);
+    memmove(data + 0, arr->mem.mem + 0, arr->shape[0] * sizeof(float));
+    lock_unlock(&ctx->lock);
+    return 0;
+}
+char *futhark_values_raw_f32_1d(struct futhark_context *ctx,
+                                struct futhark_f32_1d *arr)
+{
+    return arr->mem.mem;
+}
+int64_t *futhark_shape_f32_1d(struct futhark_context *ctx,
+                              struct futhark_f32_1d *arr)
+{
+    return arr->shape;
 }
 struct futhark_i32_2d {
     struct memblock mem;
@@ -3797,7 +4673,9 @@ int64_t *futhark_shape_f32_2d(struct futhark_context *ctx,
 }
 int futhark_entry_main(struct futhark_context *ctx, bool *out0, bool *out1,
                        bool *out2, bool *out3, bool *out4, bool *out5,
-                       bool *out6, bool *out7, bool *out8, const
+                       bool *out6, bool *out7, bool *out8, bool *out9,
+                       bool *out10, bool *out11, bool *out12, bool *out13,
+                       bool *out14, bool *out15, bool *out16, const
                        struct futhark_f32_2d *in0, const
                        struct futhark_f32_3d *in1, const
                        struct futhark_f32_3d *in2, const
@@ -3807,227 +4685,394 @@ int futhark_entry_main(struct futhark_context *ctx, bool *out0, bool *out1,
                        struct futhark_i32_1d *in6, const
                        struct futhark_f32_2d *in7, const
                        struct futhark_i32_2d *in8, const
-                       struct futhark_f32_2d *in9, const
-                       struct futhark_f32_3d *in10, const
-                       struct futhark_f32_3d *in11, const
-                       struct futhark_f32_2d *in12, const
+                       struct futhark_i32_1d *in9, const
+                       struct futhark_i32_1d *in10, const
+                       struct futhark_f32_1d *in11, const
+                       struct futhark_f32_1d *in12, const
                        struct futhark_f32_2d *in13, const
                        struct futhark_f32_2d *in14, const
                        struct futhark_i32_1d *in15, const
-                       struct futhark_f32_2d *in16, const
-                       struct futhark_i32_2d *in17)
+                       struct futhark_f32_1d *in16, const
+                       struct futhark_f32_2d *in17, const
+                       struct futhark_f32_3d *in18, const
+                       struct futhark_f32_3d *in19, const
+                       struct futhark_f32_2d *in20, const
+                       struct futhark_f32_2d *in21, const
+                       struct futhark_f32_2d *in22, const
+                       struct futhark_i32_1d *in23, const
+                       struct futhark_f32_2d *in24, const
+                       struct futhark_i32_2d *in25, const
+                       struct futhark_i32_1d *in26, const
+                       struct futhark_i32_1d *in27, const
+                       struct futhark_f32_1d *in28, const
+                       struct futhark_f32_1d *in29, const
+                       struct futhark_f32_2d *in30, const
+                       struct futhark_f32_2d *in31, const
+                       struct futhark_i32_1d *in32, const
+                       struct futhark_f32_1d *in33)
 {
-    struct memblock X_mem_26633;
+    struct memblock X_mem_36153;
     
-    X_mem_26633.references = NULL;
+    X_mem_36153.references = NULL;
     
-    struct memblock Xsqr_mem_26634;
+    struct memblock Xsqr_mem_36154;
     
-    Xsqr_mem_26634.references = NULL;
+    Xsqr_mem_36154.references = NULL;
     
-    struct memblock Xinv_mem_26635;
+    struct memblock Xinv_mem_36155;
     
-    Xinv_mem_26635.references = NULL;
+    Xinv_mem_36155.references = NULL;
     
-    struct memblock beta0_mem_26636;
+    struct memblock beta0_mem_36156;
     
-    beta0_mem_26636.references = NULL;
+    beta0_mem_36156.references = NULL;
     
-    struct memblock beta_mem_26637;
+    struct memblock beta_mem_36157;
     
-    beta_mem_26637.references = NULL;
+    beta_mem_36157.references = NULL;
     
-    struct memblock y_preds_mem_26638;
+    struct memblock y_preds_mem_36158;
     
-    y_preds_mem_26638.references = NULL;
+    y_preds_mem_36158.references = NULL;
     
-    struct memblock Nss_mem_26639;
+    struct memblock Nss_mem_36159;
     
-    Nss_mem_26639.references = NULL;
+    Nss_mem_36159.references = NULL;
     
-    struct memblock y_errors_mem_26640;
+    struct memblock y_errors_mem_36160;
     
-    y_errors_mem_26640.references = NULL;
+    y_errors_mem_36160.references = NULL;
     
-    struct memblock val_indss_mem_26641;
+    struct memblock val_indss_mem_36161;
     
-    val_indss_mem_26641.references = NULL;
+    val_indss_mem_36161.references = NULL;
     
-    struct memblock Xseq_mem_26642;
+    struct memblock hs_mem_36162;
     
-    Xseq_mem_26642.references = NULL;
+    hs_mem_36162.references = NULL;
     
-    struct memblock Xsqrseq_mem_26643;
+    struct memblock nss_mem_36163;
     
-    Xsqrseq_mem_26643.references = NULL;
+    nss_mem_36163.references = NULL;
     
-    struct memblock Xinvseq_mem_26644;
+    struct memblock sigmas_mem_36164;
     
-    Xinvseq_mem_26644.references = NULL;
+    sigmas_mem_36164.references = NULL;
     
-    struct memblock beta0seq_mem_26645;
+    struct memblock MO_fsts_mem_36165;
     
-    beta0seq_mem_26645.references = NULL;
+    MO_fsts_mem_36165.references = NULL;
     
-    struct memblock betaseq_mem_26646;
+    struct memblock MOpp_mem_36166;
     
-    betaseq_mem_26646.references = NULL;
+    MOpp_mem_36166.references = NULL;
     
-    struct memblock y_predsseq_mem_26647;
+    struct memblock MOp_mem_36167;
     
-    y_predsseq_mem_26647.references = NULL;
+    MOp_mem_36167.references = NULL;
     
-    struct memblock Nssseq_mem_26648;
+    struct memblock breaks_mem_36168;
     
-    Nssseq_mem_26648.references = NULL;
+    breaks_mem_36168.references = NULL;
     
-    struct memblock y_errorsseq_mem_26649;
+    struct memblock means_mem_36169;
     
-    y_errorsseq_mem_26649.references = NULL;
+    means_mem_36169.references = NULL;
     
-    struct memblock val_indssseq_mem_26650;
+    struct memblock Xseq_mem_36170;
     
-    val_indssseq_mem_26650.references = NULL;
+    Xseq_mem_36170.references = NULL;
     
-    int32_t sizze_26195;
-    int32_t sizze_26196;
-    int32_t sizze_26197;
-    int32_t sizze_26198;
-    int32_t sizze_26199;
-    int32_t sizze_26200;
-    int32_t sizze_26201;
-    int32_t sizze_26202;
-    int32_t sizze_26203;
-    int32_t sizze_26204;
-    int32_t sizze_26205;
-    int32_t sizze_26206;
-    int32_t sizze_26207;
-    int32_t sizze_26208;
-    int32_t sizze_26209;
-    int32_t sizze_26210;
-    int32_t sizze_26211;
-    int32_t sizze_26212;
-    int32_t sizze_26213;
-    int32_t sizze_26214;
-    int32_t sizze_26215;
-    int32_t sizze_26216;
-    int32_t sizze_26217;
-    int32_t sizze_26218;
-    int32_t sizze_26219;
-    int32_t sizze_26220;
-    int32_t sizze_26221;
-    int32_t sizze_26222;
-    int32_t sizze_26223;
-    int32_t sizze_26224;
-    int32_t sizze_26225;
-    int32_t sizze_26226;
-    int32_t sizze_26227;
-    int32_t sizze_26228;
-    int32_t sizze_26229;
-    int32_t sizze_26230;
-    int32_t sizze_26231;
-    int32_t sizze_26232;
-    bool scalar_out_26651;
-    bool scalar_out_26652;
-    bool scalar_out_26653;
-    bool scalar_out_26654;
-    bool scalar_out_26655;
-    bool scalar_out_26656;
-    bool scalar_out_26657;
-    bool scalar_out_26658;
-    bool scalar_out_26659;
+    struct memblock Xsqrseq_mem_36171;
+    
+    Xsqrseq_mem_36171.references = NULL;
+    
+    struct memblock Xinvseq_mem_36172;
+    
+    Xinvseq_mem_36172.references = NULL;
+    
+    struct memblock beta0seq_mem_36173;
+    
+    beta0seq_mem_36173.references = NULL;
+    
+    struct memblock betaseq_mem_36174;
+    
+    betaseq_mem_36174.references = NULL;
+    
+    struct memblock y_predsseq_mem_36175;
+    
+    y_predsseq_mem_36175.references = NULL;
+    
+    struct memblock Nssseq_mem_36176;
+    
+    Nssseq_mem_36176.references = NULL;
+    
+    struct memblock y_errorsseq_mem_36177;
+    
+    y_errorsseq_mem_36177.references = NULL;
+    
+    struct memblock val_indssseq_mem_36178;
+    
+    val_indssseq_mem_36178.references = NULL;
+    
+    struct memblock hsseq_mem_36179;
+    
+    hsseq_mem_36179.references = NULL;
+    
+    struct memblock nssseq_mem_36180;
+    
+    nssseq_mem_36180.references = NULL;
+    
+    struct memblock sigmasseq_mem_36181;
+    
+    sigmasseq_mem_36181.references = NULL;
+    
+    struct memblock MO_fstsseq_mem_36182;
+    
+    MO_fstsseq_mem_36182.references = NULL;
+    
+    struct memblock MOppseq_mem_36183;
+    
+    MOppseq_mem_36183.references = NULL;
+    
+    struct memblock MOpseq_mem_36184;
+    
+    MOpseq_mem_36184.references = NULL;
+    
+    struct memblock breaksseq_mem_36185;
+    
+    breaksseq_mem_36185.references = NULL;
+    
+    struct memblock meansseq_mem_36186;
+    
+    meansseq_mem_36186.references = NULL;
+    
+    int32_t sizze_35491;
+    int32_t sizze_35492;
+    int32_t sizze_35493;
+    int32_t sizze_35494;
+    int32_t sizze_35495;
+    int32_t sizze_35496;
+    int32_t sizze_35497;
+    int32_t sizze_35498;
+    int32_t sizze_35499;
+    int32_t sizze_35500;
+    int32_t sizze_35501;
+    int32_t sizze_35502;
+    int32_t sizze_35503;
+    int32_t sizze_35504;
+    int32_t sizze_35505;
+    int32_t sizze_35506;
+    int32_t sizze_35507;
+    int32_t sizze_35508;
+    int32_t sizze_35509;
+    int32_t sizze_35510;
+    int32_t sizze_35511;
+    int32_t sizze_35512;
+    int32_t sizze_35513;
+    int32_t sizze_35514;
+    int32_t sizze_35515;
+    int32_t sizze_35516;
+    int32_t sizze_35517;
+    int32_t sizze_35518;
+    int32_t sizze_35519;
+    int32_t sizze_35520;
+    int32_t sizze_35521;
+    int32_t sizze_35522;
+    int32_t sizze_35523;
+    int32_t sizze_35524;
+    int32_t sizze_35525;
+    int32_t sizze_35526;
+    int32_t sizze_35527;
+    int32_t sizze_35528;
+    int32_t sizze_35529;
+    int32_t sizze_35530;
+    int32_t sizze_35531;
+    int32_t sizze_35532;
+    int32_t sizze_35533;
+    int32_t sizze_35534;
+    int32_t sizze_35535;
+    int32_t sizze_35536;
+    int32_t sizze_35537;
+    int32_t sizze_35538;
+    int32_t sizze_35539;
+    int32_t sizze_35540;
+    int32_t sizze_35541;
+    int32_t sizze_35542;
+    int32_t sizze_35543;
+    int32_t sizze_35544;
+    int32_t sizze_35545;
+    int32_t sizze_35546;
+    int32_t sizze_35547;
+    int32_t sizze_35548;
+    bool scalar_out_36187;
+    bool scalar_out_36188;
+    bool scalar_out_36189;
+    bool scalar_out_36190;
+    bool scalar_out_36191;
+    bool scalar_out_36192;
+    bool scalar_out_36193;
+    bool scalar_out_36194;
+    bool scalar_out_36195;
+    bool scalar_out_36196;
+    bool scalar_out_36197;
+    bool scalar_out_36198;
+    bool scalar_out_36199;
+    bool scalar_out_36200;
+    bool scalar_out_36201;
+    bool scalar_out_36202;
+    bool scalar_out_36203;
     
     lock_lock(&ctx->lock);
-    X_mem_26633 = in0->mem;
-    sizze_26195 = in0->shape[0];
-    sizze_26196 = in0->shape[1];
-    Xsqr_mem_26634 = in1->mem;
-    sizze_26197 = in1->shape[0];
-    sizze_26198 = in1->shape[1];
-    sizze_26199 = in1->shape[2];
-    Xinv_mem_26635 = in2->mem;
-    sizze_26200 = in2->shape[0];
-    sizze_26201 = in2->shape[1];
-    sizze_26202 = in2->shape[2];
-    beta0_mem_26636 = in3->mem;
-    sizze_26203 = in3->shape[0];
-    sizze_26204 = in3->shape[1];
-    beta_mem_26637 = in4->mem;
-    sizze_26205 = in4->shape[0];
-    sizze_26206 = in4->shape[1];
-    y_preds_mem_26638 = in5->mem;
-    sizze_26207 = in5->shape[0];
-    sizze_26208 = in5->shape[1];
-    Nss_mem_26639 = in6->mem;
-    sizze_26209 = in6->shape[0];
-    y_errors_mem_26640 = in7->mem;
-    sizze_26210 = in7->shape[0];
-    sizze_26211 = in7->shape[1];
-    val_indss_mem_26641 = in8->mem;
-    sizze_26212 = in8->shape[0];
-    sizze_26213 = in8->shape[1];
-    Xseq_mem_26642 = in9->mem;
-    sizze_26214 = in9->shape[0];
-    sizze_26215 = in9->shape[1];
-    Xsqrseq_mem_26643 = in10->mem;
-    sizze_26216 = in10->shape[0];
-    sizze_26217 = in10->shape[1];
-    sizze_26218 = in10->shape[2];
-    Xinvseq_mem_26644 = in11->mem;
-    sizze_26219 = in11->shape[0];
-    sizze_26220 = in11->shape[1];
-    sizze_26221 = in11->shape[2];
-    beta0seq_mem_26645 = in12->mem;
-    sizze_26222 = in12->shape[0];
-    sizze_26223 = in12->shape[1];
-    betaseq_mem_26646 = in13->mem;
-    sizze_26224 = in13->shape[0];
-    sizze_26225 = in13->shape[1];
-    y_predsseq_mem_26647 = in14->mem;
-    sizze_26226 = in14->shape[0];
-    sizze_26227 = in14->shape[1];
-    Nssseq_mem_26648 = in15->mem;
-    sizze_26228 = in15->shape[0];
-    y_errorsseq_mem_26649 = in16->mem;
-    sizze_26229 = in16->shape[0];
-    sizze_26230 = in16->shape[1];
-    val_indssseq_mem_26650 = in17->mem;
-    sizze_26231 = in17->shape[0];
-    sizze_26232 = in17->shape[1];
+    X_mem_36153 = in0->mem;
+    sizze_35491 = in0->shape[0];
+    sizze_35492 = in0->shape[1];
+    Xsqr_mem_36154 = in1->mem;
+    sizze_35493 = in1->shape[0];
+    sizze_35494 = in1->shape[1];
+    sizze_35495 = in1->shape[2];
+    Xinv_mem_36155 = in2->mem;
+    sizze_35496 = in2->shape[0];
+    sizze_35497 = in2->shape[1];
+    sizze_35498 = in2->shape[2];
+    beta0_mem_36156 = in3->mem;
+    sizze_35499 = in3->shape[0];
+    sizze_35500 = in3->shape[1];
+    beta_mem_36157 = in4->mem;
+    sizze_35501 = in4->shape[0];
+    sizze_35502 = in4->shape[1];
+    y_preds_mem_36158 = in5->mem;
+    sizze_35503 = in5->shape[0];
+    sizze_35504 = in5->shape[1];
+    Nss_mem_36159 = in6->mem;
+    sizze_35505 = in6->shape[0];
+    y_errors_mem_36160 = in7->mem;
+    sizze_35506 = in7->shape[0];
+    sizze_35507 = in7->shape[1];
+    val_indss_mem_36161 = in8->mem;
+    sizze_35508 = in8->shape[0];
+    sizze_35509 = in8->shape[1];
+    hs_mem_36162 = in9->mem;
+    sizze_35510 = in9->shape[0];
+    nss_mem_36163 = in10->mem;
+    sizze_35511 = in10->shape[0];
+    sigmas_mem_36164 = in11->mem;
+    sizze_35512 = in11->shape[0];
+    MO_fsts_mem_36165 = in12->mem;
+    sizze_35513 = in12->shape[0];
+    MOpp_mem_36166 = in13->mem;
+    sizze_35514 = in13->shape[0];
+    sizze_35515 = in13->shape[1];
+    MOp_mem_36167 = in14->mem;
+    sizze_35516 = in14->shape[0];
+    sizze_35517 = in14->shape[1];
+    breaks_mem_36168 = in15->mem;
+    sizze_35518 = in15->shape[0];
+    means_mem_36169 = in16->mem;
+    sizze_35519 = in16->shape[0];
+    Xseq_mem_36170 = in17->mem;
+    sizze_35520 = in17->shape[0];
+    sizze_35521 = in17->shape[1];
+    Xsqrseq_mem_36171 = in18->mem;
+    sizze_35522 = in18->shape[0];
+    sizze_35523 = in18->shape[1];
+    sizze_35524 = in18->shape[2];
+    Xinvseq_mem_36172 = in19->mem;
+    sizze_35525 = in19->shape[0];
+    sizze_35526 = in19->shape[1];
+    sizze_35527 = in19->shape[2];
+    beta0seq_mem_36173 = in20->mem;
+    sizze_35528 = in20->shape[0];
+    sizze_35529 = in20->shape[1];
+    betaseq_mem_36174 = in21->mem;
+    sizze_35530 = in21->shape[0];
+    sizze_35531 = in21->shape[1];
+    y_predsseq_mem_36175 = in22->mem;
+    sizze_35532 = in22->shape[0];
+    sizze_35533 = in22->shape[1];
+    Nssseq_mem_36176 = in23->mem;
+    sizze_35534 = in23->shape[0];
+    y_errorsseq_mem_36177 = in24->mem;
+    sizze_35535 = in24->shape[0];
+    sizze_35536 = in24->shape[1];
+    val_indssseq_mem_36178 = in25->mem;
+    sizze_35537 = in25->shape[0];
+    sizze_35538 = in25->shape[1];
+    hsseq_mem_36179 = in26->mem;
+    sizze_35539 = in26->shape[0];
+    nssseq_mem_36180 = in27->mem;
+    sizze_35540 = in27->shape[0];
+    sigmasseq_mem_36181 = in28->mem;
+    sizze_35541 = in28->shape[0];
+    MO_fstsseq_mem_36182 = in29->mem;
+    sizze_35542 = in29->shape[0];
+    MOppseq_mem_36183 = in30->mem;
+    sizze_35543 = in30->shape[0];
+    sizze_35544 = in30->shape[1];
+    MOpseq_mem_36184 = in31->mem;
+    sizze_35545 = in31->shape[0];
+    sizze_35546 = in31->shape[1];
+    breaksseq_mem_36185 = in32->mem;
+    sizze_35547 = in32->shape[0];
+    meansseq_mem_36186 = in33->mem;
+    sizze_35548 = in33->shape[0];
     
-    int ret = futrts_main(ctx, &scalar_out_26651, &scalar_out_26652,
-                          &scalar_out_26653, &scalar_out_26654,
-                          &scalar_out_26655, &scalar_out_26656,
-                          &scalar_out_26657, &scalar_out_26658,
-                          &scalar_out_26659, X_mem_26633, Xsqr_mem_26634,
-                          Xinv_mem_26635, beta0_mem_26636, beta_mem_26637,
-                          y_preds_mem_26638, Nss_mem_26639, y_errors_mem_26640,
-                          val_indss_mem_26641, Xseq_mem_26642,
-                          Xsqrseq_mem_26643, Xinvseq_mem_26644,
-                          beta0seq_mem_26645, betaseq_mem_26646,
-                          y_predsseq_mem_26647, Nssseq_mem_26648,
-                          y_errorsseq_mem_26649, val_indssseq_mem_26650,
-                          sizze_26195, sizze_26196, sizze_26197, sizze_26198,
-                          sizze_26199, sizze_26200, sizze_26201, sizze_26202,
-                          sizze_26203, sizze_26204, sizze_26205, sizze_26206,
-                          sizze_26207, sizze_26208, sizze_26209, sizze_26210,
-                          sizze_26211, sizze_26212, sizze_26213, sizze_26214,
-                          sizze_26215, sizze_26216, sizze_26217, sizze_26218,
-                          sizze_26219, sizze_26220, sizze_26221, sizze_26222,
-                          sizze_26223, sizze_26224, sizze_26225, sizze_26226,
-                          sizze_26227, sizze_26228, sizze_26229, sizze_26230,
-                          sizze_26231, sizze_26232);
+    int ret = futrts_main(ctx, &scalar_out_36187, &scalar_out_36188,
+                          &scalar_out_36189, &scalar_out_36190,
+                          &scalar_out_36191, &scalar_out_36192,
+                          &scalar_out_36193, &scalar_out_36194,
+                          &scalar_out_36195, &scalar_out_36196,
+                          &scalar_out_36197, &scalar_out_36198,
+                          &scalar_out_36199, &scalar_out_36200,
+                          &scalar_out_36201, &scalar_out_36202,
+                          &scalar_out_36203, X_mem_36153, Xsqr_mem_36154,
+                          Xinv_mem_36155, beta0_mem_36156, beta_mem_36157,
+                          y_preds_mem_36158, Nss_mem_36159, y_errors_mem_36160,
+                          val_indss_mem_36161, hs_mem_36162, nss_mem_36163,
+                          sigmas_mem_36164, MO_fsts_mem_36165, MOpp_mem_36166,
+                          MOp_mem_36167, breaks_mem_36168, means_mem_36169,
+                          Xseq_mem_36170, Xsqrseq_mem_36171, Xinvseq_mem_36172,
+                          beta0seq_mem_36173, betaseq_mem_36174,
+                          y_predsseq_mem_36175, Nssseq_mem_36176,
+                          y_errorsseq_mem_36177, val_indssseq_mem_36178,
+                          hsseq_mem_36179, nssseq_mem_36180,
+                          sigmasseq_mem_36181, MO_fstsseq_mem_36182,
+                          MOppseq_mem_36183, MOpseq_mem_36184,
+                          breaksseq_mem_36185, meansseq_mem_36186, sizze_35491,
+                          sizze_35492, sizze_35493, sizze_35494, sizze_35495,
+                          sizze_35496, sizze_35497, sizze_35498, sizze_35499,
+                          sizze_35500, sizze_35501, sizze_35502, sizze_35503,
+                          sizze_35504, sizze_35505, sizze_35506, sizze_35507,
+                          sizze_35508, sizze_35509, sizze_35510, sizze_35511,
+                          sizze_35512, sizze_35513, sizze_35514, sizze_35515,
+                          sizze_35516, sizze_35517, sizze_35518, sizze_35519,
+                          sizze_35520, sizze_35521, sizze_35522, sizze_35523,
+                          sizze_35524, sizze_35525, sizze_35526, sizze_35527,
+                          sizze_35528, sizze_35529, sizze_35530, sizze_35531,
+                          sizze_35532, sizze_35533, sizze_35534, sizze_35535,
+                          sizze_35536, sizze_35537, sizze_35538, sizze_35539,
+                          sizze_35540, sizze_35541, sizze_35542, sizze_35543,
+                          sizze_35544, sizze_35545, sizze_35546, sizze_35547,
+                          sizze_35548);
     
     if (ret == 0) {
-        *out0 = scalar_out_26651;
-        *out1 = scalar_out_26652;
-        *out2 = scalar_out_26653;
-        *out3 = scalar_out_26654;
-        *out4 = scalar_out_26655;
-        *out5 = scalar_out_26656;
-        *out6 = scalar_out_26657;
-        *out7 = scalar_out_26658;
-        *out8 = scalar_out_26659;
+        *out0 = scalar_out_36187;
+        *out1 = scalar_out_36188;
+        *out2 = scalar_out_36189;
+        *out3 = scalar_out_36190;
+        *out4 = scalar_out_36191;
+        *out5 = scalar_out_36192;
+        *out6 = scalar_out_36193;
+        *out7 = scalar_out_36194;
+        *out8 = scalar_out_36195;
+        *out9 = scalar_out_36196;
+        *out10 = scalar_out_36197;
+        *out11 = scalar_out_36198;
+        *out12 = scalar_out_36199;
+        *out13 = scalar_out_36200;
+        *out14 = scalar_out_36201;
+        *out15 = scalar_out_36202;
+        *out16 = scalar_out_36203;
     }
     lock_unlock(&ctx->lock);
     return ret;

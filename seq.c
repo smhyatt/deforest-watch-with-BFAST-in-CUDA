@@ -718,6 +718,24 @@ void printE(uint* E, uint m){
     printf("]");
 }
 
+void printEi(int* E, uint m){
+    printf("[");
+    for (uint i = 0; i < m; i++){
+        printf(" %d", E[i]);
+        if(i<m-1){printf(",");}
+    }
+    printf("]");
+}
+
+void printEf(float* E, uint m){
+    printf("[");
+    for (uint i = 0; i < m; i++){
+        printf(" %f", E[i]);
+        if(i<m-1){printf(",");}
+    }
+    printf("]");
+}
+
 int main(int argc, char const *argv[]) {
 
 	if (argc > 1) {
@@ -899,23 +917,14 @@ int main(int argc, char const *argv[]) {
     float* sigmas = calloc(m,sizeof(float));
     ker8(y_errors, K, hs, nss, sigmas);
 
-    // printf("\n****** Printing hs ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%d, ", hs[i]);
-    // }
-    // printf("\n");
-
-    // printf("\n****** Printing nss ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%u, ", nss[i]);
-    // }
-    // printf("\n");
-
-    // printf("\n****** Printing sigmas ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%f, ", sigmas[i]);
-    // }
-    // printf("\n");
+    printf("[");
+    for (uint i = 0; i < m; i++){
+        printf(" %d", hs[i]);
+        if(i<m-1){printf(",");}
+    }
+    printf("]");
+    printE(nss, m);
+    printEf(sigmas, m);
 
 // *****************************************************************************
 // Kernel 9
@@ -923,6 +932,7 @@ int main(int argc, char const *argv[]) {
 
     float* MO_fsts = calloc(m,sizeof(float));
     ker9(hs, y_errors, nss, MO_fsts);
+    printEf(MO_fsts, m);
 
     // printf("\n****** Printing MO_fsts ******\n");
     // for (uint i = 0; i < m; i++){
@@ -942,8 +952,12 @@ int main(int argc, char const *argv[]) {
 
     for (int i = 0; i < m*(N-n); i++) { MOpp[i] = F32_MIN; }
 
-
-    ker10(bound, Nss, nss, sigmas, hs, MO_fsts, y_errors, val_indss, MOp, means, fstBreakP, MOpp);
+    ker10(bound, Nss, nss, sigmas, hs, MO_fsts, y_errors, val_indss, MOp, means,
+          fstBreakP, MOpp);
+    printVf(MOpp, m, N-n);
+    printVf(MOp, m, N-n);
+    printEi(fstBreakP, m);
+    printEf(means, m);
 
     // printf("\n****** Printing MOpp ******\n");
     // for (uint i = 0; i < m; i++){

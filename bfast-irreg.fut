@@ -313,7 +313,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
     --                                                         yhat   , errors,   Valids, validIdxs
 --   in (MOs, MOs_NN, breaks, means, Xt, Xsqr, Xinv, beta0, beta, y_preds, y_errors, Nss, val_indss, hs, nss, sigmas, MO_fsts)
 --   in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss, sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
-  in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss)
+  in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss, sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
   -- (breaks:fst_break':[int,-2,int,...,-2,-1,...,LEN], means:mean:[float,float,...,Nmn])
 
 
