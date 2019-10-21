@@ -7,8 +7,18 @@ cmd:
 	$(CC) $(CFLAGS) seq.c && ./a.out
 	rm a.out
 
+rune:
+	futhark c bfast-irreg.fut
+	./bfast-irreg < data/testset_sahara_2pix.in > data/val.data
+	$(CC) $(CFLAGS) seq.c && ./a.out >> data/val.data
+	futhark c validation-benchmark.fut
+	./validation-benchmark < data/val.data
+	rm validation-benchmark
+	rm bfast-irreg
+	rm a.out
+
 sarah:
-	$(CC) $(CFLAGS) seq-parse.c 
+	$(CC) $(CFLAGS) seq-parse.c
 	./a.out
 	rm a.out
 
