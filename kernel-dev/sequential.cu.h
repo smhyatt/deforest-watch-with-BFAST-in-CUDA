@@ -500,8 +500,6 @@ void MO_prime_comp(uint Nmn, float* MO, uint* ns, float sigma, float* MOp){
 //                                   in  ((adj_break-1) / 2) * 2 + 1  -- Cosmin's validation hack
 //             let fst_break' = if ns <=5 || Ns-ns <= 5 then -2 else fst_break'
 void breaks(float* MOp, float* bound, uint Ns, uint ns, uint Nmn, int* isBreak, int* fstBreak){
-    int i = 0;
-
     for (uint i = 0; i < Nmn; i++){
         float mop = MOp[i];
         
@@ -578,11 +576,11 @@ void ker10(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
 
     uint Nmn = N-n;
     compBound(lam, n, N, Nmn, mappingindices, bound);
-    float* MO        = calloc(Nmn*m,sizeof(float));
-    int* isBreak     = calloc(m,sizeof(int));
-    int* fstBreak    = calloc(m,sizeof(int));
-    int* adjBreak    = calloc(m,sizeof(int));
-    int* val_indssP  = calloc(m*Nmn,sizeof(int));
+    float* MO        = (float*) calloc(Nmn*m,sizeof(float));
+    int* isBreak     = (int*) calloc(m,sizeof(int));
+    int* fstBreak    = (int*) calloc(m,sizeof(int));
+    int* adjBreak    = (int*) calloc(m,sizeof(int));
+    int* val_indssP  = (int*) calloc(m*Nmn,sizeof(int));
 
     for (uint pix = 0; pix < m; pix++){
         MO_comp(Nmn, &hs[pix], &MO_fsts[pix], &y_errors[pix*N], &Nss[pix], &nss[pix], &MO[pix*Nmn]);
