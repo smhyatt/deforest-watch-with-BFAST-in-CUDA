@@ -87,6 +87,11 @@ int main(int argc, char const *argv[]) {
       fpim = fopen("../data/peruCimages.in", "r");
    }
 
+   if (fp == NULL || fpim == NULL) {
+      printf("Files not read.\n");
+      return -1;
+   }
+
    printf("\n 1 \n");
    char input1[10], input2[10], input3[30], input4[30];
    char input5[30], input6[30], input7[50], input8[30];
