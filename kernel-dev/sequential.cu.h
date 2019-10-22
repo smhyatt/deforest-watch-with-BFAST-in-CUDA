@@ -75,7 +75,7 @@ float dotProdFilt(uint n, float* Xvct, float* XTvct, float* yvct) {
 // y  = [8,9,7]
 // xss = Xn, yss = XTn, vct = y
 void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint K){
-    float* tspVct = calloc(n,sizeof(float));
+    float* tspVct = (float*)calloc(n,sizeof(float));
 
     // K
     for (int i = 0; i < K; i++) {
