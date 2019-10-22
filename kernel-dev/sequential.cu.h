@@ -12,7 +12,7 @@
 typedef unsigned int uint;
 
 
-void ker1(uint N, int kp, int f, int* mappingindices, float* X){
+void mkX(uint N, int kp, int f, int* mappingindices, float* X){
     for (uint i = 0; i < kp; i++){
         for (uint j = 0; j < N; j++){
             float ind = mappingindices[j];

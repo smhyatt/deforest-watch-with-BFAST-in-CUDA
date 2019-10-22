@@ -201,7 +201,7 @@ int main(int argc, char const *argv[]) {
       
       printf("\n 8 \n");
       // calling sequential kernel 1 and transpose from the sequential file 
-      ker1(N, K, freq, h_mappingindices, h_X);
+      mkX(N, K, freq, h_mappingindices, h_X);
       transpose(N, K, h_X, h_XT);
       // matMult<float>(h_A, h_B, seq_C, WIDTH_A, HEIGHT_A, WIDTH_B);
       printf("\n 9 \n");
