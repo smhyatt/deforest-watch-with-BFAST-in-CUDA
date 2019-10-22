@@ -82,7 +82,6 @@ void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint 
         // K
         for (int j = 0; j < K; j++) {
             uint XIdx = i*N;
-            uint XTIdx = j;
             uint resIdx = i*K + j;
 
             for (uint l = 0; l < n; l++) {
@@ -355,7 +354,7 @@ void filterNaNsWKeys(uint N, float* diffVct, uint* valid, float* y_errors, int* 
     for (int i = 0; i < N; i++) {
         uint check = (diffVct[i] != F32_MIN);
         *valid    += check;
-        uint ind   = (check * (*valid) - 1);
+        int ind    = (check * (*valid) - 1);
 
         if (ind != -1) {
             y_errors[idx]  = diffVct[i];
@@ -363,17 +362,6 @@ void filterNaNsWKeys(uint N, float* diffVct, uint* valid, float* y_errors, int* 
             idx++;
         }
     }
-
-    // for (int i = 0; i < N; i++) {
-    //     tfs[i]  = (diffVct[i] != NAN);
-    //     acc    += tfs[i];
-    //     inds[i] = tfs[i] * acc - 1;
-    //     if (inds[i] != -1) {
-    //         y_errors[idx]    = diffVct[i];
-    //         val_indss[idx] = i;
-    //         idx++;
-    //     }
-    // }
 
 }
 
