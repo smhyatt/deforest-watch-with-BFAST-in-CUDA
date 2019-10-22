@@ -163,9 +163,9 @@ int main(int argc, char const *argv[]) {
    printf("\n 5 \n");
     
    // allocate device memory
-   uint map_size = N*m*sizeof(float);
-   uint sam_size = N*sizeof(float);
-   float* d_mappingindices;
+   uint map_size = N*sizeof(int);
+   uint sam_size = N*m*sizeof(float);
+   int* d_mappingindices;
    float* d_sample;
    cudaMalloc((void**) &d_mappingindices, map_size);
    cudaMalloc((void**) &d_sample, sam_size);
