@@ -18,7 +18,7 @@ $(EXECUTABLE): $(SRC) $(HELPERS)
 	$(CXX) -o $(EXECUTABLE) $(SRC)
 
 run: $(EXECUTABLE) 
-	./$(EXECUTABLE)
+	./$(EXECUTABLE) sahara
 
 clean:
 	rm -f $(EXECUTABLE) 
