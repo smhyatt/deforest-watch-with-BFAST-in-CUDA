@@ -113,13 +113,12 @@ int main(int argc, char const *argv[]) {
    int K  = 2*k + 2;
 
    int mappingLen, imageLen, i = 0;
-   char c;
 
    printf("\n 2 \n");
 
    // getting the lengths of mappingindices and images
-   while ((c = getc(fp)) != EOF) { mappingLen++; }
-   while ((c = getc(fpim)) != EOF) { imageLen++; }
+   while (getc(fp) != EOF) { mappingLen++; }
+   while (getc(fpim) != EOF) { imageLen++; }
 
    // rewinding the pointer to extract the data
    rewind(fpim);
