@@ -225,7 +225,7 @@ int main(int argc, char const *argv[]) {
       
       // 2. you would probably want to call here the kernel:
       // __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X){ 
-      ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X); 
+      ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT); 
       cudaThreadSynchronize();
 
       gettimeofday(&t_end, NULL);

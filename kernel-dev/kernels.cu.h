@@ -5,11 +5,14 @@
 
 typedef unsigned int uint;
 
-__global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X){
+__global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X, float* XT){
 
 	int gid = blockIdx.x*blockDim.x + threadIdx.x;
 	int cols = gid % N;
 	int rows = gid / N;
+	int colsT = cols * K + rows;
+	int rowsT = cols % K;
+	int idxT  = rowsT * K + colsT;
 
 	if (gid < N*K) {
 		int mi_val = mappingindices[cols];
@@ -26,6 +29,8 @@ __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X){
                 X[gid] = cos(angle);
             }
         }
+
+        XT[idxT]  = X[gid];
 	}
 
 
