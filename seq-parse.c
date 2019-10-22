@@ -551,7 +551,6 @@ int adjustValInds(uint n, uint ns, uint Ns, int* val_inds, int fstBreak) {
 //             let MO'' = scatter (replicate Nmn f32.nan) val_inds' MO'
 //             in (MO'', MO', fst_break', mean)
 void fstPComp(uint n, uint ns, uint Ns, int* val_inds, int* isBreak, int* fstBreak, int* adjBreak, int* fstBreakP) {
-    // printf("\n\n\n---------------------- %d -----------------------\n\n\n", *isBreak);
     if (!isBreak){
         *fstBreakP = -1;
     } else {
@@ -573,14 +572,10 @@ void valIndsPComp(uint n, uint Nmn, uint* ns, uint* Ns, int* fstBreak, int* val_
 
 
 void MOppComp(uint Nmn, float* MOp, int* val_indsP, float* MOpp) {
-     // printf("Nmn: %u\n", Nmn);
     for (int i = 0; i < Nmn; i++) {
         int currIdx = val_indsP[i];
-        // if (currIdx != -1 || currIdx != -2) {
-        // printf("1: currIdx: %u, MOpp: %f, MOp: %f\n",currIdx, MOpp[ currIdx ], MOp[i]);
         if (currIdx != -1 ) {
             MOpp[ currIdx ] = MOp[i];
-            // printf("2: currIdx: %u, MOpp: %f, MOp: %f\n",currIdx, MOpp[ currIdx ], MOp[i]);
         }
     }
 }
@@ -600,25 +595,19 @@ void ker10(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
     int* val_indssP  = calloc(m*Nmn,sizeof(int));
 
     for (uint pix = 0; pix < m; pix++){
-        // printf("\n---0----\n");
         MO_comp(Nmn, &hs[pix], &MO_fsts[pix], &y_errors[pix*N], &Nss[pix], &nss[pix], &MO[pix*Nmn]);
-        // printf("\n---1----\n");
+
         MO_prime_comp(Nmn, &MO[pix*Nmn], &nss[pix], sigmas[pix], &MOp[pix*Nmn]);
 
         breaks(&MOp[pix*Nmn], bound, Nss[pix], nss[pix], Nmn, &isBreak[pix], &fstBreak[pix]);
 
         meanComp(Nss[pix], nss[pix], Nmn, &MOp[pix*Nmn], &means[pix]);
-        // printf("\n---4----\n");
 
         fstPComp(n, nss[pix], Nss[pix], &val_indss[pix*N], &isBreak[pix], &fstBreak[pix], &adjBreak[pix], &fstBreakP[pix]);
-        // printf("\n---5----\n");
 
         valIndsPComp(n, Nmn, &nss[pix], &Nss[pix], &fstBreak[pix], &val_indss[pix*N], &val_indssP[pix*Nmn]);
-        // printf("\n---6----\n");
-        // printf("MOp: %f,  val_indssP: %u \n", MOp[pix*Nmn], val_indssP[pix*Nmn]);
 
         MOppComp(Nmn, &MOp[pix*Nmn], &val_indssP[pix*Nmn], &MOpp[pix*Nmn]);
-        // printf("\n---7----\n");
     }
 
     free(MO);
@@ -647,17 +636,6 @@ int main(int argc, char const *argv[]) {
 		fpim = fopen("data/peruCimages.in", "r");
 	}
 
-
-	// trend: 1
-	// k:     3
-	// m:     2
-	// mIRL:  67968
-	// n:     228
-	// N:     414
-	// freq:  12.000000
-	// hfrac: 0.250000
-	// lam:   1.736126
-	// (trend, k, n, freq, hfrac, lam, m, N, mappingindices)
 
 	char input1[10], input2[10], input3[30], input4[30];
 	char input5[30], input6[30], input7[50], input8[30];
@@ -736,9 +714,12 @@ int main(int argc, char const *argv[]) {
 	}
 	printf("\n");
 
-
 	fclose(fp);
 
+
+// *****************************************************************************
+// Kernel 1
+// *****************************************************************************
 
     int K = 2*k +2;
     float* X  = calloc(K*N,sizeof(float));
@@ -747,119 +728,77 @@ int main(int argc, char const *argv[]) {
     transpose(N, K, X, XT);
 
     // printf("\n****** Printing X ******\n");
-    // for (size_t i = 0; i < 1; i++){ // i < K
-    //     for (size_t j = 0; j < n; j++){
-    //         uint index = i*N + j;
-    //         printf(" %f ", X[index]);
-    //     }
-    //     printf("\n");
-    // }
+    printf("[");
+    for (size_t i = 0; i < K; i++){
+        printf("[");
+        for (size_t j = 0; j < N; j++){
+            uint index = i*N + j;
+            printf(" %ff32", X[index]);
+            if(j<N-1){printf(",");}
+        }
+        printf("]");
+        if(i<K-1){printf(",");}
+    }
+    printf("]");
 
-    // printf("\n****** Printing Y ******\n");
-    // uint Ylen = sizeof(sample)/sizeof(sample[0]);
-    // for (size_t i = 0; i < Ylen; i++){ // i < Ylen
-    //     for (size_t j = 0; j < n; j++){
-    //         printf(" %lf ", sample[i][j]);
-    //     }
-    //     printf("\n");
-    // }
 
-    // printf("\n****** Printing XT ******\n");
-    // for (size_t i = 0; i < N; i++){
-    //     for (size_t j = 0; j < K; j++){
-    //         uint index = i*K + j;
-    //         printf(" %f ", XT[index]);
-    //     }
-    //     printf("\n");
-    // }
+// *****************************************************************************
+// Kernel 2
+// *****************************************************************************
 
-    // [n][m]
     float* Xsqr = calloc(K*K*m,sizeof(float));
     ker2(n, N, m, X, XT, sample, Xsqr, K);
 
-    // printf("\n****** Printing Xsqr ******\n");
-    // for (int pix = 0; pix < m; pix++) {
-    //     for (size_t i = 0; i < K; i++){
-    //         for (size_t j = 0; j < K; j++){
-    //             uint index = pix*K*K + i*K + j;
-    //             printf("%f, ", Xsqr[index]);
-    //         }
-    //         printf("\n");
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    printM(Xsqr, m, K);
+
+
+// *****************************************************************************
+// Kernel 3
+// *****************************************************************************
 
     float* XsqrInv = calloc(2*K*K*m,sizeof(float));
     ker3(m, Xsqr, XsqrInv, K);
 
-    // printf("\n****** Printing XsqrInv ******\n");
-    // for (int pix = 0; pix < m; pix++) {
-    //     for (uint i = 0; i < K; i++){
-    //         for (uint j = 0; j < 2*K; j++){
-    //             uint index = pix*K*(2*K) + i*2*K + j;
-    //             printf("%f, ", XsqrInv[index]);
-    //         }
-    //         printf("\n");
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
-
     float* XsqrInvLess = calloc(K*K*m,sizeof(float));
     doubleDown(m, XsqrInv, XsqrInvLess, K);
 
-    // printf("\n****** Printing XsqrInvLess ******\n");
-    // for (int pix = 0; pix < m; pix++) {
-    //     for (size_t i = 0; i < K; i++){
-    //         for (size_t j = 0; j < K; j++){
-    //             uint index = pix*K*K + i*K + j;
-    //             printf("%f, ", XsqrInvLess[index]);
-    //         }
-    //         printf("\n");
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    printM(XsqrInvLess, m, K);
+
+
+// *****************************************************************************
+// Kernel 4
+// *****************************************************************************
 
     float* B0 = calloc(K*m,sizeof(float));
     ker4(m, n, N, X, K, sample, B0);
 
-    // printf("\n****** Printing B0 ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < K; j++) {
-    //         uint index = i*K + j;
-    //         printf("%f, ", B0[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    printVf(B0, m, K);
+
+
+// *****************************************************************************
+// Kernel 5
+// *****************************************************************************
 
     float* B = calloc(K*m,sizeof(float));
     ker5(m, XsqrInvLess, K, B0, B);
 
-    // printf("\n****** Printing B ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < K; j++) {
-    //         uint index = i*K + j;
-    //         printf("%f, ", B[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    printVf(B, m, K);
+
+
+// *****************************************************************************
+// Kernel 6
+// *****************************************************************************
 
     float* yhat = calloc(m*N,sizeof(float));
     ker6(m, N, XT, B, K, yhat);
 
-    // printf("\n****** Printing yhat ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < N; j++) {
-    //         uint index = i*N + j;
-    //         printf("%f, ", yhat[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    printVf(yhat, m, N);
+
+
+// *****************************************************************************
+// Kernel 7
+// *****************************************************************************
+
 
     uint* Nss           = calloc(m,sizeof(uint));
     float* y_errors_all = calloc(m*N,sizeof(float));
@@ -870,63 +809,42 @@ int main(int argc, char const *argv[]) {
 
     ker7(m, N, yhat, y_errors_all, Nss, y_errors, sample, val_indss);
 
-    // printf("\n****** Printing Nss ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%d, ", Nss[i]);
-    // }
-    // printf("\n");
+    printE(Nss, m);
+    printVf(y_errors, m, N);
+    printVi(val_indss, m, N);
 
-    // printf("\n****** Printing y_errors ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < N; j++) {
-    //         uint index = i*N + j;
-    //         printf("%f, ", y_errors[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
 
-    // printf("\n****** Printing val_indss ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < N; j++) {
-    //         uint index = i*N + j;
-    //         printf("%d, ", val_indss[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+// *****************************************************************************
+// Kernel 8
+// *****************************************************************************
 
     int* hs       = calloc(m,sizeof(int));
     uint* nss     = calloc(m,sizeof(uint));
     float* sigmas = calloc(m,sizeof(float));
     ker8(m, n, N, hfrac, y_errors, K, hs, nss, sigmas, sample);
 
-    // printf("\n****** Printing hs ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%d, ", hs[i]);
-    // }
-    // printf("\n");
+    printf("[");
+    for (uint i = 0; i < m; i++){
+        printf(" %d", hs[i]);
+        if(i<m-1){printf(",");}
+    }
+    printf("]");
+    printE(nss, m);
+    printEf(sigmas, m);
 
-    // printf("\n****** Printing nss ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%u, ", nss[i]);
-    // }
-    // printf("\n");
-
-    // printf("\n****** Printing sigmas ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%f, ", sigmas[i]);
-    // }
-    // printf("\n");
+// *****************************************************************************
+// Kernel 9
+// *****************************************************************************
 
     float* MO_fsts = calloc(m,sizeof(float));
     ker9(m, N, hs, y_errors, nss, MO_fsts);
 
-    // printf("\n****** Printing MO_fsts ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%f, ", MO_fsts[i]);
-    // }
-    // printf("\n");
+	printEf(MO_fsts, m);
+
+
+// *****************************************************************************
+// Kernel 10
+// *****************************************************************************
 
     float* bound   = calloc(N-n,sizeof(float));
     float* MOp     = calloc(m*(N-n),sizeof(float));
@@ -938,38 +856,10 @@ int main(int argc, char const *argv[]) {
 
     ker10(lam, m, n, N, bound, Nss, nss, sigmas, hs, mappingindices, MO_fsts, y_errors, val_indss, MOp, means, fstBreakP, MOpp);
 
-    // printf("\n****** Printing MOpp ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < N-n; j++) {
-    //         uint index = i*(N-n) + j;
-    //         printf("%f, ", MOpp[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
-
-    // printf("\n****** Printing MOp ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     for (int j = 0; j < N-n; j++) {
-    //         uint index = i*(N-n) + j;
-    //         printf("%f, ", MOp[index]);
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
-
-    // printf("\n****** Printing fstBreakP ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%d, ", fstBreakP[i]);
-    // }
-    // printf("\n");
-
-    // printf("\n****** Printing means ******\n");
-    // for (uint i = 0; i < m; i++){
-    //     printf("%f, ", means[i]);
-    // }
-    // printf("\n");
-
+    printVf(MOpp, m, N-n);
+    printVf(MOp, m, N-n);
+    printEi(fstBreakP, m);
+    printEf(means, m);
 
     free(X);
     free(XT);

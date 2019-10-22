@@ -14,6 +14,7 @@ rune:
 	futhark c validation-benchmark.fut
 	./validation-benchmark < data/val.data
 	rm validation-benchmark
+	rm validation-benchmark.c
 	rm bfast-irreg
 	rm a.out
 
