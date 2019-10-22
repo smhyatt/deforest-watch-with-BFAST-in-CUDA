@@ -32,41 +32,51 @@ __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X, flo
 
         XT[idxT]  = X[gid];
 	}
-
-
-    // for (uint i = 0; i < K; i++){
-    //     for (uint j = 0; j < N; j++){
-    //         float ind = mappingindices[j];
-    //         uint index = i*N + j;
-
-    //         if(i==0){
-    //             X[index] = 1.0;
-    //         } else if(i==1){
-    //             X[index] = ind;
-    //         } else {
-    //             float ip = (float)(i / 2);
-    //             float jp = ind;
-    //             float angle = 2 * PI * ip * jp / f;
-    //             if(i%2 == 0) {
-    //                 X[index] = sin(angle);
-    //             } else {
-    //                 X[index] = cos(angle);
-    //             }
-    //         }
-    //     }
-    // }
 }
 
 
-// void transpose(uint N, int K, float* X, float* XT) {
-//     for (uint i = 0; i < K; i++){
-//         for (uint j = 0; j < N; j++){
-//             uint Xidx  = i*N + j;
-//             uint XTidx = j*K + i;
-//             XT[XTidx]  = X[Xidx];
-//         }
-//     }
-// }
+
+float dotProdFilt(uint n, float* Xvct, float* XTvct, float* yvct) {
+    float acc = 0.0;
+    for (uint i = 0; i < n; i++) {
+        if (yvct[i] != F32_MIN) {
+            acc += Xvct[i] * XTvct[i];
+        }
+    }
+    return acc;
+}
+
+
+
+void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint K, float* tspVct){
+
+    for (int i = 0; i < K; i++) {
+        for (int j = 0; j < K; j++) {
+            uint XIdx = i*N;
+            uint XTIdx = j;
+            uint resIdx = i*K + j;
+
+            for (uint l = 0; l < n; l++) {
+                uint idx  = l*K + j;
+                tspVct[l] = XT[idx];
+            }
+
+            Xsqr[resIdx] = dotProdFilt(n, &X[XIdx], tspVct, y);
+        }
+    }
+}
+
+void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
+	float* tspVct = calloc(n,sizeof(float));
+
+    for (uint pix = 0; pix < m; pix++) {
+        mmMulFilt(n, N, X, XT, &sample[pix*N], &Xsqr[pix*K*K], K, tspVct);
+    }
+
+    free(tspVct);
+}
+
+
 
 
 #endif

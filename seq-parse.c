@@ -45,8 +45,6 @@ void transpose(uint N, int K, float* X, float* XT) {
 }
 
 
-// let dotprod_filt [n] (vct: [n]f32) (xs: [n]f32) (ys: [n]f32) : f32 =
-//   f32.sum (map3 (\v x y -> x * y * if (f32.isnan v) then 0.0 else 1.0) vct xs ys)
 float dotProdFilt(uint n, float* Xvct, float* XTvct, float* yvct) {
     float acc = 0.0;
     for (uint i = 0; i < n; i++) {
@@ -59,25 +57,8 @@ float dotProdFilt(uint n, float* Xvct, float* XTvct, float* yvct) {
 
 
 
-// let matmul_filt [n][p][m] (xss: [n][p]f32) (yss: [p][m]f32) (vct: [p]f32) : [n][m]f32 =
-//   map (\xs -> map (dotprod_filt vct xs) (transpose yss)) xss
-// [p][m]
-// [3][2]
-// XT = [[1,2],
-//       [3,4],
-//       [5,6]]
-// [n][p]
-// [2][3]
-// X  = [[1,3,5],
-//       [2,4,6]]
-// y  = [8,9,7]
-// xss = Xn, yss = XTn, vct = y
-void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint K){
-    float* tspVct = calloc(n,sizeof(float));
-
-    // K
+void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint K, float* tspVct){
     for (int i = 0; i < K; i++) {
-        // K
         for (int j = 0; j < K; j++) {
             uint XIdx = i*N;
             uint XTIdx = j;
@@ -91,18 +72,16 @@ void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint 
             Xsqr[resIdx] = dotProdFilt(n, &X[XIdx], tspVct, y);
         }
     }
-
-    // free(tspVct);
 }
 
-
-// -- Xsqr,Xsqr−1:[K][K]f32; β0,β:[K]f32
-// let Xsqr = mmMulFilt X[:,:n] XT[:n,:] y[:n] -- ker 2
 void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
+    float* tspVct = calloc(n,sizeof(float));
+
     for (uint pix = 0; pix < m; pix++) {
-        mmMulFilt(n, N, X, XT, &sample[pix*N], &Xsqr[pix*K*K], K);
+        mmMulFilt(n, N, X, XT, &sample[pix*N], &Xsqr[pix*K*K], K, tspVct);
     }
 
+    free(tspVct);
 }
 
 
