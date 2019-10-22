@@ -176,13 +176,19 @@ int main(int argc, char const *argv[]) {
    printf("\n 6 \n");
 
    // allocate host memory for X
-   uint X_size    = K*N*sizeof(float);
-   float* h_X     = (float*) calloc(K*N,sizeof(float));
-   float* h_seq_X = (float*) calloc(K*N,sizeof(float));
+   uint X_size     = K*N*sizeof(float);
+   float* h_X      = (float*) calloc(N*K,sizeof(float));
+   float* h_XT     = (float*) calloc(K*N,sizeof(float));
+   float* h_seq_X  = (float*) calloc(N*K,sizeof(float));
+   float* h_seq_XT = (float*) calloc(N*K,sizeof(float));
  
    // allocate device memory for X
    float *d_X;
    cudaMalloc((void**) &d_X, X_size);
+
+   // allocate device memory for XT
+   float *d_XT;
+   cudaMalloc((void**) &d_XT, X_size);
 
    printf("\n 7 \n");
  
@@ -195,7 +201,7 @@ int main(int argc, char const *argv[]) {
       printf("\n 8 \n");
       // calling sequential kernel 1 and transpose from the sequential file 
       ker1(N, K, freq, h_mappingindices, h_X);
-      // transpose(N, K, h_X, h_XT);
+      transpose(N, K, h_X, h_XT);
       // matMult<float>(h_A, h_B, seq_C, WIDTH_A, HEIGHT_A, WIDTH_B);
       printf("\n 9 \n");
 
