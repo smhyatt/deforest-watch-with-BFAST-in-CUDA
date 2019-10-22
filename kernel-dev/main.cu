@@ -122,8 +122,8 @@ int main(int argc, char const *argv[]) {
    char *mapPtr = strtok(mappings, delim);
  
    // allocating host memory for mappingindices and pixels
-   int* h_mappingindices = calloc(N,sizeof(int));
-   float* h_sample = calloc(N*m,sizeof(float));
+   int* h_mappingindices = (int*) calloc(N,sizeof(int));
+   float* h_sample = (float*) calloc(N*m,sizeof(float));
 
    // inserting data to mappingindices
    while(mapPtr != NULL) {
@@ -160,8 +160,8 @@ int main(int argc, char const *argv[]) {
  
    // allocate host memory for X
    uint X_size    = K*N*sizeof(float);
-   float* h_X     = calloc(K*N,sizeof(float));
-   float* h_seq_X = calloc(K*N,sizeof(float));
+   float* h_X     = (float*) calloc(K*N,sizeof(float));
+   float* h_seq_X = (float*) calloc(K*N,sizeof(float));
  
    // allocate device memory for X
    float *d_X;
