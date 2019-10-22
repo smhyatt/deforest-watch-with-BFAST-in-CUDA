@@ -37,15 +37,15 @@ insp:
 parseSahara:
 	futhark opencl flatten.fut   && ./flatten   < data/sahara.in > data/sflat.in
 	futhark opencl getCInput.fut && ./getCInput < data/sahara.in > data/sCInput.in
-	python3 filterTypes.py sahara > data/saharaCimages.in
-	python3 filterTypes.py sinput > data/saharaC.in
+	python3 filtertypes.py sahara > data/saharaCimages.in
+	python3 filtertypes.py sinput > data/saharaC.in
 	rm flatten data/sflat.in data/sCInput.in getCInput
 
 parsePeru:
 	futhark opencl flatten.fut   && ./flatten   < data/peru.in > data/pflat.in
 	futhark opencl getCInput.fut && ./getCInput < data/peru.in > data/pCInput.in
-	python3 filterTypes.py peru   > data/peruCimages.in
-	python3 filterTypes.py pinput > data/peruC.in
+	python3 filtertypes.py peru   > data/peruCimages.in
+	python3 filtertypes.py pinput > data/peruC.in
 	rm data/pflat.in data/pCInput.in flatten getCInput
 
 parse4C: parseSahara parsePeru
