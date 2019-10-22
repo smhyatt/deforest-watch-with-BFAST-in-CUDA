@@ -80,11 +80,11 @@ int main(int argc, char const *argv[]) {
    FILE *fp, *fpim;
    
    if (argv[1][0] == 's') {
-      fp   = fopen("data/saharaC.in", "r");
-      fpim = fopen("data/saharaCimages.in", "r");
+      fp   = fopen("../data/saharaC.in", "r");
+      fpim = fopen("../data/saharaCimages.in", "r");
    } else {
-      fp   = fopen("data/peruC.in", "r");
-      fpim = fopen("data/peruCimages.in", "r");
+      fp   = fopen("../data/peruC.in", "r");
+      fpim = fopen("../data/peruCimages.in", "r");
    }
 
    char input1[10], input2[10], input3[30], input4[30];
