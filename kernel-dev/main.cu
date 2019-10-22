@@ -10,11 +10,12 @@
 #include "kernels.cu.h"
 #include "sequential.cu.h"
 
+#define BLOCK_SIZE 1024//1024 //1024//2048
 #define WIDTH_A  1024//1024 //1024//2048
-#define HEIGHT_A 1024//2048//2048//2048
-#define WIDTH_B  4096//2048
-#define TILE     16
-#define PI 3.14159265
+#define HEIGHT_A 1//2048//2048//2048
+#define WIDTH_B  1024//4096//2048
+#define TILE_HEIGHT 1
+#define TILE_WIDTH 1024
 #define F32_MIN -FLT_MAX
 #define I32_MIN -2147483648
 typedef unsigned int uint;
@@ -212,40 +213,37 @@ int main(int argc, char const *argv[]) {
    }
 
    
-   // execute the block+register tiled kernel
-   // ToDo: please fill in the implementation below
-   //       (for TILE = 16)
-   // {
-   //    // 1. you would probably want to compute some valid grid and block here
-   //    int  dimy = (HEIGHT_A+TILE-1)/TILE; 
-   //    int  dimx = (WIDTH_B+(TILE*TILE)-1)/(TILE*TILE);
-   //    dim3 block(TILE, TILE, 1);
-   //    dim3 grid (dimx, dimy, 1);
+   {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH ); 
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
 
-   //    unsigned long int elapsed;
-   //    struct timeval t_start, t_end, t_diff;
-   //    gettimeofday(&t_start, NULL); 
+      unsigned long int elapsed;
+      struct timeval t_start, t_end, t_diff;
+      gettimeofday(&t_start, NULL); 
       
-   //    // 2. you would probably want to call here the kernel: 
-   //    // matMultRegTiledKer<float,TILE> <<< grid, block >>>(d_A, d_B, d_C, HEIGHT_A, WIDTH_B, WIDTH_A); 
-   //    cudaThreadSynchronize();
+      // 2. you would probably want to call here the kernel:
+      // __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X){ 
+      ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X); 
+      cudaThreadSynchronize();
 
-   //    gettimeofday(&t_end, NULL);
-   //    timeval_subtract(&t_diff, &t_end, &t_start);
-   //    elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec); 
+      gettimeofday(&t_end, NULL);
+      timeval_subtract(&t_diff, &t_end, &t_start);
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec); 
 
-   //    // copy result from device to host
-   //    cudaMemcpy(h_C, d_C, mem_size_C, cudaMemcpyDeviceToHost);
-   //    // validate
-   //    printf("GPU Block+Register Tiled MMM version ... ");
-   //    validate<float>(seq_C, h_C, size_C);
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      // validate
+      // printf("");
+      // validate<float>(seq_C, h_C, size_C);
 
-   //    printf("GPU Block+Register Tiled MMM version runs in: %lu microsecs\n", elapsed);
-   //    float microsecPerMatrixMul = elapsed; 
-   //    double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A; 
-   //    double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f)); 
-   //    printf( "GPU Block+Register Tiled MMM Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y); 
-   // }
+      printf("GPU Kernel 1 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed; 
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A; 
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f)); 
+      printf( "GPU Kernel 1 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y); 
+   }
 
    printf("\n 10 \n");
 
@@ -253,8 +251,11 @@ int main(int argc, char const *argv[]) {
    free(h_mappingindices);
    free(h_sample);
    free(h_seq_X);
+   free(h_seq_XT);
    free(h_X);
+   free(h_XT);
    cudaFree(d_X);
+   cudaFree(d_XT);
    cudaFree(d_mappingindices);
    cudaFree(d_sample);
 
