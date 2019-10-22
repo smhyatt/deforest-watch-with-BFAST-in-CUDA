@@ -87,6 +87,7 @@ int main(int argc, char const *argv[]) {
       fpim = fopen("../data/peruCimages.in", "r");
    }
 
+   printf("\n 1 \n");
    char input1[10], input2[10], input3[30], input4[30];
    char input5[30], input6[30], input7[50], input8[30];
    fscanf(fp, " %[^\n]  %[^\n]  %[^\n]  %[^\n] ", input1,input2,input3,input4);
@@ -106,6 +107,8 @@ int main(int argc, char const *argv[]) {
    int mappingLen, imageLen, i = 0;
    char c;
 
+   printf("\n 2 \n");
+
    // getting the lengths of mappingindices and images
    while ((c = getc(fp)) != EOF) { mappingLen++; }
    while ((c = getc(fpim)) != EOF) { imageLen++; }
@@ -116,6 +119,8 @@ int main(int argc, char const *argv[]) {
    // extracting each array
    char mappings[mappingLen], pixels[(imageLen-mappingLen)];
    fscanf(fpim, " %[^\n]  %[^\n] ", mappings, pixels);
+
+   printf("\n 3 \n");
 
    // converting mappingindices from char* to int*
    char delim[] = ",";
@@ -132,6 +137,8 @@ int main(int argc, char const *argv[]) {
       mapPtr = strtok(NULL, delim);
    }
 
+   printf("\n 4 \n");
+
    // converting samples from char* to float*
    char *pixelsPtr = strtok(pixels, delim);
    i = 0;
@@ -145,6 +152,7 @@ int main(int argc, char const *argv[]) {
 
    fclose(fp);
 
+   printf("\n 5 \n");
     
    // allocate device memory
    uint map_size = N*m*sizeof(float);
@@ -158,6 +166,8 @@ int main(int argc, char const *argv[]) {
    cudaMemcpy(d_mappingindices, h_mappingindices, map_size, cudaMemcpyHostToDevice);
    cudaMemcpy(d_sample, h_sample, sam_size, cudaMemcpyHostToDevice);
  
+   printf("\n 6 \n");
+
    // allocate host memory for X
    uint X_size    = K*N*sizeof(float);
    float* h_X     = (float*) calloc(K*N,sizeof(float));
@@ -167,6 +177,7 @@ int main(int argc, char const *argv[]) {
    float *d_X;
    cudaMalloc((void**) &d_X, X_size);
 
+   printf("\n 7 \n");
  
    // compute sequential creation of X and XT
    {
@@ -174,10 +185,12 @@ int main(int argc, char const *argv[]) {
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL); 
       
+      printf("\n 8 \n");
       // calling sequential kernel 1 and transpose from the sequential file 
       ker1(N, K, freq, h_mappingindices, h_X);
       // transpose(N, K, h_X, h_XT);
       // matMult<float>(h_A, h_B, seq_C, WIDTH_A, HEIGHT_A, WIDTH_B);
+      printf("\n 9 \n");
 
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
@@ -221,6 +234,7 @@ int main(int argc, char const *argv[]) {
    //    printf( "GPU Block+Register Tiled MMM Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y); 
    // }
 
+   printf("\n 10 \n");
 
    // 7. clean up memory
    free(h_mappingindices);
