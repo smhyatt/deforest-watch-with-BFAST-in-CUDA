@@ -90,9 +90,11 @@ int main(int argc, char const *argv[]) {
    printf("\n 1 \n");
    char input1[10], input2[10], input3[30], input4[30];
    char input5[30], input6[30], input7[50], input8[30];
+   printf("\n 1.2 \n");
    fscanf(fp, " %[^\n]  %[^\n]  %[^\n]  %[^\n] ", input1,input2,input3,input4);
+   printf("\n 1.3 \n");
    fscanf(fp, " %[^\n]  %[^\n]  %[^\n]  %[^\n] ", input5,input6,input7,input8);
-   
+   printf("\n 1.4 \n");
    int  k    = atoi(input2); 
    uint n    = (uint)atoi(input3);
    uint N    = (uint)atoi(input8);
