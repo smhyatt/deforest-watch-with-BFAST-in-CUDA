@@ -7,7 +7,6 @@
 #include <time.h>
 
 #include "helper.cu.h"
-#include "kernels-naive.cu.h"
 #include "sequential.cu.h"
 
 #define BLOCK_SIZE 1024//1024 //1024//2048
@@ -93,14 +92,10 @@ int main(int argc, char const *argv[]) {
       return -1;
    }
 
-   printf("\n 1 \n");
    char input1[10], input2[10], input3[30], input4[30];
    char input5[30], input6[30], input7[50], input8[30];
-   printf("\n 1.2 \n");
    fscanf(fp, " %[^\n]  %[^\n]  %[^\n]  %[^\n] ", input1,input2,input3,input4);
-   printf("\n 1.3 \n");
    fscanf(fp, " %[^\n]  %[^\n]  %[^\n]  %[^\n] ", input5,input6,input7,input8);
-   printf("\n 1.4 \n");
    int  k    = atoi(input2);
    uint n    = (uint)atoi(input3);
    uint N    = (uint)atoi(input8);
@@ -114,8 +109,6 @@ int main(int argc, char const *argv[]) {
 
    int mappingLen, imageLen, i = 0;
 
-   printf("\n 2 \n");
-
    // getting the lengths of mappingindices and images
    while (getc(fp) != EOF) { mappingLen++; }
    while (getc(fpim) != EOF) { imageLen++; }
@@ -126,8 +119,6 @@ int main(int argc, char const *argv[]) {
    // extracting each array
    char mappings[mappingLen], pixels[(imageLen-mappingLen)];
    fscanf(fpim, " %[^\n]  %[^\n] ", mappings, pixels);
-
-   printf("\n 3 \n");
 
    // converting mappingindices from char* to int*
    char delim[] = ",";
@@ -144,8 +135,6 @@ int main(int argc, char const *argv[]) {
       mapPtr = strtok(NULL, delim);
    }
 
-   printf("\n 4 \n");
-
    // converting samples from char* to float*
    char *pixelsPtr = strtok(pixels, delim);
    i = 0;
@@ -159,47 +148,16 @@ int main(int argc, char const *argv[]) {
 
    fclose(fp);
 
-   printf("\n 5 \n");
-
    // allocate device memory
    uint map_size = N*sizeof(int);
    uint sam_size = N*m*sizeof(float);
-   int* d_mappingindices;
-   float* d_sample;
-   cudaMalloc((void**) &d_mappingindices, map_size);
-   cudaMalloc((void**) &d_sample, sam_size);
-
-   // copy host memory to device
-   cudaMemcpy(d_mappingindices, h_mappingindices, map_size, cudaMemcpyHostToDevice);
-   cudaMemcpy(d_sample, h_sample, sam_size, cudaMemcpyHostToDevice);
-
-   printf("\n 6 \n");
-
    // allocate host memory for X
    uint X_size     = K*N*sizeof(float);
    uint Xsqr_size  = K*K*m*sizeof(float);
 
-   float* h_X      = (float*) calloc(N*K,sizeof(float));
-   float* h_XT     = (float*) calloc(K*N,sizeof(float));
-   float* h_Xsqr   = (float*) calloc(K*K*m,sizeof(float));
    float* h_seq_X  = (float*) calloc(N*K,sizeof(float));
    float* h_seq_XT = (float*) calloc(N*K,sizeof(float));
    float* h_seq_Xsqr = (float*) calloc(K*K*m,sizeof(float));
-
-   // allocate device memory for X
-   float *d_X;
-   cudaMalloc((void**) &d_X, X_size);
-
-   // allocate device memory for XT
-   float *d_XT;
-   cudaMalloc((void**) &d_XT, X_size);
-
-   // allocate device memory for Xsqr
-   float *d_Xsqr;
-   cudaMalloc((void**) &d_Xsqr, Xsqr_size);
-
-
-   printf("\n 7 \n");
 
    // compute sequential creation of X and XT
    {
@@ -207,13 +165,11 @@ int main(int argc, char const *argv[]) {
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
 
-      printf("\n 8 \n");
       // calling sequential kernel 1 and transpose from the sequential file
       mkX(N, K, freq, h_mappingindices, h_seq_X);
       transpose(N, K, h_seq_X, h_seq_XT);
       // calling sequential kernel 2
       mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
-      printf("\n 9 \n");
 
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
@@ -221,60 +177,11 @@ int main(int argc, char const *argv[]) {
       printf("Sequential kernels version runs in: %lu microsecs\n", elapsed);
    }
 
-
-   {
-      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
-      dim3 grid (dimx, dimy, 1);
-
-      unsigned long int elapsed;
-      struct timeval t_start, t_end, t_diff;
-      gettimeofday(&t_start, NULL);
-
-      // 2. you would probably want to call here the kernel:
-      // __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X){
-      ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
-      cudaDeviceSynchronize();
-      ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_sample, d_Xsqr, K);
-      cudaDeviceSynchronize();
-
-      gettimeofday(&t_end, NULL);
-      timeval_subtract(&t_diff, &t_end, &t_start);
-      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
-
-      // check for cuda errors
-      gpuAssert( cudaPeekAtLastError() );
-
-      // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
-      // validate
-      // printf("");
-      // validate<float>(seq_C, h_C, size_C);
-
-      printf("GPU Kernels runs in: %lu microsecs\n", elapsed);
-      float microsecPerMatrixMul = elapsed;
-      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-      printf( "GPU Kernels Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
-   }
-
-   printf("\n 10 \n");
-
    // 7. clean up memory
    free(h_mappingindices);
    free(h_sample);
    free(h_seq_X);
    free(h_seq_XT);
-   free(h_X);
-   free(h_XT);
-   cudaFree(d_X);
-   cudaFree(d_XT);
-   cudaFree(d_mappingindices);
-   cudaFree(d_sample);
-
 }
 
 

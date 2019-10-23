@@ -8,81 +8,81 @@
 // Printing functions for validation
 // *****************************************************************************
 
-void printM(float* M, uint m, uint K){
-    printf("[");
+void printM(FILE* fp, float* M, uint m, uint K){
+    fprintf(fp, "[");
     for (int pix = 0; pix < m; pix++) {
-        printf("[");
+        fprintf(fp, "[");
         for (size_t i = 0; i < K; i++){
-            printf("[");
+            fprintf(fp, "[");
             for (size_t j = 0; j < K; j++){
                 uint index = pix*K*K + i*K + j;
-                printf(" %f", M[index]);
-                if(j<K-1){printf(",");}
+                fprintf(fp, " %f", M[index]);
+                if(j<K-1){fprintf(fp, ",");}
             }
-            printf("]");
-            if(i<K-1){printf(",");}
+            fprintf(fp, "]");
+            if(i<K-1){fprintf(fp, ",");}
         }
-        printf("]");
-        if(pix<m-1){printf(",");}
+        fprintf(fp, "]");
+        if(pix<m-1){fprintf(fp, ",");}
     }
-    printf("]");
+    fprintf(fp, "]");
 }
 
-void printVf(float* V, uint m, uint K){
-    printf("[");
+void printVf(FILE* fp, float* V, uint m, uint K){
+    fprintf(fp, "[");
     for (uint i = 0; i < m; i++){
-        printf("[");
+        fprintf(fp, "[");
         for (int j = 0; j < K; j++) {
             uint index = i*K + j;
-            printf(" %f", V[index]);
-            if(j<K-1){printf(",");}
+            fprintf(fp, " %f", V[index]);
+            if(j<K-1){fprintf(fp, ",");}
         }
-        printf("]");
-        if(i<m-1){printf(",");}
+        fprintf(fp, "]");
+        if(i<m-1){fprintf(fp, ",");}
     }
-    printf("]");
+    fprintf(fp, "]");
 }
 
-void printVi(int* V, uint m, uint K){
-    printf("[");
+void printVi(FILE* fp, int* V, uint m, uint K){
+    fprintf(fp, "[");
     for (uint i = 0; i < m; i++){
-        printf("[");
+        fprintf(fp, "[");
         for (int j = 0; j < K; j++) {
             uint index = i*K + j;
-            printf(" %d", V[index]);
-            if(j<K-1){printf(",");}
+            fprintf(fp, " %d", V[index]);
+            if(j<K-1){fprintf(fp, ",");}
         }
-        printf("]");
-        if(i<m-1){printf(",");}
+        fprintf(fp, "]");
+        if(i<m-1){fprintf(fp, ",");}
     }
-    printf("]");
+    fprintf(fp, "]");
 }
 
-void printE(uint* E, uint m){
-    printf("[");
+void printE(FILE* fp, uint* E, uint m){
+    fprintf(fp, "[");
     for (uint i = 0; i < m; i++){
-        printf(" %u", E[i]);
-        if(i<m-1){printf(",");}
+        fprintf(fp, " %u", E[i]);
+        if(i<m-1){fprintf(fp, ",");}
     }
-    printf("]");
+    fprintf(fp, "]");
 }
 
-void printEi(int* E, uint m){
-    printf("[");
+void printEi(FILE* fp, int* E, uint m){
+    fprintf(fp, "[");
     for (uint i = 0; i < m; i++){
-        printf(" %d", E[i]);
-        if(i<m-1){printf(",");}
+        fprintf(fp, " %d", E[i]);
+        if(i<m-1){fprintf(fp, ",");}
     }
-    printf("]");
+    fprintf(fp, "]");
 }
 
-void printEf(float* E, uint m){
-    printf("[");
+void printEf(FILE* fp, float* E, uint m){
+    fprintf(fp, "[");
     for (uint i = 0; i < m; i++){
-        printf(" %f", E[i]);
-        if(i<m-1){printf(",");}
+        fprintf(fp, " %f", E[i]);
+        if(i<m-1){fprintf(fp, ",");}
     }
-    printf("]");
+    fprintf(fp, "]");
 }
 
 
