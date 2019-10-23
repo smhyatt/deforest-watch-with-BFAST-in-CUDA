@@ -1,36 +1,84 @@
 CXX = nvcc
 
 SRC1 = main-seq.cu
-HELPERS    = helper.cu.h kernels-naive.cu.h sequential.cu.h
-EXECUTABLE = bfast-project
+SRC2 = main-naive.cu
+SRC3 = main-optim.cu
+SOURCES_CPP = main-seq.cu main-naive.cu main-optim.cu
+HELPERS     = helper.cu.h kernels-naive.cu.h kernels-optim.cu.h sequential.cu.h
+EXECUTABLE1 = seq-bfast-project
+EXECUTABLE2 = naive-bfast-project
+EXECUTABLE3 = optim-bfast-project
 
 default: compile run
 
-.cu.o: $(SRC1) $(HELPERS)
+.cu.o: $(SOURCES_CPP) $(HELPERS)
 	$(CXX) -c $@ $<
 
-bfast: $(EXECUTABLE)
-		./$(EXECUTABLE)
 
-compile: $(EXECUTABLE)
+seqbfast: $(EXECUTABLE1)
+			./$(EXECUTABLE1) sahara
 
-$(EXECUTABLE): $(SRC1) $(HELPERS)
-	$(CXX) -o $(EXECUTABLE) $(SRC1)
+naivebfast: $(EXECUTABLE2)
+			./$(EXECUTABLE2) sahara	
 
-run: $(EXECUTABLE)
-	./$(EXECUTABLE) sahara
+optimbfast: $(EXECUTABLE3)
+			./$(EXECUTABLE3) sahara
 
-seqValidering:
+
+compile: $(EXECUTABLE1) $(EXECUTABLE2) $(EXECUTABLE3)
+
+$(EXECUTABLE1): $(SRC1) $(HELPERS)
+	$(CXX) -o $(EXECUTABLE1) $(SRC1)
+
+$(EXECUTABLE2): $(SRC2) $(HELPERS)
+	$(CXX) -o $(EXECUTABLE2) $(SRC2)
+
+$(EXECUTABLE3): $(SRC3) $(HELPERS)
+	$(CXX) -o $(EXECUTABLE3) $(SRC3)
+
+
+
+run: $(EXECUTABLE1) $(EXECUTABLE2) $(EXECUTABLE3)
+	./$(EXECUTABLE1) sahara
+	./$(EXECUTABLE2) sahara
+	./$(EXECUTABLE3) sahara
+
+
+futV:
 	futhark c ../bfast-irreg.fut
-	.././bfast-irreg < ../data/testset_sahara_2pix.in > ../data/val.data
-	make run
 	futhark c ../validation-benchmark.fut
+
+seqV: seqbfast
+	.././bfast-irreg < ../data/testset_sahara_2pix.in > ../data/val.data
+	$(info )
+	$(info The validation for the sequential implementation.)
 	.././validation-benchmark < ../data/val.data
+
+naiveV: naivebfast
+	.././bfast-irreg < ../data/testset_sahara_2pix.in > ../data/val.data
+	$(info )
+	$(info The validation for the naive implementation.)
+	.././validation-benchmark < ../data/val.data
+
+optimV: optimbfast
+	.././bfast-irreg < ../data/testset_sahara_2pix.in > ../data/val.data
+	$(info )
+	$(info The validation for the optimized implementation.)
+	.././validation-benchmark < ../data/val.data
+
+fullV: compile futV seqV naiveV optimV 
 	rm validation-benchmark
 	rm validation-benchmark.c
 	rm bfast-irreg
 
 
+
+
 clean:
-	rm -f $(EXECUTABLE)
+	rm -f $(EXECUTABLE1) $(EXECUTABLE2) $(EXECUTABLE3)
+
+
+
+
+
 
