@@ -182,16 +182,19 @@ int main(int argc, char const *argv[]) {
    // allocate host memory for X
    uint X_size     = K*N*sizeof(float);
    uint Xsqr_size  = K*K*m*sizeof(float);
+   uint Xinv_double_size  = 2*K*K*m*sizeof(float);
 
    float* h_X      = (float*) calloc(N*K,sizeof(float));
    float* h_XT     = (float*) calloc(K*N,sizeof(float));
    float* h_Xsqr   = (float*) calloc(K*K*m,sizeof(float));
+   float* h_XsqrInv= (float*) calloc(2*K*K*m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
-   float *d_X, *d_XT, *d_Xsqr;
+   float *d_X, *d_XT, *d_Xsqr, *d_XsqrInv;
    cudaMalloc((void**) &d_X, X_size);
    cudaMalloc((void**) &d_XT, X_size);
    cudaMalloc((void**) &d_Xsqr, Xsqr_size);
+   cudaMalloc((void**) &d_XsqrInv, Xinv_double_size);
 
    // opening file for validation of results
    FILE* fpV = fopen("../data/val.data","a+");
@@ -272,17 +275,17 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 3
    /////////////////////////////////////////////////////////////////////////
    {
-      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
-      dim3 grid (dimx, dimy, 1);
+    //   int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+    //   int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(1024, 1, 1);
+      dim3 grid (1024, 1, 1);
 
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 3
-      // ker3 <<< grid, block >>> ( m, Xsqr, XsqrInv, K);
+      ker3 <<< grid, block >>> ( m, Xsqr, XsqrInv, K);
       // cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
