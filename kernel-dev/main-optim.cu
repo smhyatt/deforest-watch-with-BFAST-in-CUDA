@@ -64,6 +64,14 @@ bool validate(float* A,float* B, unsigned int sizeAB){
     return true;
 }
 
+int gpuAssert(cudaError_t code) {
+    if(code != cudaSuccess) {
+      printf("GPU Error: %s\n", cudaGetErrorString(code));
+      return -1;
+    }
+    return 0;
+}
+
 /////////////////////////////////////////////////////////
 // Program main
 /////////////////////////////////////////////////////////
