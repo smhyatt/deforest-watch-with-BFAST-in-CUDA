@@ -193,7 +193,7 @@ void doubleDown(uint m, float* XsqrInv, float* XsqrInvLess, uint K) {
 }
 
 
-void mkXsqr(float* Xsqr, float* XsqrInv, uint K) {
+void mkXsqrIdent(float* Xsqr, float* XsqrInv, uint K) {
     uint cols = 2*K;        // 2*8=16
     uint identIdx = K*cols; // 8*16=128
 
@@ -235,7 +235,7 @@ void ker3(uint m, float* Xsqr, float* XsqrInv, uint K){
     uint identIdx = K*cols; // 8*16=128
 
     for (int pix = 0; pix < m; pix++) {
-        mkXsqr(&Xsqr[pix*(K*K)], &XsqrInv[pix*identIdx], K);
+        mkXsqrIdent(&Xsqr[pix*(K*K)], &XsqrInv[pix*identIdx], K);
         gaussJordan(&XsqrInv[pix*identIdx], cols, K);
     }
 

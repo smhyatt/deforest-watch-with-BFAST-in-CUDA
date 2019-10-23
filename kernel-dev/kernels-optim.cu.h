@@ -56,6 +56,41 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
 }
 
 
+// let matvecmul_row_filt [n][m] (xss: [n][m]f32) (ys: [m]f32) =
+//     map (\xs -> map2 (\x y -> if (f32.isnan y) then 0 else x*y) xs ys |> f32.sum) xss
+
+void mvMulFilt(uint n, uint N, float* X, float* y, uint K, float* B0){
+
+    for (int i = 0; i < K; i++) {
+        uint XIdx  = i*N;
+
+        B0[i] = dotProdFilt(n, &X[XIdx], y, y);
+    }
+}
+
+
+
+__global__ void ker4(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
+    float accum = 0.0f;
+
+    // setting global thread 
+    int gidx = blockIdx.x*blockDim.x + threadIdx.x;
+
+    // defining thread limit
+    if( gidx >= K*m ) return;
+
+    for(int i = 0; i < n; i ++) {
+        // setting valid bit of valid pixel data
+        int valid = !(sample[blockIdx.x*N+i] == F32_MIN);
+        accum += X[gidx*N + i] * valid;
+    }
+
+    // adding results to beta0 
+    B0[gidx*K] = accum;
+
+}
+
+
 
 #endif
 

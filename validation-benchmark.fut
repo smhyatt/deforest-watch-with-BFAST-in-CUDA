@@ -7,7 +7,7 @@
 
 entry main (X:[][]f32) (Xsqr:[][][]f32)
         --    (Xinv:[][][]f32)
-        --    (beta0:[][]f32)
+           (beta0:[][]f32)
         --    (beta:[][]f32)
         --    (y_preds:[][]f32)
         --    (Nss:[]i32) (y_errors:[][]f32)
@@ -16,7 +16,7 @@ entry main (X:[][]f32) (Xsqr:[][][]f32)
 
            (Xseq:[][]f32) (Xsqrseq:[][][]f32)
         --    (Xinvseq:[][][]f32)
-        --    (beta0seq:[][]f32) (betaseq:[][]f32) (y_predsseq:[][]f32)
+           (beta0seq:[][]f32) -- (betaseq:[][]f32) (y_predsseq:[][]f32)
         --    (Nssseq:[]i32) (y_errorsseq:[][]f32) (val_indssseq:[][]i32)
         --    (hsseq:[]i32) (nssseq:[]i32) (sigmasseq:[]f32) (MO_fstsseq:[]f32)
         --    (MOppseq:[][]f32) (MOpseq:[][]f32) (breaksseq:[]i32) (meansseq:[]f32)
@@ -59,11 +59,11 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
 --                   |> and
 
 -- -- Kernel 4: beta0
--- let beta0tfs = map2 (\x y ->
---                  map2 (\x' y' -> f32.abs (x' - y') < 1.1) x y
---                  ) beta0 beta0seq
--- let beta0allTrue = map (\x -> and x) beta0tfs
---                |> and
+let beta0tfs = map2 (\x y ->
+                 map2 (\x' y' -> f32.abs (x' - y') < 1.1) x y
+                 ) beta0 beta0seq
+let beta0allTrue = map (\x -> and x) beta0tfs
+               |> and
 
 -- -- Kernel 5: beta
 -- let betatfs = map2 (\x y ->
@@ -125,7 +125,7 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
 in (XallTrue
    ,XsqrAllTrue
 --    ,XinvAllTrue
---    ,beta0allTrue
+   ,beta0allTrue
 --    ,betaallTrue
 --    ,y_predsallTrue
 --    ,NssallTrue

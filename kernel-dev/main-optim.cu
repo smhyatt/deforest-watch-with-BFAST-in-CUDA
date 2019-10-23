@@ -165,6 +165,9 @@ int main(int argc, char const *argv[]) {
    // closing file with data
    fclose(fp);
 
+   // opening file for validation of results
+   FILE* fpV = fopen("../data/val.data","a+");
+
 
    // allocate device memory
    uint map_size = N*sizeof(int);
@@ -178,20 +181,22 @@ int main(int argc, char const *argv[]) {
    cudaMemcpy(d_mappingindices, h_mappingindices, map_size, cudaMemcpyHostToDevice);
    cudaMemcpy(d_sample, h_sample, sam_size, cudaMemcpyHostToDevice);
 
-
-   // allocate host memory for X
    uint X_size     = K*N*sizeof(float);
    uint Xsqr_size  = K*K*m*sizeof(float);
+   uint B0_size    = K*m*sizeof(float);
 
+   // allocate host memory for X
    float* h_X      = (float*) calloc(N*K,sizeof(float));
    float* h_XT     = (float*) calloc(K*N,sizeof(float));
    float* h_Xsqr   = (float*) calloc(K*K*m,sizeof(float));
+   float* h_B0     = (float*) calloc(K*m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
-   float *d_X, *d_XT, *d_Xsqr;
+   float *d_X, *d_XT, *d_Xsqr, d_B0;
    cudaMalloc((void**) &d_X, X_size);
    cudaMalloc((void**) &d_XT, X_size);
    cudaMalloc((void**) &d_Xsqr, Xsqr_size);
+   cudaMalloc((void**) &d_B0, B0_size);
 
 
    /////////////////////////////////////////////////////////////////////////
@@ -221,7 +226,9 @@ int main(int argc, char const *argv[]) {
       // copy result from device to host
       cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
       cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      // add to validation
+      printX(fpV, h_X, K, N);
 
       printf("GPU Optimized Kernel 1 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -256,9 +263,11 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
       cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      // add to validation
+      printM(fpV, h_Xsqr, m, K);
+
 
       printf("GPU Optimized Kernel 2 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -292,9 +301,10 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+
+      // add to validation
+
 
       printf("GPU Optimized Kernel 3 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -318,8 +328,8 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 4
-      // ker4 <<< grid, block >>> ();
-      // cudaDeviceSynchronize();
+      ker4 <<< grid, block >>> (m, n, N, d_X, K, d_sample, d_B0);
+      cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
@@ -329,9 +339,10 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_B0, d_B0, B0_size, cudaMemcpyDeviceToHost);
+      
+      // add to validation
+      printVf(fpV, h_B0, m, K);
 
       printf("GPU Optimized Kernel 4 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -365,9 +376,8 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      
 
       printf("GPU Optimized Kernel 5 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -402,9 +412,7 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Optimized Kernel 6 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -439,9 +447,7 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Optimized Kernel 7 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -476,9 +482,7 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Optimized Kernel 8 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -513,9 +517,7 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -550,9 +552,7 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Optimized Kernel 10 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -567,15 +567,8 @@ int main(int argc, char const *argv[]) {
    //// VALIDATION
    /////////////////////////////////////////////////////////////////////////
    /////////////////////////////////////////////////////////////////////////
-
-   // opening file for validation of results
-   FILE* fpV = fopen("../data/val.data","a+");
-
-   printX(fpV, h_X, K, N);
-   printM(fpV, h_Xsqr, m, K);
-
+   
    fclose(fpV);
-
 
    // 7. clean up memory
    free(h_mappingindices);
