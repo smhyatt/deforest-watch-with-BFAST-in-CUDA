@@ -56,7 +56,71 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
 }
 
 // Kernel 3
-void matInv(uint m, float* Xsqr, float* XsqrInv, uint K){
+void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrInvLess){
+	int gid = blockIdx.x*blockDim.x + threadIdx.x;
+
+    float* XsqrPix = Xsqr + gid*K*K;
+    float* XsqrInvPix = XsqrInv + gid*K*K*2;
+    float* d_XsqrInvLessPix = d_XsqrInvLess + gid*K*K;
+
+    uint cols = 2*K;
+    uint identIdx = K*cols;
+
+    for (uint i = 0; i < K; i++){
+        for (uint j = 0; j < K; j++){
+            uint sqrIdx = i*K + j;
+            uint invIdx = i*cols + j;
+            XsqrInvPix[invIdx] = XsqrPix[sqrIdx];
+        }
+    }
+
+    for (uint i = 0; i < K; i++){
+        for (uint j = K; j < identIdx; j+=cols+1){
+            uint idx = i*identIdx + j;
+            XsqrInvPix[idx] = 1.0;
+        }
+    }
+
+
+    // Making the upper triangle
+    for (uint row = 0; row < K-1; row++){
+        for (uint rowWork = row + 1; rowWork < K; rowWork++){
+            float xMult = XsqrInv[rowWork*cols+row] / XsqrInv[row*cols+row];
+            for (uint col = row; col < cols; col++){
+                uint factorIdx   = row     * cols + col;
+                uint elemIdx     = rowWork * cols + col;
+                XsqrInv[elemIdx] = XsqrInv[elemIdx] - xMult * XsqrInv[factorIdx];
+            }
+        }
+    }
+
+    // scalling
+    for (uint i = 0; i < K; i++) {
+        float temp = XsqrInv[i*cols+i];
+        for (uint j = i; j < cols; j++){
+            XsqrInv[i*cols+j] = XsqrInv[i*cols+j] / temp;
+        }
+    }
+
+    // Making back substitution
+    for (uint row = K-1; row >= 1; row--){
+        for (int rowWork = row-1; 0 <= rowWork ; rowWork--){
+            float x = XsqrInv[rowWork*cols+row] / XsqrInv[row*cols+row];
+            for (uint col = row; col < cols; col++){
+                XsqrInv[rowWork*cols+col] = XsqrInv[rowWork*cols+col] - XsqrInv[row*cols+col] * x;
+            }
+        }
+    }
+
+    for (int pix = 0; pix < m; pix++) {
+        for (int i = 0; i < K; i++) {
+            for (int j = 0; j < K; j++) {
+                uint XinvIdx  = pix*K*(2*K) + i*(K*2) + j+K; // XsqrInv er K længere
+                uint XlessIdx = pix*K*K + i*K + j;
+                d_XsqrInvLessPix[XlessIdx] = d_XsqrInv[XinvIdx];
+            }
+        }
+    }
 
 }
 
