@@ -75,7 +75,6 @@ __global__ void ker4(uint m, uint n, uint N, float* X, uint K, float* sample, fl
 
     // adding results to beta0 
     B0[gidx*K] = accum;
-
 }
 
 

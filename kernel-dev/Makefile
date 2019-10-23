@@ -69,7 +69,7 @@ optimV: clear optimbfast
 	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
-fullV: compile futV seqV optimV naiveV 
+fullV: compile futV optimV seqV naiveV 
 	rm ../validation-benchmark
 	rm ../validation-benchmark.c
 	rm ../bfast-irreg
