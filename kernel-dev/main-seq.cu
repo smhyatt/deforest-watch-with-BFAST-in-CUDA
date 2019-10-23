@@ -154,6 +154,8 @@ int main(int argc, char const *argv[]) {
     // closing file with data
     fclose(fp);
 
+    // opening file for validation of results
+    FILE* fpV = fopen("../data/val.data","a+");
 
     // allocate host memory for X
     float* h_seq_X    = (float*) calloc(N*K,sizeof(float));
@@ -176,6 +178,9 @@ int main(int argc, char const *argv[]) {
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 1 version runs in: %lu microsecs\n", elapsed);
+
+        // validation 
+        printX(fpV, h_seq_X, K, N);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -193,6 +198,9 @@ int main(int argc, char const *argv[]) {
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 2 version runs in: %lu microsecs\n", elapsed);
+
+        // validation 
+        printM(fpV, h_seq_Xsqr, m, K);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -327,21 +335,7 @@ int main(int argc, char const *argv[]) {
     }
 
 
-
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-    //// VALIDATION
-    /////////////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////////////
-
-    // opening file for validation of results
-    FILE* fpV = fopen("../data/val.data","a+");
-
-    printX(fpV, h_X, K, N);
-    printM(fpV, h_Xsqr, m, K);
-
     fclose(fpV);
-
 
     // 7. clean up memory
     free(h_mappingindices);
