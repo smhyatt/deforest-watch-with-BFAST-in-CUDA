@@ -177,10 +177,14 @@ int main(int argc, char const *argv[]) {
 
    // allocate host memory for X
    uint X_size     = K*N*sizeof(float);
+   uint Xsqr_size  = K*K*m*sizeof(float);
+
    float* h_X      = (float*) calloc(N*K,sizeof(float));
    float* h_XT     = (float*) calloc(K*N,sizeof(float));
+   float* h_Xsqr   = (float*) calloc(K*K*m,sizeof(float));
    float* h_seq_X  = (float*) calloc(N*K,sizeof(float));
    float* h_seq_XT = (float*) calloc(N*K,sizeof(float));
+   float* h_seq_Xsqr = (float*) calloc(K*K*m,sizeof(float));
 
    // allocate device memory for X
    float *d_X;
@@ -189,6 +193,11 @@ int main(int argc, char const *argv[]) {
    // allocate device memory for XT
    float *d_XT;
    cudaMalloc((void**) &d_XT, X_size);
+
+   // allocate device memory for Xsqr
+   float *d_Xsqr;
+   cudaMalloc((void**) &d_Xsqr, Xsqr_size);
+
 
    printf("\n 7 \n");
 
@@ -200,10 +209,10 @@ int main(int argc, char const *argv[]) {
 
       printf("\n 8 \n");
       // calling sequential kernel 1 and transpose from the sequential file
-      mkX(N, K, freq, h_mappingindices, h_X);
-      transpose(N, K, h_X, h_XT);
-      mkXsqr(n, N, m, X, XT,  sample, Xsqr, K);
-      // matMult<float>(h_A, h_B, seq_C, WIDTH_A, HEIGHT_A, WIDTH_B);
+      mkX(N, K, freq, h_mappingindices, h_seq_X);
+      transpose(N, K, h_seq_X, h_seq_XT);
+      // calling sequential kernel 2
+      mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
       printf("\n 9 \n");
 
       gettimeofday(&t_end, NULL);
@@ -226,7 +235,7 @@ int main(int argc, char const *argv[]) {
       // 2. you would probably want to call here the kernel:
       // __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X){
       ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
-      ker2 <<< grid, block >>> (n, N, m, X, XT,  sample, Xsqr, K);
+      ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_sample, d_Xsqr, K);
       cudaThreadSynchronize();
 
       gettimeofday(&t_end, NULL);
@@ -235,6 +244,8 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
       // validate
       // printf("");
       // validate<float>(seq_C, h_C, size_C);
