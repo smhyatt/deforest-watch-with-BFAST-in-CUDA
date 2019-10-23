@@ -313,7 +313,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
 
   ------------------------------------------------------------------------------
   -- This is the original out of this file
---   in (MOs, MOs_NN, breaks, means)
+--   in (breaks, means)
   -- This is the final validation output
 --   in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss, sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
   -- This is the working validation output
