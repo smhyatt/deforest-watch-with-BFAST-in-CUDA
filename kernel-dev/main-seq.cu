@@ -20,9 +20,11 @@
 typedef unsigned int uint;
 
 
-/////////////////////////////////////////////////////////
-// Helpers
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// Helpers
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
 int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval *t1) {
     unsigned int resolution=1000000;
@@ -63,9 +65,12 @@ bool validate(float* A,float* B, unsigned int sizeAB){
     return true;
 }
 
-/////////////////////////////////////////////////////////
-// Program main
-/////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//// PROGRAM MAIN
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char const *argv[]) {
    if (argc != 2) {
@@ -73,9 +78,9 @@ int main(int argc, char const *argv[]) {
          return -1;
    }
 
-// *****************************************************************************
-// Parsing
-// *****************************************************************************
+///////////////////////////////////////////////////////////////////////////////
+//// PARSING
+///////////////////////////////////////////////////////////////////////////////
 
     FILE *fp, *fpim;
 
@@ -146,16 +151,18 @@ int main(int argc, char const *argv[]) {
         pixelsPtr = strtok(NULL, delim);
     }
 
+    // closing file with data
     fclose(fp);
 
-    FILE* fpV = fopen("../data/val.data","a+");
 
     // allocate host memory for X
-    float* h_seq_X  = (float*) calloc(N*K,sizeof(float));
-    float* h_seq_XT = (float*) calloc(N*K,sizeof(float));
+    float* h_seq_X    = (float*) calloc(N*K,sizeof(float));
+    float* h_seq_XT   = (float*) calloc(N*K,sizeof(float));
     float* h_seq_Xsqr = (float*) calloc(K*K*m,sizeof(float));
 
-    // compute sequential creation of X and XT
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 1
+    /////////////////////////////////////////////////////////////////////////
     {
         unsigned long int elapsed;
         struct timeval t_start, t_end, t_diff;
@@ -165,18 +172,175 @@ int main(int argc, char const *argv[]) {
         mkX(N, K, freq, h_mappingindices, h_seq_X);
         transpose(N, K, h_seq_X, h_seq_XT);
 
+        gettimeofday(&t_end, NULL);
+        timeval_subtract(&t_diff, &t_end, &t_start);
+        elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+        printf("Sequential kernel 1 version runs in: %lu microsecs\n", elapsed);
+    }
+    
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 2
+    /////////////////////////////////////////////////////////////////////////
+    {
+        unsigned long int elapsed;
+        struct timeval t_start, t_end, t_diff;
+        gettimeofday(&t_start, NULL);
+
         // calling sequential kernel 2
         mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
-        printf("Sequential kernels version runs in: %lu microsecs\n", elapsed);
+        printf("Sequential kernel 2 version runs in: %lu microsecs\n", elapsed);
     }
-    printX(fpV, h_seq_X, K, N);
-    printM(fpV, h_seq_Xsqr, m, K);
+
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 3
+    /////////////////////////////////////////////////////////////////////////
+    {
+        unsigned long int elapsed;
+        struct timeval t_start, t_end, t_diff;
+        gettimeofday(&t_start, NULL);
+
+        // calling sequential kernel 3
+
+        gettimeofday(&t_end, NULL);
+        timeval_subtract(&t_diff, &t_end, &t_start);
+        elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+        printf("Sequential kernel 3 version runs in: %lu microsecs\n", elapsed);
+    }
+    
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 4
+    /////////////////////////////////////////////////////////////////////////
+    {
+        unsigned long int elapsed;
+        struct timeval t_start, t_end, t_diff;
+        gettimeofday(&t_start, NULL);
+
+        // calling sequential kernel 4
+
+        gettimeofday(&t_end, NULL);
+        timeval_subtract(&t_diff, &t_end, &t_start);
+        elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+        printf("Sequential kernel 4 version runs in: %lu microsecs\n", elapsed);
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 5
+    /////////////////////////////////////////////////////////////////////////
+    {
+        unsigned long int elapsed;
+        struct timeval t_start, t_end, t_diff;
+        gettimeofday(&t_start, NULL);
+
+        // calling sequential kernel 5
+
+        gettimeofday(&t_end, NULL);
+        timeval_subtract(&t_diff, &t_end, &t_start);
+        elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+        printf("Sequential kernel 5 version runs in: %lu microsecs\n", elapsed);
+    }
+    
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 6
+    /////////////////////////////////////////////////////////////////////////
+    {
+        unsigned long int elapsed;
+        struct timeval t_start, t_end, t_diff;
+        gettimeofday(&t_start, NULL);
+
+        // calling sequential kernel 6
+
+        gettimeofday(&t_end, NULL);
+        timeval_subtract(&t_diff, &t_end, &t_start);
+        elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+        printf("Sequential kernel 6 version runs in: %lu microsecs\n", elapsed);
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 7
+    /////////////////////////////////////////////////////////////////////////
+    {
+        unsigned long int elapsed;
+        struct timeval t_start, t_end, t_diff;
+        gettimeofday(&t_start, NULL);
+
+        // calling sequential kernel 7
+
+        gettimeofday(&t_end, NULL);
+        timeval_subtract(&t_diff, &t_end, &t_start);
+        elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+        printf("Sequential kernel 7 version runs in: %lu microsecs\n", elapsed);
+    }
+    
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 8
+    /////////////////////////////////////////////////////////////////////////
+    {
+        unsigned long int elapsed;
+        struct timeval t_start, t_end, t_diff;
+        gettimeofday(&t_start, NULL);
+
+        // calling sequential kernel 8
+
+        gettimeofday(&t_end, NULL);
+        timeval_subtract(&t_diff, &t_end, &t_start);
+        elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+        printf("Sequential kernel 8 version runs in: %lu microsecs\n", elapsed);
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 9
+    /////////////////////////////////////////////////////////////////////////
+    {
+        unsigned long int elapsed;
+        struct timeval t_start, t_end, t_diff;
+        gettimeofday(&t_start, NULL);
+
+        // calling sequential kernel 9
+
+        gettimeofday(&t_end, NULL);
+        timeval_subtract(&t_diff, &t_end, &t_start);
+        elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+        printf("Sequential kernel 9 version runs in: %lu microsecs\n", elapsed);
+    }
+    
+    /////////////////////////////////////////////////////////////////////////
+    //// KERNEL 10
+    /////////////////////////////////////////////////////////////////////////
+    {
+        unsigned long int elapsed;
+        struct timeval t_start, t_end, t_diff;
+        gettimeofday(&t_start, NULL);
+
+        // calling sequential kernel 10
+
+        gettimeofday(&t_end, NULL);
+        timeval_subtract(&t_diff, &t_end, &t_start);
+        elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+        printf("Sequential kernel 10 version runs in: %lu microsecs\n", elapsed);
+    }
+
+
+
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    //// VALIDATION
+    /////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+
+    // opening file for validation of results
+    FILE* fpV = fopen("../data/val.data","a+");
+
+    printX(fpV, h_X, K, N);
+    printM(fpV, h_Xsqr, m, K);
 
     fclose(fpV);
+
 
     // 7. clean up memory
     free(h_mappingindices);

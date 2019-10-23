@@ -21,9 +21,11 @@
 typedef unsigned int uint;
 
 
-/////////////////////////////////////////////////////////
-// Helpers
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// Helpers
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
 int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval *t1) {
     unsigned int resolution=1000000;
@@ -72,9 +74,12 @@ int gpuAssert(cudaError_t code) {
     return 0;
 }
 
-/////////////////////////////////////////////////////////
-// Program main
-/////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+//// PROGRAM MAIN
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char const *argv[]) {
    if (argc != 2) {
@@ -82,10 +87,9 @@ int main(int argc, char const *argv[]) {
          return -1;
    }
 
-// *****************************************************************************
-// Parsing
-// *****************************************************************************
-
+///////////////////////////////////////////////////////////////////////////////
+//// PARSING
+///////////////////////////////////////////////////////////////////////////////
    FILE *fp, *fpim;
 
    if (argv[1][0] == 's') {
@@ -101,14 +105,11 @@ int main(int argc, char const *argv[]) {
       return -1;
    }
 
-   printf("\n 1 \n");
    char input1[10], input2[10], input3[30], input4[30];
    char input5[30], input6[30], input7[50], input8[30];
-   printf("\n 1.2 \n");
    fscanf(fp, " %[^\n]  %[^\n]  %[^\n]  %[^\n] ", input1,input2,input3,input4);
-   printf("\n 1.3 \n");
    fscanf(fp, " %[^\n]  %[^\n]  %[^\n]  %[^\n] ", input5,input6,input7,input8);
-   printf("\n 1.4 \n");
+
    int  k    = atoi(input2);
    uint n    = (uint)atoi(input3);
    uint N    = (uint)atoi(input8);
@@ -121,8 +122,6 @@ int main(int argc, char const *argv[]) {
    int K  = 2*k + 2;
 
    int mappingLen, imageLen, i = 0;
-
-   printf("\n 2 \n");
 
    // getting the lengths of mappingindices and images
    while (getc(fp) != EOF) { mappingLen++; }
@@ -152,8 +151,6 @@ int main(int argc, char const *argv[]) {
       mapPtr = strtok(NULL, delim);
    }
 
-   printf("\n 4 \n");
-
    // converting samples from char* to float*
    char *pixelsPtr = strtok(pixels, delim);
    i = 0;
@@ -165,9 +162,9 @@ int main(int argc, char const *argv[]) {
       pixelsPtr = strtok(NULL, delim);
    }
 
+   // closing file with data
    fclose(fp);
 
-   printf("\n 5 \n");
 
    // allocate device memory
    uint map_size = N*sizeof(int);
@@ -181,7 +178,6 @@ int main(int argc, char const *argv[]) {
    cudaMemcpy(d_mappingindices, h_mappingindices, map_size, cudaMemcpyHostToDevice);
    cudaMemcpy(d_sample, h_sample, sam_size, cudaMemcpyHostToDevice);
 
-   printf("\n 6 \n");
 
    // allocate host memory for X
    uint X_size     = K*N*sizeof(float);
@@ -190,46 +186,54 @@ int main(int argc, char const *argv[]) {
    float* h_X      = (float*) calloc(N*K,sizeof(float));
    float* h_XT     = (float*) calloc(K*N,sizeof(float));
    float* h_Xsqr   = (float*) calloc(K*K*m,sizeof(float));
-   float* h_seq_X  = (float*) calloc(N*K,sizeof(float));
-   float* h_seq_XT = (float*) calloc(N*K,sizeof(float));
-   float* h_seq_Xsqr = (float*) calloc(K*K*m,sizeof(float));
 
-   // allocate device memory for X
-   float *d_X;
+   // allocate device memory for X, XT and Xsqr
+   float *d_X, *d_XT, *d_Xsqr;
    cudaMalloc((void**) &d_X, X_size);
-
-   // allocate device memory for XT
-   float *d_XT;
    cudaMalloc((void**) &d_XT, X_size);
-
-   // allocate device memory for Xsqr
-   float *d_Xsqr;
    cudaMalloc((void**) &d_Xsqr, Xsqr_size);
 
 
-   printf("\n 7 \n");
-
-   // compute sequential creation of X and XT
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 1
+   /////////////////////////////////////////////////////////////////////////
    {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
+
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
-
-      printf("\n 8 \n");
-      // calling sequential kernel 1 and transpose from the sequential file
-      mkX(N, K, freq, h_mappingindices, h_seq_X);
-      transpose(N, K, h_seq_X, h_seq_XT);
-      // calling sequential kernel 2
-      mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
-      printf("\n 9 \n");
+      
+      // GPU call to kernel 3
+      ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
+      cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
       elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
-      printf("Sequential kernels version runs in: %lu microsecs\n", elapsed);
+
+      // check for cuda errors
+      gpuAssert( cudaPeekAtLastError() );
+
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      printf("GPU Optimized Kernel 1 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Optimized Kernel 1 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
    }
 
 
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 2
+   /////////////////////////////////////////////////////////////////////////
    {
       int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
       int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
@@ -240,10 +244,7 @@ int main(int argc, char const *argv[]) {
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
 
-      // 2. you would probably want to call here the kernel:
-      // __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X){
-      ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
-      cudaDeviceSynchronize();
+      // GPU call to kernel 2
       ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_sample, d_Xsqr, K);
       cudaDeviceSynchronize();
 
@@ -258,32 +259,336 @@ int main(int argc, char const *argv[]) {
       cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
       cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
       cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
-      // validate
-      // printf("");
-      // validate<float>(seq_C, h_C, size_C);
 
-      printf("GPU Kernels runs in: %lu microsecs\n", elapsed);
+      printf("GPU Optimized Kernel 2 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
       double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
       double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-      printf( "GPU Kernels Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+      printf( "GPU Optimized Kernel 2 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
    }
 
-   printf("\n 10 \n");
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 3
+   /////////////////////////////////////////////////////////////////////////
+   {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
+
+      unsigned long int elapsed;
+      struct timeval t_start, t_end, t_diff;
+      gettimeofday(&t_start, NULL);
+
+      // GPU call to kernel 3
+      // ker3 <<< grid, block >>> ();
+      // cudaDeviceSynchronize();
+
+      gettimeofday(&t_end, NULL);
+      timeval_subtract(&t_diff, &t_end, &t_start);
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+
+      // check for cuda errors
+      gpuAssert( cudaPeekAtLastError() );
+
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      printf("GPU Optimized Kernel 3 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Optimized Kernel 3 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+   }
+
+
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 4
+   /////////////////////////////////////////////////////////////////////////
+   {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
+
+      unsigned long int elapsed;
+      struct timeval t_start, t_end, t_diff;
+      gettimeofday(&t_start, NULL);
+
+      // GPU call to kernel 4
+      // ker4 <<< grid, block >>> ();
+      // cudaDeviceSynchronize();
+
+      gettimeofday(&t_end, NULL);
+      timeval_subtract(&t_diff, &t_end, &t_start);
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+
+      // check for cuda errors
+      gpuAssert( cudaPeekAtLastError() );
+
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      printf("GPU Optimized Kernel 4 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Optimized Kernel 4 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+   }
+
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 5
+   /////////////////////////////////////////////////////////////////////////
+   {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
+
+      unsigned long int elapsed;
+      struct timeval t_start, t_end, t_diff;
+      gettimeofday(&t_start, NULL);
+
+      // GPU call to kernel 5
+      // ker5 <<< grid, block >>> ();
+      // cudaDeviceSynchronize();
+
+      gettimeofday(&t_end, NULL);
+      timeval_subtract(&t_diff, &t_end, &t_start);
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+
+      // check for cuda errors
+      gpuAssert( cudaPeekAtLastError() );
+
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      printf("GPU Optimized Kernel 5 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Optimized Kernel 5 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+   }
+
+
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 6
+   /////////////////////////////////////////////////////////////////////////
+   {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
+
+      unsigned long int elapsed;
+      struct timeval t_start, t_end, t_diff;
+      gettimeofday(&t_start, NULL);
+
+      // GPU call to kernel 6
+      // ker6 <<< grid, block >>> ();
+      // cudaDeviceSynchronize();
+
+      gettimeofday(&t_end, NULL);
+      timeval_subtract(&t_diff, &t_end, &t_start);
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+
+      // check for cuda errors
+      gpuAssert( cudaPeekAtLastError() );
+
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      printf("GPU Optimized Kernel 6 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Optimized Kernel 6 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+   }
+
+
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 7
+   /////////////////////////////////////////////////////////////////////////
+   {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
+
+      unsigned long int elapsed;
+      struct timeval t_start, t_end, t_diff;
+      gettimeofday(&t_start, NULL);
+
+      // GPU call to kernel 7
+      // ker7 <<< grid, block >>> ();
+      // cudaDeviceSynchronize();
+
+      gettimeofday(&t_end, NULL);
+      timeval_subtract(&t_diff, &t_end, &t_start);
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+
+      // check for cuda errors
+      gpuAssert( cudaPeekAtLastError() );
+
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      printf("GPU Optimized Kernel 7 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Optimized Kernel 7 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+   }
+
+
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 8
+   /////////////////////////////////////////////////////////////////////////
+   {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
+
+      unsigned long int elapsed;
+      struct timeval t_start, t_end, t_diff;
+      gettimeofday(&t_start, NULL);
+
+      // GPU call to kernel 8
+      // ker8 <<< grid, block >>> ();
+      // cudaDeviceSynchronize();
+
+      gettimeofday(&t_end, NULL);
+      timeval_subtract(&t_diff, &t_end, &t_start);
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+
+      // check for cuda errors
+      gpuAssert( cudaPeekAtLastError() );
+
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      printf("GPU Optimized Kernel 8 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Optimized Kernel 8 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+   }
+
+
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 9
+   /////////////////////////////////////////////////////////////////////////
+   {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
+
+      unsigned long int elapsed;
+      struct timeval t_start, t_end, t_diff;
+      gettimeofday(&t_start, NULL);
+
+      // GPU call to kernel 9
+      // ker9 <<< grid, block >>> ();
+      // cudaDeviceSynchronize();
+
+      gettimeofday(&t_end, NULL);
+      timeval_subtract(&t_diff, &t_end, &t_start);
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+
+      // check for cuda errors
+      gpuAssert( cudaPeekAtLastError() );
+
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Optimized Kernel 9 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+   }
+
+
+   /////////////////////////////////////////////////////////////////////////
+   //// KERNEL 10
+   /////////////////////////////////////////////////////////////////////////
+   {
+      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
+      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
+      dim3 grid (dimx, dimy, 1);
+
+      unsigned long int elapsed;
+      struct timeval t_start, t_end, t_diff;
+      gettimeofday(&t_start, NULL);
+
+      // GPU call to kernel 10
+      // ker10 <<< grid, block >>> ();
+      // cudaDeviceSynchronize();
+
+      gettimeofday(&t_end, NULL);
+      timeval_subtract(&t_diff, &t_end, &t_start);
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+
+      // check for cuda errors
+      gpuAssert( cudaPeekAtLastError() );
+
+      // copy result from device to host
+      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+
+      printf("GPU Optimized Kernel 10 runs in: %lu microsecs\n", elapsed);
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Optimized Kernel 10 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+   }
+
+
+   /////////////////////////////////////////////////////////////////////////
+   /////////////////////////////////////////////////////////////////////////
+   //// VALIDATION
+   /////////////////////////////////////////////////////////////////////////
+   /////////////////////////////////////////////////////////////////////////
+
+   // opening file for validation of results
+   FILE* fpV = fopen("../data/val.data","a+");
+
+   printX(fpV, h_X, K, N);
+   printM(fpV, h_Xsqr, m, K);
+
+   fclose(fpV);
+
 
    // 7. clean up memory
    free(h_mappingindices);
    free(h_sample);
-   free(h_seq_X);
-   free(h_seq_XT);
    free(h_X);
    free(h_XT);
+   free(h_Xsqr);
    cudaFree(d_X);
    cudaFree(d_XT);
+   cudaFree(d_Xsqr);
    cudaFree(d_mappingindices);
    cudaFree(d_sample);
 
 }
-
 
 
