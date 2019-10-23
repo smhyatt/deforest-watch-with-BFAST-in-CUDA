@@ -193,6 +193,8 @@ int main(int argc, char const *argv[]) {
    cudaMalloc((void**) &d_XT, X_size);
    cudaMalloc((void**) &d_Xsqr, Xsqr_size);
 
+   // opening file for validation of results
+   FILE* fpV = fopen("../data/val.data","a+");
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 1
@@ -206,7 +208,7 @@ int main(int argc, char const *argv[]) {
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
-      
+
       // GPU call to kernel 3
       ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
       cudaDeviceSynchronize();
@@ -221,7 +223,7 @@ int main(int argc, char const *argv[]) {
       // copy result from device to host
       cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
       cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      printX(fpV, h_X, K, N);
 
       printf("GPU Naive Kernel 1 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -256,9 +258,8 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
       cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      printM(fpV, h_Xsqr, m, K);
 
       printf("GPU Naive Kernel 2 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -281,7 +282,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 3
-      // ker3 <<< grid, block >>> ();
+      ker3 <<< grid, block >>> ( m, Xsqr, XsqrInv, K);
       // cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
@@ -292,9 +293,6 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Naive Kernel 3 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -562,17 +560,6 @@ int main(int argc, char const *argv[]) {
    }
 
 
-   /////////////////////////////////////////////////////////////////////////
-   /////////////////////////////////////////////////////////////////////////
-   //// VALIDATION
-   /////////////////////////////////////////////////////////////////////////
-   /////////////////////////////////////////////////////////////////////////
-
-   // opening file for validation of results
-   FILE* fpV = fopen("../data/val.data","a+");
-
-   printX(fpV, h_X, K, N);
-   printM(fpV, h_Xsqr, m, K);
 
    fclose(fpV);
 

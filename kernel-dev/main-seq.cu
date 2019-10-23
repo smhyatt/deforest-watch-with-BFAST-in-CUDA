@@ -177,7 +177,7 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 1 version runs in: %lu microsecs\n", elapsed);
     }
-    
+
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 2
     /////////////////////////////////////////////////////////////////////////
@@ -204,13 +204,14 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 3
+        matInv(m, Xsqr, XsqrInv, K);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 3 version runs in: %lu microsecs\n", elapsed);
     }
-    
+
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 4
     /////////////////////////////////////////////////////////////////////////
@@ -242,7 +243,7 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 5 version runs in: %lu microsecs\n", elapsed);
     }
-    
+
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 6
     /////////////////////////////////////////////////////////////////////////
@@ -275,7 +276,7 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 7 version runs in: %lu microsecs\n", elapsed);
     }
-    
+
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 8
     /////////////////////////////////////////////////////////////////////////
@@ -308,7 +309,7 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 9 version runs in: %lu microsecs\n", elapsed);
     }
-    
+
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 10
     /////////////////////////////////////////////////////////////////////////

@@ -55,7 +55,10 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
     Xsqr[gidy*K + gidx] = accum;
 }
 
+// Kernel 3
+void matInv(uint m, float* Xsqr, float* XsqrInv, uint K){
 
+}
 
 #endif
 
