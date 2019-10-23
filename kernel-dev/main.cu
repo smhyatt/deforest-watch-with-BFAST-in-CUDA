@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <float.h>
 #include <math.h>
-#include <time.h> 
+#include <time.h>
 
 #include "helper.cu.h"
-#include "kernels.cu.h"
+#include "kernels-naive.cu.h"
 #include "sequential.cu.h"
 
 #define BLOCK_SIZE 1024//1024 //1024//2048
@@ -50,7 +50,7 @@ void matMult(T* A, T* B, T* C, int colsA, int rowsA, int colsB) {
       }
       C[i * colsB + j] = sum;
     }
-  } 
+  }
 }
 
 template<class T>
@@ -67,7 +67,7 @@ bool validate(float* A,float* B, unsigned int sizeAB){
 /////////////////////////////////////////////////////////
 // Program main
 /////////////////////////////////////////////////////////
- 
+
 int main(int argc, char const *argv[]) {
    if (argc != 2) {
       printf("Please include the name of the dataset.\n");
@@ -77,9 +77,9 @@ int main(int argc, char const *argv[]) {
 // *****************************************************************************
 // Parsing
 // *****************************************************************************
-   
+
    FILE *fp, *fpim;
-   
+
    if (argv[1][0] == 's') {
       fp   = fopen("../data/saharaC.in", "r");
       fpim = fopen("../data/saharaCimages.in", "r");
@@ -101,11 +101,11 @@ int main(int argc, char const *argv[]) {
    printf("\n 1.3 \n");
    fscanf(fp, " %[^\n]  %[^\n]  %[^\n]  %[^\n] ", input5,input6,input7,input8);
    printf("\n 1.4 \n");
-   int  k    = atoi(input2); 
+   int  k    = atoi(input2);
    uint n    = (uint)atoi(input3);
    uint N    = (uint)atoi(input8);
    uint mIRL = (uint)atoi(input7);
-   int trend = atoi(input1); 
+   int trend = atoi(input1);
    float freq  = atof(input4);
    float hfrac = atof(input5);
    float lam   = atof(input6);
@@ -132,7 +132,7 @@ int main(int argc, char const *argv[]) {
    // converting mappingindices from char* to int*
    char delim[] = ",";
    char *mapPtr = strtok(mappings, delim);
- 
+
    // allocating host memory for mappingindices and pixels
    int* h_mappingindices = (int*) calloc(N,sizeof(int));
    float* h_sample = (float*) calloc(N*m,sizeof(float));
@@ -160,7 +160,7 @@ int main(int argc, char const *argv[]) {
    fclose(fp);
 
    printf("\n 5 \n");
-    
+
    // allocate device memory
    uint map_size = N*sizeof(int);
    uint sam_size = N*m*sizeof(float);
@@ -168,11 +168,11 @@ int main(int argc, char const *argv[]) {
    float* d_sample;
    cudaMalloc((void**) &d_mappingindices, map_size);
    cudaMalloc((void**) &d_sample, sam_size);
- 
+
    // copy host memory to device
    cudaMemcpy(d_mappingindices, h_mappingindices, map_size, cudaMemcpyHostToDevice);
    cudaMemcpy(d_sample, h_sample, sam_size, cudaMemcpyHostToDevice);
- 
+
    printf("\n 6 \n");
 
    // allocate host memory for X
@@ -181,7 +181,7 @@ int main(int argc, char const *argv[]) {
    float* h_XT     = (float*) calloc(K*N,sizeof(float));
    float* h_seq_X  = (float*) calloc(N*K,sizeof(float));
    float* h_seq_XT = (float*) calloc(N*K,sizeof(float));
- 
+
    // allocate device memory for X
    float *d_X;
    cudaMalloc((void**) &d_X, X_size);
@@ -191,45 +191,47 @@ int main(int argc, char const *argv[]) {
    cudaMalloc((void**) &d_XT, X_size);
 
    printf("\n 7 \n");
- 
+
    // compute sequential creation of X and XT
    {
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
-      gettimeofday(&t_start, NULL); 
-      
+      gettimeofday(&t_start, NULL);
+
       printf("\n 8 \n");
-      // calling sequential kernel 1 and transpose from the sequential file 
+      // calling sequential kernel 1 and transpose from the sequential file
       mkX(N, K, freq, h_mappingindices, h_X);
       transpose(N, K, h_X, h_XT);
+      mkXsqr(n, N, m, X, XT,  sample, Xsqr, K);
       // matMult<float>(h_A, h_B, seq_C, WIDTH_A, HEIGHT_A, WIDTH_B);
       printf("\n 9 \n");
 
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
-      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec); 
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
       printf("Sequential kernel 1 version runs in: %lu microsecs\n", elapsed);
    }
 
-   
+
    {
       int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH ); 
+      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
       dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
       dim3 grid (dimx, dimy, 1);
 
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
-      gettimeofday(&t_start, NULL); 
-      
+      gettimeofday(&t_start, NULL);
+
       // 2. you would probably want to call here the kernel:
-      // __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X){ 
-      ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT); 
+      // __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X){
+      ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
+      ker2 <<< grid, block >>> (n, N, m, X, XT,  sample, Xsqr, K);
       cudaThreadSynchronize();
 
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
-      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec); 
+      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
 
       // copy result from device to host
       cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
@@ -238,10 +240,10 @@ int main(int argc, char const *argv[]) {
       // validate<float>(seq_C, h_C, size_C);
 
       printf("GPU Kernel 1 runs in: %lu microsecs\n", elapsed);
-      float microsecPerMatrixMul = elapsed; 
-      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A; 
-      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f)); 
-      printf( "GPU Kernel 1 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y); 
+      float microsecPerMatrixMul = elapsed;
+      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      printf( "GPU Kernel 1 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
    }
 
    printf("\n 10 \n");

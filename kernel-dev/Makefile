@@ -1,7 +1,7 @@
 CXX = nvcc
 
 SRC = main.cu
-HELPERS    = helper.cu.h kernels.cu.h sequential.cu.h
+HELPERS    = helper.cu.h kernels-naive.cu.h sequential.cu.h
 EXECUTABLE = bfast-project
 
 default: compile run
@@ -12,14 +12,14 @@ default: compile run
 bfast: $(EXECUTABLE)
 		./$(EXECUTABLE)
 
-compile: $(EXECUTABLE) 
+compile: $(EXECUTABLE)
 
 $(EXECUTABLE): $(SRC) $(HELPERS)
 	$(CXX) -o $(EXECUTABLE) $(SRC)
 
-run: $(EXECUTABLE) 
+run: $(EXECUTABLE)
 	./$(EXECUTABLE) sahara
 
 clean:
-	rm -f $(EXECUTABLE) 
+	rm -f $(EXECUTABLE)
 

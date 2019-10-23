@@ -99,7 +99,7 @@ void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint 
 
 // -- Xsqr,Xsqr−1:[K][K]f32; β0,β:[K]f32
 // let Xsqr = mmMulFilt X[:,:n] XT[:n,:] y[:n] -- ker 2
-void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
+void mkXsqr(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
     for (uint pix = 0; pix < m; pix++) {
         mmMulFilt(n, N, X, XT, &sample[pix*N], &Xsqr[pix*K*K], K);
     }
@@ -502,7 +502,7 @@ void MO_prime_comp(uint Nmn, float* MO, uint* ns, float sigma, float* MOp){
 void breaks(float* MOp, float* bound, uint Ns, uint ns, uint Nmn, int* isBreak, int* fstBreak){
     for (uint i = 0; i < Nmn; i++){
         float mop = MOp[i];
-        
+
         if(i < (Ns-ns) && mop != F32_MIN){
             if (fabsf(mop) > bound[i] == 1) {
                 *isBreak  = 1;
@@ -569,8 +569,8 @@ void MOppComp(uint Nmn, float* MOp, int* val_indsP, float* MOpp) {
 }
 
 
-void ker10(float lam, uint m, uint n, uint N, float* bound, uint* Nss, 
-		   uint* nss, float* sigmas, int* hs, int* mappingindices, 
+void ker10(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
+		   uint* nss, float* sigmas, int* hs, int* mappingindices,
 		   float* MO_fsts, float* y_errors, int* val_indss, float* MOp,
            float* means, int* fstBreakP, float* MOpp){
 
