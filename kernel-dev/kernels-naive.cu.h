@@ -56,7 +56,7 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
 }
 
 // Kernel 3
-void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrInvLess){
+__global__ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrInvLess){
 	int gid = blockIdx.x*blockDim.x + threadIdx.x;
 
     float* XsqrPix = Xsqr + gid*K*K;
