@@ -7,6 +7,20 @@
 // *****************************************************************************
 // Printing functions for validation
 // *****************************************************************************
+void printX(FILE* fp, float* M, uint K, uint N){
+    fprintf(fp, "[");
+    for (size_t i = 0; i < K; i++){
+        fprintf(fp, "[");
+        for (size_t j = 0; j < N; j++){
+            uint index = i*N + j;
+            fprintf(fp, " %ff32", M[index]);
+            if(j<N-1){fprintf(fp, ",");}
+        }
+        fprintf(fp, "]");
+        if(i<K-1){fprintf(fp, ",");}
+    }
+    fprintf(fp, "]");
+}
 
 void printM(FILE* fp, float* M, uint m, uint K){
     fprintf(fp, "[");
