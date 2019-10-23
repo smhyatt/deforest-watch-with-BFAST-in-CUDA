@@ -230,7 +230,7 @@ void mkXsqrIdent(float* Xsqr, float* XsqrInv, uint K) {
 //     -- Drop the identity matrix at the front!
 //     in (unflatten n m Ap')[0:n,n:2*n]
 
-void matInv(uint m, float* Xsqr, float* XsqrInv, uint K){
+void mkXsqrInv(uint m, float* Xsqr, float* XsqrInv, uint K){
     uint cols = 2*K;        // 2*8=16
     uint identIdx = K*cols; // 8*16=128
 

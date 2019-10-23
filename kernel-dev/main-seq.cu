@@ -213,7 +213,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 3
-        // matInv(m, h_seq_Xsqr, h_seq_XsqrInv, K);
+        // mkXsqrInv(m, h_seq_Xsqr, h_seq_XsqrInv, K);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
