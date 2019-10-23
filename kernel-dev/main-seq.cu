@@ -161,6 +161,7 @@ int main(int argc, char const *argv[]) {
     float* h_seq_X    = (float*) calloc(N*K,sizeof(float));
     float* h_seq_XT   = (float*) calloc(N*K,sizeof(float));
     float* h_seq_Xsqr = (float*) calloc(K*K*m,sizeof(float));
+    float* h_seq_B0   = (float*) calloc(K*m,sizeof(float));
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 1
@@ -212,7 +213,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 3
-        matInv(m, Xsqr, XsqrInv, K);
+        matInv(m, h_seq_Xsqr, h_seq_XsqrInv, K);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -229,11 +230,15 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 4
+        mkB0(m, n, N, h_seq_X, K, h_sample, h_seq_B0)
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 4 version runs in: %lu microsecs\n", elapsed);
+
+        // validation 
+        printVf(h_seq_B0, m, K);
     }
 
     /////////////////////////////////////////////////////////////////////////

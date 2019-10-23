@@ -277,7 +277,7 @@ void mvMulFilt(uint n, uint N, float* X, float* y, uint K, float* B0){
 // let beta0  = map (matvecmul_row_filt Xh) Yh   -- [2k+2]
 //                |> intrinsics.opaque
 // let β0 = mvMulFilt X[:,:n] y[:n]
-void ker4(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
+void mkB0(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
     for (uint pix = 0; pix < m; pix++) {
         mvMulFilt(n, N, X, &sample[pix*N], K, &B0[pix*K]);
     }
