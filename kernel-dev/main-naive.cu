@@ -282,7 +282,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 3
-      ker3 <<< grid, block >>> ( m, Xsqr, XsqrInv, K);
+    //   ker3 <<< grid, block >>> ( m, Xsqr, XsqrInv, K);
       // cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
@@ -327,9 +327,6 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Naive Kernel 4 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -363,9 +360,6 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Naive Kernel 5 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -400,9 +394,6 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Naive Kernel 6 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -437,9 +428,6 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Naive Kernel 7 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -474,9 +462,6 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Naive Kernel 8 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -511,9 +496,6 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Naive Kernel 9 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -548,9 +530,6 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Naive Kernel 10 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
