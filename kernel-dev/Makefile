@@ -23,7 +23,7 @@ run: $(EXECUTABLE)
 seqValidering:
 	futhark c ../bfast-irreg.fut
 	.././bfast-irreg < ../data/testset_sahara_2pix.in > ../data/val.data
-	run
+	make run
 	futhark c ../validation-benchmark.fut
 	.././validation-benchmark < ../data/val.data
 	rm validation-benchmark
