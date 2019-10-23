@@ -47,24 +47,29 @@ run: $(EXECUTABLE1) $(EXECUTABLE2) $(EXECUTABLE3)
 futV:
 	futhark c ../bfast-irreg.fut
 	futhark c ../validation-benchmark.fut
+
+clear:
 	.././bfast-irreg < ../data/testset_sahara_2pix.in > ../data/val.data
 
-seqV: futV seqbfast
+seqV: clear seqbfast
 	$(info )
 	$(info The validation for the sequential implementation.)
 	.././validation-benchmark < ../data/val.data
+	rm ../data/val.data
 
-naiveV: futV naivebfast
+naiveV: clear naivebfast
 	$(info )
 	$(info The validation for the naive implementation.)
 	.././validation-benchmark < ../data/val.data
+	rm ../data/val.data
 
-optimV: futV optimbfast
+optimV: clear optimbfast
 	$(info )
 	$(info The validation for the optimized implementation.)
 	.././validation-benchmark < ../data/val.data
+	rm ../data/val.data
 
-fullV: compile seqV naiveV optimV
+fullV: compile futV seqV naiveV optimV
 	rm ../validation-benchmark
 	rm ../validation-benchmark.c
 	rm ../bfast-irreg
