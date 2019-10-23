@@ -98,7 +98,7 @@ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrInvLess){
     for (uint i = 0; i < K; i++) {
         float temp = XsqrInv[i*cols+i];
         for (uint j = i; j < cols; j++){
-            XsqrInv[i*cols+j] = XsqrInv[i*cols+j] / temp;
+            XsqrInvPix[i*cols+j] = XsqrInvPix[i*cols+j] / temp;
         }
     }
 
@@ -117,7 +117,7 @@ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrInvLess){
             for (int j = 0; j < K; j++) {
                 uint XinvIdx  = pix*K*(2*K) + i*(K*2) + j+K; // XsqrInv er K længere
                 uint XlessIdx = pix*K*K + i*K + j;
-                d_XsqrInvLessPix[XlessIdx] = d_XsqrInv[XinvIdx];
+                d_XsqrInvLessPix[XlessIdx] = XsqrInvPix[XinvIdx];
             }
         }
     }

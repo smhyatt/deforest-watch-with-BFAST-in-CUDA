@@ -190,7 +190,7 @@ int main(int argc, char const *argv[]) {
    float* h_XsqrInv= (float*) calloc(K*K*m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
-   float *d_X, *d_XT, *d_Xsqr, *d_XsqrInv;
+   float *d_X, *d_XT, *d_Xsqr, *d_XsqrInv, *d_XsqrInvLess;
    cudaMalloc((void**) &d_X, X_size);
    cudaMalloc((void**) &d_XT, X_size);
    cudaMalloc((void**) &d_Xsqr, Xsqr_size);
@@ -286,7 +286,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 3
-      ker3 <<< grid, block >>> (m, K, d_Xsqr, d_XsqrInv, d_XsqrInvLess);
+      ker3<<< grid, block >>>(m, K, d_Xsqr, d_XsqrInv, d_XsqrInvLess);
       // cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
