@@ -218,7 +218,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
       elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
-      printf("Sequential kernel 1 version runs in: %lu microsecs\n", elapsed);
+      printf("Sequential kernels version runs in: %lu microsecs\n", elapsed);
    }
 
 
@@ -250,11 +250,11 @@ int main(int argc, char const *argv[]) {
       // printf("");
       // validate<float>(seq_C, h_C, size_C);
 
-      printf("GPU Kernel 1 runs in: %lu microsecs\n", elapsed);
+      printf("GPU Kernels runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
       double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
       double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-      printf( "GPU Kernel 1 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+      printf( "GPU Kernels Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
    }
 
    printf("\n 10 \n");
