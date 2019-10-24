@@ -26,7 +26,7 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
                 if (k2<K) {
                     Ash[k1*2*K + k2] = A[i*K*2*K + k1*2*K + k2];
                 } else {
-                    Ash[k1*2*K + k2] = (float) (k2 == K+k1);
+                    Ash[k1*2*K + k2] = (float) (k2 == (K+k1));
                 }
                 // barrier
             }
@@ -42,7 +42,7 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
                         tmp = Ash[k1*2*K + k2];
                     } else {
                         float x = Ash[0+k2] / vq;
-                        if (k1 == K-1){
+                        if (k1 == (K-1)){
                             tmp = x;
                         } else {
                             tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] * x;
@@ -63,6 +63,6 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
                 AI[XlessIdx] = Ash[XinvIdx];
             }
         }
-
+        free(Ash);
     }
 }
