@@ -138,24 +138,25 @@ void transpose(float* M, float* MT, uint m, uint N) {
 
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
 
+    float[N*m] YT;
     transpose(sample, YT, m, N);
     int R = 30;
     int T1 = K;
     int T2 = K; 
 
-    for (int ii = 0; ii < m; i+=R) {                                    // forall, grid.z
+    for (int ii = 0; ii < m; ii+=R) {                                    // forall, grid.z
         for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
             for (int jj2 = 0; jj2 < K; jj2+=T2){                       // forall, grid.x
                 for (int j1 = jj1; j1 < min(jj1+T1, K); j1++) {        // forall, block.y
                     for (int j2 = jj2; j2 < min(jj2+T2, K); j2++) {    // forall, block.x
 
-                        float yqsh[R];          // size R, shared memory
+                        // float yqsh[R];          // size R, shared memory
                         float acc[R]; //  = calloc(R,sizeof(float));          // size R, registers
 
                         for (int i = 0; i < R; i++) {                   // fully unroll
                             acc[i] = 0.0;
                         }
-                        float a, b, ab, y; 
+                        float a, b, ab; //, y; 
                         for (int q = 0; q < n; q++) {
                             a = X[j1*N + q];       // a = X[j1, q];
                             b = XT[q*K + j2];      // b = XT[q, j2];
