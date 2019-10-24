@@ -114,7 +114,7 @@ void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* 
             for (int j = 0; j < K; j++) {   // j = threadIdx.x
                 float acc = 0.0;
                 for (uint k = 0; k < n; k++) {
-                    int mask = 1 - isNan(sample[pix*N+k]);
+                    int mask = isNan(sample[pix*N+k]) - 1;
                     acc += X[i*N+k] * XT[k*K+j] * mask;
                 }
                 Xsqr[pix*K*K + i*K + j] = acc;
