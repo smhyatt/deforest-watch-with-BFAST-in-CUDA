@@ -140,7 +140,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
     
     printf("************** FØR TRANSPOSE ****************\n");
     for (int i = 0; i < N*m; i++) {
-        printf("%f", sample[i]);
+        printf("%f, ", sample[i]);
     }
     printf("\n\n\n");
 
@@ -148,7 +148,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
     transpose(sample, YT, m, N);
     printf("************** EFTER TRANSPOSE ****************\n");
     for (int i = 0; i < N*m; i++) {
-        printf("%f", YT[i]);
+        printf("%f, ", YT[i]);
     }
     printf("\n\n\n");
     int R = 30;

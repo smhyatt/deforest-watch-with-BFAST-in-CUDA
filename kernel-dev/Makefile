@@ -66,7 +66,7 @@ clear:
 seqV: compileSeq clear seqbfast
 	$(info )
 	$(info The validation for the sequential implementation.)
-	cat ../data/val.data
+# 	cat ../data/val.data
 	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
