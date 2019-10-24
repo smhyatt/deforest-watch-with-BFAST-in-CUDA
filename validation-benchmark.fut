@@ -34,11 +34,12 @@ entry main (X:[][]f32)
 let epsilon = 0.001
 
 -- abs(v1-v2) / max(abs(v1),abs(v2) < epsilon
+-- let relError = (\(x, y) -> f32.abs(x-y) / (f32.max f32.abs(x) f32.abs(y)) < epsilon)
 
 -- Kernel 1: X
 let Xtfs = map2 (\x y ->
-                 map2 (\x' y' -> f32.abs(x'-y') /
-                                 f32.max(f32.abs(x'),f32.abs(y')) < epsilon) x y
+                 map2 (\x' y' -> (f32.abs(x'-y') /
+                                 f32.max(f32.abs(x'),f32.abs(y'))) < epsilon) x y
                  ) X Xseq
 let XallTrue = map (\x -> and x) Xtfs
                |> and
