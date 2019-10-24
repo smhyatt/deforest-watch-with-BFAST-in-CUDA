@@ -57,12 +57,21 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
 
         // collective copy shared-to-global mem:
         for (int k1 = 0; k1 < K; k1++) {
-            for (int j = 0; j < K; j++) {
-                uint XinvIdx  = k1*(K*2) + j+K;
-                uint XlessIdx = i*K*K + k1*K + j;
+            for (int k2 = 0; k2 < K; k2++) {
+                uint XinvIdx  = k1*(K*2) + k2;
+                uint XlessIdx = i*K*K + k1*K + k2;
                 AI[XlessIdx] = Ash[XinvIdx];
             }
         }
+
+        // // collective copy shared-to-global mem:
+        // for (int k1 = 0; k1 < K; k1++) {
+        //     for (int k2 = 0; k2 < K; k2++) {
+        //         uint XinvIdx  = k1*(K*2) + k2+K;
+        //         uint XlessIdx = i*K*K + k1*K + k2;
+        //         AI[XlessIdx] = Ash[XinvIdx];
+        //     }
+        // }
         free(Ash);
     }
 }
