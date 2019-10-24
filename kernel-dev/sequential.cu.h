@@ -302,15 +302,18 @@ void mkB0(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
 
 
 void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
+    float acc = 0.0;
     for (uint pix = 0; pix < m; pix++) {            // blockIdx.x
         for (int i = 0; i < K; i++) {               // i = threadIdx.y
-            float acc = 0.0;
+            acc = 0.0;
             for (uint k = 0; k < n; k++) {
                 float cur_y = sample[pix*N+k];
                 int mask = isNotNan(cur_y);
                 acc += X[i*N+k] * cur_y * mask;
             }
-            B0[pix*K + i] = acc;
+            int b0idx = pix*K + i;
+            printf("\n\n\n\n\n\n\n\n***** %d *****\n\n\n\n\n\n\n", b0idx);
+            B0[b0idx] = acc;
         }
     }
 }    
