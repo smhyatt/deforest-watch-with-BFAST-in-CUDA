@@ -54,8 +54,8 @@ clear:
 seqV: clear seqbfast
 	$(info )
 	$(info The validation for the sequential implementation.)
-	.././validation-benchmark < ../data/val.data
 	cat ../data/val.data
+	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
 naiveV: clear naivebfast

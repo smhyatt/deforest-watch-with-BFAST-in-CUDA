@@ -306,8 +306,9 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
         for (int i = 0; i < K; i++) {
             float acc = 0.0;
             for (uint k = 0; k < n; k++) {
-                int mask = isNotNan(sample[pix*N+k]);
-                acc += X[i*N+k] * sample[pix*N+k] * mask;
+                float cur_y = sample[pix*N+k];
+                int mask = isNotNan(cur_y);
+                acc += X[i*N+k] * cur_y * mask;
             }
             B0[i] = acc;
         }
