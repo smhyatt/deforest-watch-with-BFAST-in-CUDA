@@ -109,7 +109,7 @@ int isNotNan(float x){
 
 // the squared MM multiplication in one gathered function
 void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K){
-    for (uint pix = 0; pix < m; pix++) {    // blockIdx.x
+    for (uint pix = 0; pix < m; pix++) {    // pix = blockIdx.x
         for (int i = 0; i < K; i++) {       // i = threadIdx.y
             for (int j = 0; j < K; j++) {   // j = threadIdx.x
                 float acc = 0.0;
@@ -309,7 +309,7 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             for (uint k = 0; k < n; k++) {
                 float cur_y = sample[pix*N+k];
 
-                if (cur_y == F32_MIN) {
+                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan. 
                     acc += 0.0;
                 } else {
                     acc += X[i*N+k] * cur_y;
@@ -343,6 +343,22 @@ void ker5(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
         mvMul(&XsqrInvLess[pix*(K*K)], &B0[pix*K], K, K, &B[pix*K]);
     }
 }
+
+
+
+void mkB(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
+    for (uint pix = 0; pix < m; pix++) {
+        for (int i = 0; i < K; i++) {
+            float acc = 0.0;
+
+            for (uint j = 0; j < K; j++) {
+                acc += XsqrInvLess[pix*(K*K) + i*K + j] * B0[pix*K + j];
+            }
+            B[pix*K + i] = acc;
+        }
+    }        
+}
+
 
 
 // -- yˆ,r,I : [N]f32

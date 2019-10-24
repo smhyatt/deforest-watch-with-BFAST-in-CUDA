@@ -161,7 +161,9 @@ int main(int argc, char const *argv[]) {
     float* h_seq_X    = (float*) calloc(N*K,sizeof(float));
     float* h_seq_XT   = (float*) calloc(N*K,sizeof(float));
     float* h_seq_Xsqr = (float*) calloc(K*K*m,sizeof(float));
+    float* h_seq_XInv = (float*) calloc(K*K*m,sizeof(float));
     float* h_seq_B0   = (float*) calloc(K*m,sizeof(float));
+    float* h_seq_B    = (float*) calloc(K*m,sizeof(float));
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 1
@@ -214,7 +216,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 3
-        // mkXsqrInv(m, h_seq_Xsqr, h_seq_XsqrInv, K);
+        mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -252,6 +254,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 5
+        mkB(m, h_seq_XInv, K, h_seq_B0, h_seq_B);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);

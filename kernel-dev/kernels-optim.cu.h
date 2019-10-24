@@ -37,22 +37,37 @@ __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X, flo
 }
 
 
+#if 0
+void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K){
+    for (uint pix = 0; pix < m; pix++) {    // pix = blockIdx.x
+        for (int i = 0; i < K; i++) {       // i = threadIdx.y
+            for (int j = 0; j < K; j++) {   // j = threadIdx.x
+                float acc = 0.0;
+                for (uint k = 0; k < n; k++) {
+                    int mask = isNotNan(sample[pix*N+k]);
+                    acc += X[i*N+k] * XT[k*K+j] * mask;
+                }
+                Xsqr[pix*K*K + i*K + j] = acc;
+            }
+        }
+    }
+}
+#endif
+
 __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
                      float* Xsqr, uint K) {
 
+    int pix = blockIdx.x; 
+    int i = threadIdx.y;
+    int j = threadIdx.x;
     float accum = 0.0f;
 
-    int gidx = blockIdx.x*blockDim.x + threadIdx.x;
-    int gidy = blockIdx.x*blockDim.y + threadIdx.y;
-
-    if( (gidx >= K*m) || (gidy >= K*m) ) return;
-
-    for(int i = 0; i < n; i ++) {
-        int valid = !(sample[blockIdx.x*N+i] == F32_MIN);
-        accum += X[gidy*N + i] * XT[i*K + gidx] * valid;
+    for(int k = 0; k < n; k ++) {
+        int valid = !(sample[pix*N+k] == F32_MIN);
+        accum += X[i*N+k] * XT[k*K+j] * valid;
     }
 
-    Xsqr[gidy*K + gidx] = accum;
+    Xsqr[pix*K*K + i*K + j] = accum;
 }
 
 
