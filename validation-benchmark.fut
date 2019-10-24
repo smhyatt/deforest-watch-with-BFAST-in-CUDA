@@ -31,7 +31,7 @@ entry main (X:[][]f32)
 
 -- in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss,
 --     sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
-let epsilon = 2
+let epsilon = 1
 
 let relError x y =
     let x' = f32.abs(x)
@@ -133,9 +133,9 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
 -- let meansallTrue = map2 (\x' y' -> f32.abs (x' - y') < 1) means meansseq |> and
 
 
-in (XallTrue
-    -- Xtfs
-   ,XsqrAllTrue
+in (--XallTrue
+   ,XsqrTfs[7]
+   ,XsqrAllTrue[7]
 --    ,XinvAllTrue
 --    ,beta0allTrue
 --    ,betaallTrue
