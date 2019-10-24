@@ -21,25 +21,25 @@ __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X, flo
 	int rows = gid / N;
 	int colsT = cols * K + rows;
 	int rowsT = cols % K;
-	int idxT  = rowsT * K + colsT;
 
 	if (gid < N*K) {
 		int mi_val = mappingindices[cols];
+        float res;
 
         if(rows == 0){
-            X[gid] = 1.0;
+            res = 1.0;
         } else if(rows == 1){
-            X[gid] = mi_val;
+            res = mi_val;
         } else {
             float angle = 2 * PI * ((float)(rows / 2)) * (float)mi_val / freq;
             if(rows % 2 == 0) {
-                X[gid] = sin(angle);
+                res = sin(angle);
             } else {
-                X[gid] = cos(angle);
+                res = cos(angle);
             }
         }
-
-        XT[idxT]  = X[gid];
+        X[gid] = res;
+        XT[cols*K + rows]  = X[gid];
 	}
 }
 
@@ -61,8 +61,6 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
     Xsqr[pix*K*K + i*K + j] = accum;
 }
 
-//     Xsqr[gidy*K + gidx] = accum;
-// }
 
 // Kernel 3
 __global__ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrInvLess){
