@@ -33,12 +33,8 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
         }
 
         // for (uint k1 = 0; k1 < K; k1++){
-        //     for (uint k2 = 0; k2 < 2*K; k2++){
-        //         if (k2<K) {
-        //             Ash[k1*2*K + k2] = A[i*K*2*K + k1*2*K + k2];
-        //         } else {
-        //             Ash[k1*2*K + k2] = (float) (k2 == (K+k1));
-        //         }
+        //     for (uint k2 = 0; k2 < K; k2++){
+                //    Ash[i*K*2 + k2]
         //         // barrier
         //     }
         // }
