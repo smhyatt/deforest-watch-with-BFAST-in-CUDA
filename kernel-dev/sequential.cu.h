@@ -93,7 +93,6 @@ void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint 
     // free(tspVct);
 }
 
-
 // -- Xsqr,Xsqr−1:[K][K]f32; β0,β:[K]f32
 // let Xsqr = mmMulFilt X[:,:n] XT[:n,:] y[:n] -- ker 2
 void mkXsqr(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
@@ -104,7 +103,7 @@ void mkXsqr(uint n, uint N, uint m, float* X, float* XT, float* sample, float* X
 }
 
 int isNan(float x){
-    if (I32_MIN == x) return 0;
+    if (F32_MIN == x) return 0;
     else return 1;
 }
 
