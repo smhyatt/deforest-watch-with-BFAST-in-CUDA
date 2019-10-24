@@ -44,8 +44,8 @@ let absError x y = f32.abs (x - y) < epsilon
 let Xtfs = map2 (\x y ->
                  map2 relError x y
                  ) X Xseq
--- let XallTrue = map (\x -> and x) Xtfs
---                |> and
+let XallTrue = map (\x -> and x) Xtfs
+               |> and
 
 -- Kernel 2: Xsqr
 let XsqrTfs = map2 (\x y ->
@@ -54,9 +54,9 @@ let XsqrTfs = map2 (\x y ->
                               ) x y
                         ) Xsqr  Xsqrseq
 
--- let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
---                   |> map (\x -> and x)
---                   |> and
+let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
+                  |> map (\x -> and x)
+                  |> and
 
 -- Kernel 3: Xinv
 -- let XinvTfs = map2 (\x y ->
