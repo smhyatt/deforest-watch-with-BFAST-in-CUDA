@@ -208,7 +208,7 @@ int main(int argc, char const *argv[]) {
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
-      
+
       // GPU call to kernel 1
       ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
       cudaDeviceSynchronize();
@@ -333,9 +333,9 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_B0, d_B0, B0_size, cudaMemcpyDeviceToHost);
-      
+
       // add to validation
-      printVf(fpV, h_B0, m, K);
+    //   printVf(fpV, h_B0, m, K);
 
       printf("GPU Optimized Kernel 4 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -370,7 +370,7 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-      
+
 
       printf("GPU Optimized Kernel 5 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -560,7 +560,7 @@ int main(int argc, char const *argv[]) {
    //// VALIDATION
    /////////////////////////////////////////////////////////////////////////
    /////////////////////////////////////////////////////////////////////////
-   
+
    fclose(fpV);
 
    // 7. clean up memory
