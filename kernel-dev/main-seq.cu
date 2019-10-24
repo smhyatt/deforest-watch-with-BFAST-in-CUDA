@@ -224,6 +224,9 @@ int main(int argc, char const *argv[]) {
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 3 version runs in: %lu microsecs\n", elapsed);
+
+        // validation
+        printM(fpV, h_seq_XInv, m, K);
     }
 
     /////////////////////////////////////////////////////////////////////////
