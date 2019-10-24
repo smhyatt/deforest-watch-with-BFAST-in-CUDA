@@ -7,7 +7,7 @@
 
 entry main (X:[][]f32)
            (Xsqr:[][][]f32)
-           (Xinv:[][][]f32)
+        --    (Xinv:[][][]f32)
         --    (beta0:[][]f32)
         --    (beta:[][]f32)
         --    (y_preds:[][]f32)
@@ -17,7 +17,7 @@ entry main (X:[][]f32)
 
            (Xseq:[][]f32)
            (Xsqrseq:[][][]f32)
-           (Xinvseq:[][][]f32)
+        --    (Xinvseq:[][][]f32)
         --    (beta0seq:[][]f32)
         -- (betaseq:[][]f32) (y_predsseq:[][]f32)
         --    (Nssseq:[]i32) (y_errorsseq:[][]f32) (val_indssseq:[][]i32)
@@ -127,7 +127,7 @@ let XinvAllTrue = map (\x -> map (\x' -> and x') x ) XinvTfs
 
 in (XallTrue
    ,XsqrAllTrue
-   ,XinvAllTrue
+--    ,XinvAllTrue
 --    ,beta0allTrue
 --    ,betaallTrue
 --    ,y_predsallTrue
