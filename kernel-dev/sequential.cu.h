@@ -152,14 +152,13 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
     // }
     printf("\n\n\n");
     int R = 30;
-    int T1 = K;
-    int T2 = K; 
+
 
     for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
-        for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
-            for (int jj2 = 0; jj2 < K; jj2+=T2){                       // forall, grid.x
-                for (int j1 = jj1; j1 < min(jj1+T1, K); j1++) {        // forall, block.y
-                    for (int j2 = jj2; j2 < min(jj2+T2, K); j2++) {    // forall, block.x
+        for (int jj1 = 0; jj1 < K; jj1+=K) {                          // forall, grid.y
+            for (int jj2 = 0; jj2 < K; jj2+=K){                       // forall, grid.x
+                for (int j1 = jj1; j1 < min(jj1+K, K); j1++) {        // forall, block.y
+                    for (int j2 = jj2; j2 < min(jj2+K, K); j2++) {    // forall, block.x
 
                         // float yqsh[R];          // size R, shared memory
                         float acc[R]; //  = calloc(R,sizeof(float));          // size R, registers
@@ -180,7 +179,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
 
                             for (int i1 = 0; i1 < R; i1++) { // fully unroll
                                 if (ii+i1 < m) {
-                                    if (YT[q*m + ii+i1] != F32_MIN) {
+                                    if (YT[q*m + (ii+i1)] != F32_MIN) {
                                     // if (sample[(ii+i1)*N + q] != F32_MIN) {
                                         acc[i1] += ab;          // acc[i1] += ab * (1.0-isnan(yqsh[i1]));
                                     }
@@ -188,9 +187,9 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
                             }
 
                             for (int i2 = 0; i2 < R; i2++) { // fully unroll
-                                if (ii+i2 < m) {
+                                if ((ii+i2) < m) {
                                     // Xsqr[pix*K*K + i*K + j] = acc;
-                                    Xsqr[(ii+i2)*(K*K) + j1*K + j2*K] = acc[i2];
+                                    Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
                                 }
                             }
                         }
