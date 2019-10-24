@@ -65,9 +65,12 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
     float accum = 0.0f;
 
     for(int k = 0; k < n; k++) {
-        int valid = !(sample[pix*N+k] == F32_MIN);
-        printf("%d\n", valid);
-        accum += X[i*N+k] * XT[k*K+j] * valid;
+        if (sample[pix*N+k] != F32_MIN) { 
+            accum += X[i*N+k] * XT[k*K+j];
+        } 
+        // int valid = !(sample[pix*N+k] == F32_MIN);
+        // printf("%d\n", valid);
+        // accum += X[i*N+k] * XT[k*K+j] * valid;
     }
 
     Xsqr[pix*K*K + i*K + j] = accum;
@@ -75,25 +78,69 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
 
 
 
+#if 0
+void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
+    float acc = 0.0;
+    for (uint pix = 0; pix < m; pix++) {            // blockIdx.x
+        for (int i = 0; i < K; i++) {               // i = threadIdx.y
+            acc = 0.0;
+            for (uint k = 0; k < n; k++) {
+                float cur_y = sample[pix*N+k];
+
+                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan. 
+                    acc += 0.0;
+                } else {
+                    acc += X[i*N+k] * cur_y;
+                }
+            }
+            B0[pix*K + i] = acc;
+        }
+    }
+}    
+#endif
+
+
 
 __global__ void ker4(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
+
+    int pix = blockIdx.x;
+    int i = threadIdx.y;
     float accum = 0.0f;
 
-    // setting global thread 
-    int gidx = blockIdx.x*blockDim.x + threadIdx.x;
-
-    // defining thread limit
-    if( gidx >= K*m ) return;
-
-    for(int i = 0; i < n; i ++) {
+    for(int k = 0; k < n; k++) {
         // setting valid bit of valid pixel data
-        int valid = !(sample[blockIdx.x*N+i] == F32_MIN);
-        accum += X[gidx*N + i] * valid;
+        float cur_y = sample[pix*N+k];
+
+        if (cur_y == F32_MIN) { 
+            acc += 0.0;
+        } else {
+            acc += X[i*N+k] * cur_y;
+        }
     }
 
     // adding results to beta0 
-    B0[gidx*K] = accum;
+    B0[pix*K + i] = accum;
 }
+
+
+
+
+
+#if 0
+void mkB(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
+    for (uint pix = 0; pix < m; pix++) {
+        for (int i = 0; i < K; i++) {
+            float acc = 0.0;
+
+            for (uint j = 0; j < K; j++) {
+                acc += XsqrInvLess[pix*(K*K) + i*K + j] * B0[pix*K + j];
+            }
+            B[pix*K + i] = acc;
+        }
+    }        
+}
+#endif
+
 
 
 

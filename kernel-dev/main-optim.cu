@@ -318,8 +318,6 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 4
    /////////////////////////////////////////////////////////////////////////
    {
-      // int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-      // int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
       dim3 block(K, K, 1);
       dim3 grid (m, 1, 1);
 
