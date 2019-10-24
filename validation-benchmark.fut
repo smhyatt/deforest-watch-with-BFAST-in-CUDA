@@ -40,7 +40,7 @@ let max (x:f32, y:f32) = f32.max x y
 -- Kernel 1: X
 let Xtfs = map2 (\x y ->
                  map2 (\x' y' -> (f32.abs(x'-y') /
-                                 (max (f32.abs(x'), f32.abs(y'))) < epsilon) x y
+                                 (max (f32.abs(x'), f32.abs(y')))) < epsilon) x y
                  ) X Xseq
 let XallTrue = map (\x -> and x) Xtfs
                |> and
