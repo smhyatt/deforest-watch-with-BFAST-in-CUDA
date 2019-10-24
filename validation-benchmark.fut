@@ -35,10 +35,10 @@ let epsilon = 0.001
 
 -- abs(v1-v2) / max(abs(v1),abs(v2) < epsilon
 let max (x:f32, y:f32) = f32.max x y
-let relError = (\(x, y) ->
+let relError x y =
     let x' = f32.abs(x)
     let y' = f32.abs(y)
-    in f32.abs(x-y) / (max (x', y')) < epsilon)
+    in f32.abs(x-y) / (max (x', y')) < epsilon
 
 -- Kernel 1: X
 let Xtfs = map2 (\x y ->
@@ -51,7 +51,7 @@ let XallTrue = map (\x -> and x) Xtfs
 -- Kernel 2: Xsqr
 let XsqrTfs = map2 (\x y ->
                         map2 (\x' y' ->
-                              map2 (\x'' y'' -> relError (x'', y'') ) x' y'
+                              map2 relError x' y'
                               ) x y
                         ) Xsqr  Xsqrseq
 
