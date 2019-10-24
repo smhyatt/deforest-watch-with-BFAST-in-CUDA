@@ -31,7 +31,7 @@ entry main (X:[][]f32)
 
 -- in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss,
 --     sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
-let epsilon = 0.01
+let epsilon = 0.1
 
 -- abs(v1-v2) / max(abs(v1),abs(v2) < epsilon
 let relError x y =
