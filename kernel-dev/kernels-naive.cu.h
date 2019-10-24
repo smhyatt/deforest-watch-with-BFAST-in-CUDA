@@ -47,20 +47,22 @@ __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X, flo
 __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
                      float* Xsqr, uint K) {
 
+    int pix = blockIdx.x;
+    int i = threadIdx.y;
+    int j = threadIdx.x;
     float accum = 0.0f;
 
-    int gidx = blockIdx.x*blockDim.x + threadIdx.x;
-    int gidy = blockIdx.x*blockDim.y + threadIdx.y;
-
-    if( (gidx >= K*m) || (gidy >= K*m) ) return;
-
-    for(int i = 0; i < n; i ++) {
-        int valid = !(sample[blockIdx.x*N+i] == F32_MIN);
-        accum += X[gidy*N + i] * XT[i*K + gidx] * valid;
+    for(int k = 0; k < n; k++) {
+        if (sample[pix*N+k] != F32_MIN) {
+            accum += X[i*N+k] * XT[k*K+j];
+        }
     }
 
-    Xsqr[gidy*K + gidx] = accum;
+    Xsqr[pix*K*K + i*K + j] = accum;
 }
+
+//     Xsqr[gidy*K + gidx] = accum;
+// }
 
 // Kernel 3
 __global__ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrInvLess){
