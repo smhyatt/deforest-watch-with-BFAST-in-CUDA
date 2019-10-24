@@ -34,13 +34,6 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
             }
         }
 
-        // for (uint k1 = 0; k1 < K; k1++){
-        //     for (uint k2 = 0; k2 < 2*K; k2++){
-        //            Ash[k1*K*2 + k2] = (k2<K) ? A[i*K*K + k1*K + k2] : (k2==K+k1) ? 1.0 : 0.0;
-        //     }
-        // }
-
-
         // Gauss-Jordan Elimination the other version:
         for (uint q = 0; q < K; q++){               // sequential
             float vq = Ash[q];
@@ -57,9 +50,9 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
                             tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
                         }
                     }
-                    // barrier
+                    // barrier for block-level sync
                     AshTmp[k1*2*K + k2] = tmp;
-                    // barrier
+                    // barrier for block-level sync
                 }
             }
             // switch pointer
@@ -67,14 +60,6 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
             AshTmp = Ash;
             Ash = tmp2;
         }
-        // // after gauss jordan copies id matrix to AI
-        // for (int k1 = 0; k1 < K; k1++) {
-        //     for (int k2 = 0; k2 < K; k2++) {
-        //         uint XinvIdx  = k1*(K*2) + k2;
-        //         uint XlessIdx = i*K*K + k1*K + k2;
-        //         AI[XlessIdx] = Ash[XinvIdx];
-        //     }
-        // }
 
         // collective copy shared-to-global mem:
         for (int k1 = 0; k1 < K; k1++) {
