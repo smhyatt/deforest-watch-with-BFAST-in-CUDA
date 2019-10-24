@@ -138,17 +138,17 @@ void transpose(float* M, float* MT, uint m, uint N) {
 
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
     
-    printf("************** FØR TRANSPOSE ****************\n");
-    for (int i = 0; i < N*m; i++) {
-        printf("%f, ", sample[i]);
-    }
-    printf("\n\n\n");
+    // printf("************** FØR TRANSPOSE ****************\n");
+    // for (int i = 0; i < N*m; i++) {
+    //     printf("%f, ", sample[i]);
+    // }
+    // printf("\n\n\n");
 
     float* YT = (float*) calloc(N*m,sizeof(float));
     transpose(sample, YT, m, N);
-    printf("************** EFTER TRANSPOSE ****************\n");
-    for (int i = 0; i < N*m; i++) {
-        printf("%f, ", YT[i]);
+    // printf("************** EFTER TRANSPOSE ****************\n");
+    // for (int i = 0; i < N*m; i++) {
+    //     printf("%f, ", YT[i]);
     }
     printf("\n\n\n");
     int R = 30;
@@ -180,7 +180,8 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
 
                             for (int i1 = 0; i1 < R; i1++) { // fully unroll
                                 if (ii+i1 < m) {
-                                    if (YT[q*m + ii+i1] != F32_MIN) {
+                                    // if (YT[q*m + ii+i1] != F32_MIN) {
+                                    if (sample[(ii+i1)*N + q] != F32_MIN) {
                                         acc[i1] += ab;          // acc[i1] += ab * (1.0-isnan(yqsh[i1]));
                                     }
                                 }
