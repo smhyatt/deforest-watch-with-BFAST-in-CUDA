@@ -71,14 +71,14 @@ clear:
 seqV: compileSeq futV clear seqbfast
 	$(info )
 	$(info The validation for the sequential implementation.)
-	cat ../data/val.data
+	# cat ../data/val.data
 	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
 naiveV: compileNaive futV clear naivebfast
 	$(info )
 	$(info The validation for the naive implementation.)
-	cat ../data/val.data
+	# cat ../data/val.data
 	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
