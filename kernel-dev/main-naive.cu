@@ -300,7 +300,7 @@ int main(int argc, char const *argv[]) {
       // copy result from device to host
       cudaMemcpy(h_XsqrInv, d_XsqrInvLess, X_size, cudaMemcpyDeviceToHost);
     //   printM(fpV, h_XsqrInv, K, K);
-      printM(fpV, h_Xsqr, K, K);
+    //   printM(fpV, h_Xsqr, K, K);
 
       printf("GPU Naive Kernel 3 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -338,7 +338,7 @@ int main(int argc, char const *argv[]) {
       cudaMemcpy(h_B0, d_B0, B0_size, cudaMemcpyDeviceToHost);
 
       // add to validation
-      printVf(fpV, h_B0, m, K);
+    //   printVf(fpV, h_B0, m, K);
 
       printf("GPU Naive Kernel 4 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
