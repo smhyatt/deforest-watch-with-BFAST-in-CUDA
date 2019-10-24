@@ -308,12 +308,12 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             acc = 0.0;
             for (uint k = 0; k < n; k++) {
                 float cur_y = sample[pix*N+k];
-                int mask = isNotNan(cur_y);
-                if (mask == 1) {
+
+                if (cur_y == F32_MIN) {
+                    acc += 0.0;
+                } else {
                     acc += X[i*N+k] * cur_y;
                 }
-                acc += 0.0;
-                // printf("\n\n\n***** y: %f ***** X: %f ***** Xidx: %d ***** mask: %d *****\n\n\n", cur_y, X[i*N+k], (i*N+k), mask);
             }
             B0[pix*K + i] = acc;
         }
