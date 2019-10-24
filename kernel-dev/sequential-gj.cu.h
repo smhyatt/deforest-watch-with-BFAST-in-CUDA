@@ -23,7 +23,7 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
         // Pad A with identity matrix to the right
         for (uint k1 = 0; k1 < K; k1++){
             for (uint k2 = 0; k2 < 2*K; k2++){
-                if (j<K) {
+                if (k2<K) {
                     Ash[k1*2*K + k2] = A[i*K*2*K + k1*2*K + k2];
                 } else {
                     Ash[k1*2*K + k2] = (float) (k2 == K+k1);
@@ -39,7 +39,7 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
                 for (uint k2 = 0; k2 < 2*K; k2++){  // parallel block.x
                     float tmp = 0.0;
                     if (vq == 0.0) {
-                        float tmp = Ash[k1*2*K + k2];
+                        tmp = Ash[k1*2*K + k2];
                     } else {
                         float x = Ash[0+k2] / vq;
                         if (k1 == K-1){
@@ -56,7 +56,7 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
         }
 
         // collective copy shared-to-global mem:
-        for (int pix = 0; pix < m; pix++) {
+        for (int pix = 0; pix < M; pix++) {
             for (int i = 0; i < K; i++) {
                 for (int j = 0; j < K; j++) {
                     uint XinvIdx  = pix*K*(2*K) + i*(K*2) + j+K;
