@@ -134,8 +134,6 @@ int main(int argc, char const *argv[]) {
    char mappings[mappingLen], pixels[(imageLen-mappingLen)];
    fscanf(fpim, " %[^\n]  %[^\n] ", mappings, pixels);
 
-   printf("\n 3 \n");
-
    // converting mappingindices from char* to int*
    char delim[] = ",";
    char *mapPtr = strtok(mappings, delim);
@@ -265,7 +263,7 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, Xsqr_size, cudaMemcpyDeviceToHost);
       printM(fpV, h_Xsqr, m, K);
 
       printf("GPU Naive Kernel 2 runs in: %lu microsecs\n", elapsed);
