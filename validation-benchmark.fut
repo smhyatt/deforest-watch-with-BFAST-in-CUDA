@@ -7,7 +7,7 @@
 
 entry main (X:[][]f32)
            (Xsqr:[][][]f32)
-        --    (Xinv:[][][]f32)
+           (Xinv:[][][]f32)
         --    (beta0:[][]f32)
         --    (beta:[][]f32)
         --    (y_preds:[][]f32)
@@ -17,7 +17,7 @@ entry main (X:[][]f32)
 
            (Xseq:[][]f32)
            (Xsqrseq:[][][]f32)
-        --    (Xinvseq:[][][]f32)
+           (Xinvseq:[][][]f32)
         --    (beta0seq:[][]f32)
         -- (betaseq:[][]f32) (y_predsseq:[][]f32)
         --    (Nssseq:[]i32) (y_errorsseq:[][]f32) (val_indssseq:[][]i32)
@@ -31,12 +31,13 @@ entry main (X:[][]f32)
 
 -- in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss,
 --     sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
-let epsilon = 3
+let epsilon = 5
 
 let relError x y =
     let x' = f32.abs(x)
     let y' = f32.abs(y)
     in f32.abs(x'-y') / f32.max x' y' < epsilon
+
 let absError x y = f32.abs (x - y) < epsilon
 
 
@@ -59,15 +60,15 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
                   |> and
 
 -- Kernel 3: Xinv
--- let XinvTfs = map2 (\x y ->
---                         map2 (\x' y' ->
---                               map2 (\x'' y'' -> f32.abs (x'' - y'') < 0.0000001) x' y'
---                               ) x y
---                         ) Xinv  Xinvseq
+let XinvTfs = map2 (\x y ->
+                        map2 (\x' y' ->
+                              map2 (\x'' y'' -> f32.abs (x'' - y'') < 0.0000001) x' y'
+                              ) x y
+                        ) Xinv  Xinvseq
 
--- let XinvAllTrue = map (\x -> map (\x' -> and x') x ) XinvTfs
---                   |> map (\x -> and x)
---                   |> and
+let XinvAllTrue = map (\x -> map (\x' -> and x') x ) XinvTfs
+                  |> map (\x -> and x)
+                  |> and
 
 -- -- Kernel 4: beta0
 -- let beta0tfs = map2 (\x y ->
@@ -135,7 +136,7 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
 
 in (XallTrue
    ,XsqrAllTrue
---    ,XinvAllTrue
+   ,XinvAllTrue
 --    ,beta0allTrue
 --    ,betaallTrue
 --    ,y_predsallTrue
