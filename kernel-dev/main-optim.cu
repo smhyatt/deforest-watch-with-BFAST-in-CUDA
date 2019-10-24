@@ -135,8 +135,6 @@ int main(int argc, char const *argv[]) {
    char mappings[mappingLen], pixels[(imageLen-mappingLen)];
    fscanf(fpim, " %[^\n]  %[^\n] ", mappings, pixels);
 
-   printf("\n 3 \n");
-
    // converting mappingindices from char* to int*
    char delim[] = ",";
    char *mapPtr = strtok(mappings, delim);
@@ -232,7 +230,7 @@ int main(int argc, char const *argv[]) {
       printf("GPU Optimized Kernel 1 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
       double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+      // double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
       // printf( "GPU Optimized Kernel 1 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
    }
 
@@ -271,10 +269,8 @@ int main(int argc, char const *argv[]) {
                    for (uint k = 0; k < n; k++) {
                      if (h_sample[pix*N+k] != F32_MIN) {
                        acc += h_X[i*N+k] * h_XT[k*K+j];
-                     } else {
-                        acc += 0.0;
+                     } 
                        // int mask = isNotNan(h_sample[pix*N+k]);
-                     }
                    }
                    h_Xsqr[pix*K*K + i*K + j] = acc;
                }
