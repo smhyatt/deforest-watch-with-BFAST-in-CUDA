@@ -134,7 +134,7 @@ let XsqrTfs = map2 (\x y ->
 
 
 in (--XallTrue
-    ,Xtfs
+    Xtfs
 --    ,XsqrAllTrue
 --    ,XinvAllTrue
 --    ,beta0allTrue
