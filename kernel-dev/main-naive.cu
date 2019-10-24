@@ -201,41 +201,6 @@ int main(int argc, char const *argv[]) {
    // opening file for validation of results
    FILE* fpV = fopen("../data/val.data","a+");
 
-//    /////////////////////////////////////////////////////////////////////////
-//    //// KERNEL 1
-//    /////////////////////////////////////////////////////////////////////////
-//    {
-//       int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-//       int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-//       dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
-//       dim3 grid (dimx, dimy, 1);
-
-//       unsigned long int elapsed;
-//       struct timeval t_start, t_end, t_diff;
-//       gettimeofday(&t_start, NULL);
-
-//       // GPU call to kernel 3
-//       ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
-//       cudaDeviceSynchronize();
-
-//       gettimeofday(&t_end, NULL);
-//       timeval_subtract(&t_diff, &t_end, &t_start);
-//       elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
-
-//       // check for cuda errors
-//       gpuAssert( cudaPeekAtLastError() );
-
-//       // copy result from device to host
-//       cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-//       cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
-//       printX(fpV, h_X, K, N);
-
-//       printf("GPU Naive Kernel 1 runs in: %lu microsecs\n", elapsed);
-//       float microsecPerMatrixMul = elapsed;
-//       double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-//       double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-//       printf( "GPU Naive Kernel 1 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
-//    }
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 1
    /////////////////////////////////////////////////////////////////////////
@@ -272,41 +237,6 @@ int main(int argc, char const *argv[]) {
     // printf( "GPU Optimized Kernel 1 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
  }
 
-
-//    /////////////////////////////////////////////////////////////////////////
-//    //// KERNEL 2
-//    /////////////////////////////////////////////////////////////////////////
-//    {
-//       int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-//       int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-//       dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
-//       dim3 grid (dimx, dimy, 1);
-
-//       unsigned long int elapsed;
-//       struct timeval t_start, t_end, t_diff;
-//       gettimeofday(&t_start, NULL);
-
-//       // GPU call to kernel 2
-//       ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_sample, d_Xsqr, K);
-//       cudaDeviceSynchronize();
-
-//       gettimeofday(&t_end, NULL);
-//       timeval_subtract(&t_diff, &t_end, &t_start);
-//       elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
-
-//       // check for cuda errors
-//       gpuAssert( cudaPeekAtLastError() );
-
-//       // copy result from device to host
-//       cudaMemcpy(h_Xsqr, d_Xsqr, Xsqr_size, cudaMemcpyDeviceToHost);
-//       printM(fpV, h_Xsqr, m, K);
-
-//       printf("GPU Naive Kernel 2 runs in: %lu microsecs\n", elapsed);
-//       float microsecPerMatrixMul = elapsed;
-//       double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-//       double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-//       printf( "GPU Naive Kernel 2 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
-//    }
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 2
    /////////////////////////////////////////////////////////////////////////
@@ -357,7 +287,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 3
-    //   ker3<<< grid, block >>>(m, K, d_Xsqr, d_XsqrInv, d_XsqrInvLess);
+      ker3<<< grid, block >>>(m, K, d_Xsqr, d_XsqrInv, d_XsqrInvLess);
       // cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
@@ -369,7 +299,7 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_XsqrInv, d_XsqrInvLess, X_size, cudaMemcpyDeviceToHost);
-    //   printM(fpV, h_XsqrInv, K, K);
+      printM(fpV, h_XsqrInv, K, K);
     //   printM(fpV, h_Xsqr, K, K);
 
       printf("GPU Naive Kernel 3 runs in: %lu microsecs\n", elapsed);
