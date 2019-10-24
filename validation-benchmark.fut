@@ -54,9 +54,9 @@ let XsqrTfs = map2 (\x y ->
                               ) x y
                         ) Xsqr  Xsqrseq
 
-let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
-                  |> map (\x -> and x)
-                  |> and
+-- let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
+--                   |> map (\x -> and x)
+--                   |> and
 
 -- Kernel 3: Xinv
 -- let XinvTfs = map2 (\x y ->
@@ -135,7 +135,7 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
 
 in (--XallTrue
     ,Xtfs
-   ,XsqrAllTrue
+--    ,XsqrAllTrue
 --    ,XinvAllTrue
 --    ,beta0allTrue
 --    ,betaallTrue
