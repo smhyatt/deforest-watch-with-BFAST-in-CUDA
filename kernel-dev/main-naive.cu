@@ -188,6 +188,7 @@ int main(int argc, char const *argv[]) {
    float* h_XT     = (float*) calloc(K*N,sizeof(float));
    float* h_Xsqr   = (float*) calloc(K*K*m,sizeof(float));
    float* h_XsqrInv= (float*) calloc(K*K*m,sizeof(float));
+   float* h_B0     = (float*) calloc(K*m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
    float *d_X, *d_XT, *d_Xsqr, *d_XsqrInv, *d_XsqrInvLess;
@@ -196,6 +197,7 @@ int main(int argc, char const *argv[]) {
    cudaMalloc((void**) &d_Xsqr, Xsqr_size);
    cudaMalloc((void**) &d_XsqrInv, Xinv_double_size);
    cudaMalloc((void**) &d_XsqrInvLess, Xsqr_size);
+   cudaMalloc((void**) &d_B0, B0_size);
 
    // opening file for validation of results
    FILE* fpV = fopen("../data/val.data","a+");
@@ -322,7 +324,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 4
-      // ker4 <<< grid, block >>> ();
+      ker4 <<< grid, block >>> (m, n, N, d_X, K, d_sample, d_B0);
       // cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
@@ -333,6 +335,10 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
+      cudaMemcpy(h_B0, d_B0, B0_size, cudaMemcpyDeviceToHost);
+
+      // add to validation
+      printVf(fpV, h_B0, m, K);
 
       printf("GPU Naive Kernel 4 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;

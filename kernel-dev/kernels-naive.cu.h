@@ -131,6 +131,34 @@ __global__ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrI
 
 }
 
+
+
+
+
+
+// Kernel 4
+__global__ void ker4(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
+
+    int pix = blockIdx.x;
+    int i = threadIdx.y;
+    float accum = 0.0f;
+
+    for(int k = 0; k < n; k++) {
+        // setting valid bit of valid pixel data
+        float cur_y = sample[pix*N+k];
+
+        if (cur_y == F32_MIN) {
+            accum += 0.0;
+        } else {
+            accum += X[i*N+k] * cur_y;
+        }
+    }
+
+    // adding results to beta0
+    B0[pix*K + i] = accum;
+}
+
+
 #endif
 
 

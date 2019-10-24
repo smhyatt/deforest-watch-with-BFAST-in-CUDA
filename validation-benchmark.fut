@@ -5,7 +5,8 @@
 --                   (mappingindices : [N]i32)
 --                   (images : [m][N]f32) =
 
-entry main (X:[][]f32) (Xsqr:[][][]f32)
+entry main (X:[][]f32)
+           (Xsqr:[][][]f32)
            (Xinv:[][][]f32)
            (beta0:[][]f32)
         --    (beta:[][]f32)
@@ -14,9 +15,11 @@ entry main (X:[][]f32) (Xsqr:[][][]f32)
         --    (val_indss:[][]i32) (hs:[]i32) (nss:[]i32) (sigmas:[]f32) (MO_fsts:[]f32)
         --    (MOpp:[][]f32)  (MOp:[][]f32) (breaks:[]i32) (means:[]f32)
 
-           (Xseq:[][]f32) (Xsqrseq:[][][]f32)
+           (Xseq:[][]f32)
+           (Xsqrseq:[][][]f32)
            (Xinvseq:[][][]f32)
-           (beta0seq:[][]f32) -- (betaseq:[][]f32) (y_predsseq:[][]f32)
+           (beta0seq:[][]f32)
+        -- (betaseq:[][]f32) (y_predsseq:[][]f32)
         --    (Nssseq:[]i32) (y_errorsseq:[][]f32) (val_indssseq:[][]i32)
         --    (hsseq:[]i32) (nssseq:[]i32) (sigmasseq:[]f32) (MO_fstsseq:[]f32)
         --    (MOppseq:[][]f32) (MOpseq:[][]f32) (breaksseq:[]i32) (meansseq:[]f32)
