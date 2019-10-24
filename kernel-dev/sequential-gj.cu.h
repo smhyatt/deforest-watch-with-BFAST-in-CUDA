@@ -58,7 +58,7 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
                         }
                     }
                     // barrier
-                    Ash[k1*2*K + k2] = tmp;
+                    AshTmp[k1*2*K + k2] = tmp;
                     // barrier
                 }
             }
