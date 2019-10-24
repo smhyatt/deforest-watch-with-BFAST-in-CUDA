@@ -277,8 +277,8 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 3
    /////////////////////////////////////////////////////////////////////////
    {
-      dim3 block(K*K, 1, 1);
-      dim3 grid (m, 1, 1);
+      dim3 block(256, 1, 1);
+      dim3 grid (1, 1, 1);
 
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
