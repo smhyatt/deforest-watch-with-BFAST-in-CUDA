@@ -45,7 +45,7 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
                         if (k1 == (K-1)){
                             tmp = x;
                         } else {
-                            tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] * x;
+                            tmp = (Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q]) * x;
                         }
                     }
                     // barrier
