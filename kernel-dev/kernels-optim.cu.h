@@ -14,7 +14,6 @@ __global__ void ker1(uint N, int K, int freq, int* mappingindices, float* X, flo
 	int rows = gid / N;
 	int colsT = cols * K + rows;
 	int rowsT = cols % K;
-	int idxT  = rowsT * K + colsT;
 
 	if (gid < N*K) {
 		int mi_val = mappingindices[cols];
