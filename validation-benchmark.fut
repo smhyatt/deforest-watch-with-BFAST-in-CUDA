@@ -31,15 +31,14 @@ entry main (X:[][]f32)
 
 -- in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss,
 --     sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
-let epsilon = 0.001
+let epsilon = 0.01
 
 -- abs(v1-v2) / max(abs(v1),abs(v2) < epsilon
-let max (x:f32, y:f32) = f32.max x y
 let relError x y =
     let x' = f32.abs(x)
     let y' = f32.abs(y)
     in f32.abs(x-y) / f32.max x' y' < epsilon
-let absError x y = f32.abs (x - y) < 0.01
+let absError x y = f32.abs (x - y) < epsilon
 
 
 -- Kernel 1: X
