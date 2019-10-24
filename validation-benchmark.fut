@@ -133,9 +133,9 @@ let XsqrTfs = map2 (\x y ->
 -- let meansallTrue = map2 (\x' y' -> f32.abs (x' - y') < 1) means meansseq |> and
 
 
-in (--XallTrue
-    Xtfs
---    ,XsqrAllTrue
+in (XallTrue
+    -- Xtfs
+   ,XsqrAllTrue
 --    ,XinvAllTrue
 --    ,beta0allTrue
 --    ,betaallTrue
