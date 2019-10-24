@@ -39,7 +39,7 @@ let epsilon = 0.001
 -- Kernel 1: X
 let Xtfs = map2 (\x y ->
                  map2 (\x' y' -> (f32.abs(x'-y') /
-                                 (f32.max f32.abs(x') f32.abs(y'))) < epsilon) x y
+                                 (f32.max f32.abs(x') |> f32.abs(y'))) < epsilon) x y
                  ) X Xseq
 let XallTrue = map (\x -> and x) Xtfs
                |> and
