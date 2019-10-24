@@ -51,15 +51,15 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
                   |> and
 
 -- Kernel 3: Xinv
-let XinvTfs = map2 (\x y ->
-                        map2 (\x' y' ->
-                              map2 (\x'' y'' -> f32.abs (x'' - y'') < 0.0000001) x' y'
-                              ) x y
-                        ) Xinv  Xinvseq
+-- let XinvTfs = map2 (\x y ->
+--                         map2 (\x' y' ->
+--                               map2 (\x'' y'' -> f32.abs (x'' - y'') < 0.0000001) x' y'
+--                               ) x y
+--                         ) Xinv  Xinvseq
 
-let XinvAllTrue = map (\x -> map (\x' -> and x') x ) XinvTfs
-                  |> map (\x -> and x)
-                  |> and
+-- let XinvAllTrue = map (\x -> map (\x' -> and x') x ) XinvTfs
+--                   |> map (\x -> and x)
+--                   |> and
 
 -- -- Kernel 4: beta0
 -- let beta0tfs = map2 (\x y ->
