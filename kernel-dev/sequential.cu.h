@@ -137,14 +137,23 @@ void transpose(float* M, float* MT, uint m, uint N) {
 
 
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
-
+    
     float* YT = (float*) calloc(N*m,sizeof(float));
+    printf("************** FØR TRANSPOSE ****************\n");
+    for (int i = 0; i < N*m; i++) {
+        printf("%f\n", YT[i]);
+    }
+    printf("************** EFTER TRANSPOSE ****************\n");
+    for (int i = 0; i < N*m; i++) {
+        printf("%f\n", YT[i]);
+    }
+
     transpose(sample, YT, m, N);
     int R = 30;
     int T1 = K;
     int T2 = K; 
 
-    for (int ii = 0; ii < m; ii+=R) {                                    // forall, grid.z
+    for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
         for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
             for (int jj2 = 0; jj2 < K; jj2+=T2){                       // forall, grid.x
                 for (int j1 = jj1; j1 < min(jj1+T1, K); j1++) {        // forall, block.y
