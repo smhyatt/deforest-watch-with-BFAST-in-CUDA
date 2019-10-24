@@ -66,13 +66,14 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
 __global__ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrInvLess){
 	int gid = blockIdx.x*blockDim.x + threadIdx.x;
 
-    float* XsqrPix = Xsqr + gid*K*K;
-    float* XsqrInvPix = XsqrInv + gid*K*K*2;
-    float* d_XsqrInvLessPix = d_XsqrInvLess + gid*K*K;
+    float* XsqrPix = &Xsqr[gid*K*K];
+    float* XsqrInvPix = &XsqrInv[gid*K*K*2];
+    float* d_XsqrInvLessPix = &d_XsqrInvLess[gid*K*K];
 
     uint cols = 2*K;
     uint identIdx = K*cols;
 
+    // copy data
     for (uint i = 0; i < K; i++){
         for (uint j = 0; j < K; j++){
             uint sqrIdx = i*K + j;
@@ -81,6 +82,7 @@ __global__ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrI
         }
     }
 
+    // appending the identity matrix
     for (uint i = 0; i < K; i++){
         for (uint j = K; j < identIdx; j+=cols+1){
             uint idx = i*identIdx + j;
@@ -119,10 +121,11 @@ __global__ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrI
         }
     }
 
+    // Writing the second half of the 2*K*K matrix to output
     for (int pix = 0; pix < m; pix++) {
         for (int i = 0; i < K; i++) {
             for (int j = 0; j < K; j++) {
-                uint XinvIdx  = pix*K*(2*K) + i*(K*2) + j+K; // XsqrInv er K længere
+                uint XinvIdx  = pix*K*(2*K) + i*(K*2) + j+K;
                 uint XlessIdx = pix*K*K + i*K + j;
                 d_XsqrInvLessPix[XlessIdx] = XsqrInvPix[XinvIdx];
             }
