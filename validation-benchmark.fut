@@ -6,7 +6,7 @@
 --                   (images : [m][N]f32) =
 
 entry main (X:[][]f32) (Xsqr:[][][]f32)
-        --    (Xinv:[][][]f32)
+           (Xinv:[][][]f32)
            (beta0:[][]f32)
         --    (beta:[][]f32)
         --    (y_preds:[][]f32)
@@ -15,7 +15,7 @@ entry main (X:[][]f32) (Xsqr:[][][]f32)
         --    (MOpp:[][]f32)  (MOp:[][]f32) (breaks:[]i32) (means:[]f32)
 
            (Xseq:[][]f32) (Xsqrseq:[][][]f32)
-        --    (Xinvseq:[][][]f32)
+           (Xinvseq:[][][]f32)
            (beta0seq:[][]f32) -- (betaseq:[][]f32) (y_predsseq:[][]f32)
         --    (Nssseq:[]i32) (y_errorsseq:[][]f32) (val_indssseq:[][]i32)
         --    (hsseq:[]i32) (nssseq:[]i32) (sigmasseq:[]f32) (MO_fstsseq:[]f32)
@@ -47,16 +47,16 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
                   |> map (\x -> and x)
                   |> and
 
--- -- Kernel 3: Xinv
--- let XinvTfs = map2 (\x y ->
---                         map2 (\x' y' ->
---                               map2 (\x'' y'' -> f32.abs (x'' - y'') < 0.0000001) x' y'
---                               ) x y
---                         ) Xinv  Xinvseq
+-- Kernel 3: Xinv
+let XinvTfs = map2 (\x y ->
+                        map2 (\x' y' ->
+                              map2 (\x'' y'' -> f32.abs (x'' - y'') < 0.0000001) x' y'
+                              ) x y
+                        ) Xinv  Xinvseq
 
--- let XinvAllTrue = map (\x -> map (\x' -> and x') x ) XinvTfs
---                   |> map (\x -> and x)
---                   |> and
+let XinvAllTrue = map (\x -> map (\x' -> and x') x ) XinvTfs
+                  |> map (\x -> and x)
+                  |> and
 
 -- -- Kernel 4: beta0
 let beta0tfs = map2 (\x y ->
@@ -124,10 +124,8 @@ let beta0allTrue = map (\x -> and x) beta0tfs
 
 in (XallTrue
    ,XsqrAllTrue
-   ,Xsqr
-   ,  Xsqrseq
---    ,XinvAllTrue
---    ,beta0allTrue
+   ,XinvAllTrue
+   ,beta0allTrue
 --    ,betaallTrue
 --    ,y_predsallTrue
 --    ,NssallTrue
