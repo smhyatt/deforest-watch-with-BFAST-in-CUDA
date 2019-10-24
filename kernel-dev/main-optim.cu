@@ -10,6 +10,13 @@
 #include "kernels-optim.cu.h"
 #include "sequential.cu.h"
 
+#define BLOCK_SIZE 1024//1024 //1024//2048
+#define WIDTH_A  1024//1024 //1024//2048
+#define HEIGHT_A 1//2048//2048//2048
+#define WIDTH_B  1024//4096//2048
+#define TILE_HEIGHT 1
+#define TILE_WIDTH 1024
+
 #define F32_MIN -FLT_MAX
 #define I32_MIN -2147483648
 typedef unsigned int uint;
