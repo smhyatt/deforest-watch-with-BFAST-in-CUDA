@@ -118,7 +118,7 @@ void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* 
                     int mask = 1 - isNan(sample[pix*N+k]);
                     acc += X[i*N+k] * XT[k*K+j] * mask;
                 }
-                Xsqr[pix*K*K + i*N + j] = acc;
+                Xsqr[pix*K*K + i*K + j] = acc;
             }
         }
     }
