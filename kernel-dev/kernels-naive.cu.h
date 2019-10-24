@@ -66,6 +66,8 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
 __global__ void ker3(uint m, uint K, float* Xsqr, float* XsqrInv, float* d_XsqrInvLess){
 	int gid = blockIdx.x*blockDim.x + threadIdx.x;
 
+    if (gid > m) return;
+
     float* XsqrPix = &Xsqr[gid*K*K];
     float* XsqrInvPix = &XsqrInv[gid*K*K*2];
     float* d_XsqrInvLessPix = &d_XsqrInvLess[gid*K*K];

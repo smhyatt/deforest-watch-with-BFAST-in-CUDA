@@ -277,10 +277,8 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 3
    /////////////////////////////////////////////////////////////////////////
    {
-    //   int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-    //   int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-      dim3 block(1024, 1, 1);
-      dim3 grid (1024, 1, 1);
+      dim3 block(K*K, 1, 1);
+      dim3 grid (m, 1, 1);
 
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
