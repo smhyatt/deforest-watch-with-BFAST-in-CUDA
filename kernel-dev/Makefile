@@ -28,7 +28,7 @@ optimbfast: $(EXECUTABLE3)
 compileSeq: $(EXECUTABLE1)
 
 $(EXECUTABLE1): $(SRC1) $(HELPERS)
-	$(CXX) -o $(EXECUTABLE3) $(SRC1)
+	$(CXX) -o $(EXECUTABLE1) $(SRC1)
 
 
 compileOptim: $(EXECUTABLE3)
