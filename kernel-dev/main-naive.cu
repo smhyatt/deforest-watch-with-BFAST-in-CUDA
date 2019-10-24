@@ -183,6 +183,7 @@ int main(int argc, char const *argv[]) {
    uint X_size     = K*N*sizeof(float);
    uint Xsqr_size  = K*K*m*sizeof(float);
    uint Xinv_double_size  = 2*K*K*m*sizeof(float);
+   uint B0_size    = K*m*sizeof(float);
 
    float* h_X      = (float*) calloc(N*K,sizeof(float));
    float* h_XT     = (float*) calloc(K*N,sizeof(float));
