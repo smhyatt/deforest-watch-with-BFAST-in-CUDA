@@ -126,7 +126,7 @@ void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* 
 
 
 
-void transposeOPTIM(float* M, float* MT, uint m, uint N) {
+void transposeMatrix(float* M, float* MT, uint m, uint N) {
     for (int row = 0; row < m; row++) {
         for (int col = 0; col < N; col++) {
             MT[col*m + row] = M[row*N + col];
@@ -138,23 +138,14 @@ void transposeOPTIM(float* M, float* MT, uint m, uint N) {
 
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
     
-    // printf("************** FØR TRANSPOSE ****************\n");
-    // for (int i = 0; i < N*m; i++) {
-    //     printf("%f, ", sample[i]);
-    // }
-    // printf("\n\n\n");
-
     float* YT = (float*) calloc(N*m,sizeof(float));
-    transposeOPTIM(sample, YT, m, N);
-    // printf("************** EFTER TRANSPOSE ****************\n");
-    // for (int i = 0; i < N*m; i++) {
-    //     printf("%f, ", YT[i]);
-    // }
+    transposeMatrix(sample, YT, m, N);
+
     printf("\n\n\n");
     int R = 30;
 
 
-    for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
+    for (int ii = 0; ii < m; ii+=R) {                                 // forall, grid.z
         for (int jj1 = 0; jj1 < K; jj1+=K) {                          // forall, grid.y
             for (int jj2 = 0; jj2 < K; jj2+=K){                       // forall, grid.x
                 for (int j1 = jj1; j1 < min(jj1+K, K); j1++) {        // forall, block.y
