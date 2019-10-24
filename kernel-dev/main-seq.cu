@@ -196,9 +196,9 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 2
-        mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
+        // mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
         // mkXsqrG(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
-        // mkXsqrOptim(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
+        mkXsqrOptim(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
