@@ -227,7 +227,7 @@ int main(int argc, char const *argv[]) {
         printf("Sequential kernel 3 version runs in: %lu microsecs\n", elapsed);
 
         // validation
-        // printM(fpV, h_seq_XInv, m, K);
+        printM(fpV, h_seq_XInv, m, K);
     }
 
     /////////////////////////////////////////////////////////////////////////
