@@ -138,16 +138,6 @@ void transpose(float* M, float* MT, uint m, uint N) {
 
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
     
-    // printf("************** FØR TRANSPOSE ****************\n");
-    // for (int i = 0; i < N*m; i++) {
-    //     printf("%f, ", sample[i]);
-    // }
-    // printf("\n\n\n");
-
-    // printf("************** EFTER TRANSPOSE ****************\n");
-    // for (int i = 0; i < N*m; i++) {
-    //     printf("%f, ", YT[i]);
-    // }
     const int R = 30;
     for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
         //for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
@@ -185,7 +175,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
                         for (int i2 = 0; i2 < R; i2++) { // fully unroll
                             if (ii+i2 < m) {
                                 // Xsqr[pix*K*K + i*K + j] = acc;
-                                Xsqr[(ii+i2)*(K*K) + j1*K + j2*K] = acc[i2];
+                                Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
                             }
                         }
                     }
