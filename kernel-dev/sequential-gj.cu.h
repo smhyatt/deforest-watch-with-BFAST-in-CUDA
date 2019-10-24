@@ -34,7 +34,7 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
 
         for (uint k1 = 0; k1 < K; k1++){
             for (uint k2 = 0; k2 < K; k2++){
-                   Ash[i*K*2 + k2] = (k2<K) ? A[i*K*K + k1*K + k2] : (k2==K+k1) ? 1.0 : 0.0;
+                   Ash[k1*K*2 + k2] = (k2<K) ? A[i*K*K + k1*K + k2] : (k2==K+k1) ? 1.0 : 0.0;
             }
         }
 
