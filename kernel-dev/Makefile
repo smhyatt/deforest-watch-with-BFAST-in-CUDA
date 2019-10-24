@@ -25,6 +25,12 @@ optimbfast: $(EXECUTABLE3)
 			./$(EXECUTABLE3) sahara
 
 
+compileSeq: $(EXECUTABLE1)
+
+$(EXECUTABLE1): $(SRC1) $(HELPERS)
+	$(CXX) -o $(EXECUTABLE3) $(SRC1)
+
+
 compileOptim: $(EXECUTABLE3)
 
 $(EXECUTABLE3): $(SRC3) $(HELPERS)
@@ -57,7 +63,7 @@ futV:
 clear:
 	.././bfast-irreg < ../data/testset_sahara_2pix.in > ../data/val.data
 
-seqV: clear seqbfast
+seqV: compileSeq clear seqbfast
 	$(info )
 	$(info The validation for the sequential implementation.)
 # 	cat ../data/val.data
