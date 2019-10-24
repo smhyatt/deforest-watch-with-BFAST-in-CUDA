@@ -134,7 +134,7 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
 
 
 in (--XallTrue
-   ,XsqrTfs[7]
+    XsqrTfs[7]
    ,XsqrAllTrue[7]
 --    ,XinvAllTrue
 --    ,beta0allTrue
