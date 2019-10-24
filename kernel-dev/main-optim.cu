@@ -263,7 +263,7 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      cudaMemcpy(h_Xsqr, d_Xsqr, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_Xsqr, d_Xsqr, Xsqr_size, cudaMemcpyDeviceToHost);
 
       // add to validation
       printM(fpV, h_Xsqr, m, K);
