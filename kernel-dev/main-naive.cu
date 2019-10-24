@@ -287,7 +287,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 3
-      ker3<<< grid, block >>>(m, K, d_Xsqr, d_XsqrInv, d_XsqrInvLess);
+    //   ker3<<< grid, block >>>(m, K, d_Xsqr, d_XsqrInv, d_XsqrInvLess);
       // cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
@@ -299,7 +299,8 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_XsqrInv, d_XsqrInvLess, X_size, cudaMemcpyDeviceToHost);
-      printM(fpV, h_XsqrInv, K, K);
+    //   printM(fpV, h_XsqrInv, K, K);
+      printM(fpV, h_Xsqr, K, K);
 
       printf("GPU Naive Kernel 3 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
