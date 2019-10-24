@@ -139,16 +139,11 @@ void transpose(float* M, float* MT, uint m, uint N) {
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
     
     float* YT = (float*) calloc(N*m,sizeof(float));
-    printf("************** FØR TRANSPOSE ****************\n");
-    for (int i = 0; i < N*m; i++) {
-        printf("%f\n", YT[i]);
-    }
+    transpose(sample, YT, m, N);
     printf("************** EFTER TRANSPOSE ****************\n");
     for (int i = 0; i < N*m; i++) {
         printf("%f\n", YT[i]);
     }
-
-    transpose(sample, YT, m, N);
     int R = 30;
     int T1 = K;
     int T2 = K; 
