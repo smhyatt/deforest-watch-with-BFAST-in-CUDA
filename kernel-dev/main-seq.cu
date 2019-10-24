@@ -8,6 +8,7 @@
 
 #include "helper.cu.h"
 #include "sequential.cu.h"
+#include "sequential-gj.cu.h"
 
 #define BLOCK_SIZE 1024//1024 //1024//2048
 #define WIDTH_A  1024//1024 //1024//2048
@@ -216,7 +217,8 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 3
-        mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
+        // mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
+        gaussJordanG(m, K, h_seq_Xsqr, h_seq_XInv);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);

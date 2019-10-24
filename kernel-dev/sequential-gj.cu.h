@@ -16,7 +16,9 @@ typedef unsigned int uint;
 // A is the input data [M][K][K]
 // Ash is the [K][2*K]
 // AI is the inverse A [K][K]
-void gaussJordan(uint M, uint K, float* A, float* Ash, float* AI){
+void gaussJordanG(uint M, uint K, float* A, float* AI){
+    float* Ash    = (float*) calloc(2*K*K,sizeof(float));
+
     for (uint i = 0; i < M; i++){
         // Pad A with identity matrix to the right
         for (uint k1 = 0; k1 < K; k1++){
@@ -31,7 +33,7 @@ void gaussJordan(uint M, uint K, float* A, float* Ash, float* AI){
         }
 
         // Gauss-Jordan Elimination:
-        for (uint q = 0; q < K; q++){
+        for (uint q = 0; q < K; q++){               // sequential
             float vq = Ash[0+q];
             for (uint k1 = 0; k1 < K; k1++){        // parallel block.y
                 for (uint k2 = 0; k2 < 2*K; k2++){  // parallel block.x
