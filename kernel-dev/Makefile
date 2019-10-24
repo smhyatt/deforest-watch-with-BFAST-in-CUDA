@@ -25,6 +25,12 @@ optimbfast: $(EXECUTABLE3)
 			./$(EXECUTABLE3) sahara
 
 
+compileOptim: $(EXECUTABLE3)
+
+$(EXECUTABLE3): $(SRC3) $(HELPERS)
+	$(CXX) -o $(EXECUTABLE3) $(SRC3)
+
+
 compile: $(EXECUTABLE1) $(EXECUTABLE2) $(EXECUTABLE3)
 
 $(EXECUTABLE1): $(SRC1) $(HELPERS)
@@ -64,7 +70,7 @@ naiveV: clear naivebfast
 	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
-optimV: clear optimbfast
+optimV: compileOptim clear optimbfast
 	$(info )
 	$(info The validation for the optimized implementation.)
 	cat ../data/val.data
