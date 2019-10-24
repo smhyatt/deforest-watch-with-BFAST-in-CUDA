@@ -37,7 +37,7 @@ let epsilon = 1.0
 let relError x y =
     let x' = f32.abs(x)
     let y' = f32.abs(y)
-    in f32.abs(x-y) / f32.max x' y' < epsilon
+    in (f32.abs(x-y) / f32.max x' y') < epsilon
 let absError x y = f32.abs (x - y) < epsilon
 
 
