@@ -20,6 +20,8 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
 
     for (uint i = 0; i < M; i++){
         float* Ash    = (float*) calloc(2*K*K,sizeof(float));
+        float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
+
         // Pad A with identity matrix to the right
         for (uint k1 = 0; k1 < K; k1++){
             for (uint k2 = 0; k2 < 2*K; k2++){
@@ -38,28 +40,6 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
         //     }
         // }
 
-        // // Gauss-Jordan Elimination:
-        // for (uint q = 0; q < K; q++){               // sequential
-        //     float vq = Ash[q];
-        //     for (uint k1 = 0; k1 < K; k1++){        // parallel block.y
-        //         for (uint k2 = 0; k2 < 2*K; k2++){  // parallel block.x
-        //             float tmp = 0.0;
-        //             if (vq == 0.0) {
-        //                 tmp = Ash[k1*2*K + k2];
-        //             } else {
-        //                 float x = Ash[k2] / vq;
-        //                 if (k1 == (K-1)){
-        //                     tmp = x;
-        //                 } else {
-        //                     tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
-        //                 }
-        //             }
-        //             // barrier
-        //             Ash[k1*2*K + k2] = tmp;
-        //             // barrier
-        //         }
-        //     }
-        // }
 
         // Gauss-Jordan Elimination the other version:
         for (uint q = 0; q < K; q++){               // sequential
@@ -82,6 +62,10 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
                     // barrier
                 }
             }
+            // switch pointer
+            float* tmp2 = AshTmp;
+            AshTmp = Ash;
+            Ash = tmp2;
         }
         // after gauss jordan copies id matrix to AI
         for (int k1 = 0; k1 < K; k1++) {
