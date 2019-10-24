@@ -180,7 +180,7 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 1 version runs in: %lu microsecs\n", elapsed);
 
-        // validation 
+        // validation
         printX(fpV, h_seq_X, K, N);
     }
 
@@ -193,14 +193,15 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 2
-        mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
+        // mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
+        mkXsqrG(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 2 version runs in: %lu microsecs\n", elapsed);
 
-        // validation 
+        // validation
         printM(fpV, h_seq_Xsqr, m, K);
     }
 
@@ -237,7 +238,7 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 4 version runs in: %lu microsecs\n", elapsed);
 
-        // validation 
+        // validation
         printVf(fpV, h_seq_B0, m, K);
     }
 

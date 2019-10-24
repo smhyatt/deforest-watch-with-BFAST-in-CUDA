@@ -76,10 +76,7 @@ float dotProdFilt(uint n, float* Xvct, float* XTvct, float* yvct) {
 // xss = Xn, yss = XTn, vct = y
 void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint K){
     float* tspVct = (float*)calloc(n,sizeof(float));
-
-    // K
     for (int i = 0; i < K; i++) {
-        // K
         for (int j = 0; j < K; j++) {
             uint XIdx = i*N;
             uint resIdx = i*K + j;
@@ -104,6 +101,27 @@ void mkXsqr(uint n, uint N, uint m, float* X, float* XT, float* sample, float* X
         mmMulFilt(n, N, X, XT, &sample[pix*N], &Xsqr[pix*K*K], K);
     }
 
+}
+
+int isNan(float x){
+    if (I32_MIN == x) return 0;
+    else return 1;
+}
+
+// the squared MM multiplication in one gathered function
+void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K){
+    for (uint pix = 0; pix < m; pix++) {    // blockIdx.x
+        for (int i = 0; i < K; i++) {       // i = threadIdx.y
+            for (int j = 0; j < K; j++) {   // j = threadIdx.x
+                float acc = 0.0;
+                for (uint k = 0; k < n; k++) {
+                    int mask = 1 - isNan(sample[pix*N+k]);
+                    acc += X[i*N+k] * XT[k*K+j] * mask;
+                }
+                Xsqr[pix*K*K + i*N + j] = acc;
+            }
+        }
+    }
 }
 
 
