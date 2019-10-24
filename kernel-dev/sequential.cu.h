@@ -102,7 +102,7 @@ void mkXsqr(uint n, uint N, uint m, float* X, float* XT, float* sample, float* X
 
 }
 
-int isNan(float x){
+int isNotNan(float x){
     if (F32_MIN == x) return 0;
     else return 1;
 }
@@ -114,7 +114,7 @@ void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* 
             for (int j = 0; j < K; j++) {   // j = threadIdx.x
                 float acc = 0.0;
                 for (uint k = 0; k < n; k++) {
-                    int mask = isNan(sample[pix*N+k]);
+                    int mask = isNotNan(sample[pix*N+k]);
                     acc += X[i*N+k] * XT[k*K+j] * mask;
                 }
                 Xsqr[pix*K*K + i*K + j] = acc;
@@ -299,6 +299,20 @@ void mkB0(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
         mvMulFilt(n, N, X, &sample[pix*N], K, &B0[pix*K]);
     }
 }
+
+
+void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
+    for (uint pix = 0; pix < m; pix++) {
+        float acc = 0.0;
+        for (int i = 0; i < K; i++) {
+            for (uint k = 0; k < n; k++) {
+                int mask = isNotNan(sample[pix*N+k]);
+                acc += X[i*N+k] * sample[pix*N+k] * mask;
+            }
+            B0[i] = acc;
+        }
+    }
+}    
 
 
 

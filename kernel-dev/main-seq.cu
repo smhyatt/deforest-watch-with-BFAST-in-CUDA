@@ -231,7 +231,8 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 4
-        mkB0(m, n, N, h_seq_X, K, h_sample, h_seq_B0);
+        // mkB0(m, n, N, h_seq_X, K, h_sample, h_seq_B0);
+        mkB0G(m, n, N, h_seq_X, K, h_sample, h_seq_B0);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
