@@ -78,6 +78,7 @@ seqV: compileSeq futV clear seqbfast
 naiveV: compileNaive futV clear naivebfast
 	$(info )
 	$(info The validation for the naive implementation.)
+	cat ../data/val.data
 	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
@@ -88,7 +89,7 @@ optimV: compileOptim futV clear optimbfast
 	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
-fullV: compile futV optimV seqV naiveV 
+fullV: compile futV optimV seqV naiveV
 	rm ../validation-benchmark
 	rm ../validation-benchmark.c
 	rm ../bfast-irreg
