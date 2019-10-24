@@ -34,18 +34,18 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
 
         // Gauss-Jordan Elimination:
         for (uint q = 0; q < K; q++){               // sequential
-            float vq = Ash[0+q];
+            float vq = Ash[q];
             for (uint k1 = 0; k1 < K; k1++){        // parallel block.y
                 for (uint k2 = 0; k2 < 2*K; k2++){  // parallel block.x
                     float tmp = 0.0;
                     if (vq == 0.0) {
                         tmp = Ash[k1*2*K + k2];
                     } else {
-                        float x = Ash[0+k2] / vq;
+                        float x = Ash[k2] / vq;
                         if (k1 == (K-1)){
                             tmp = x;
                         } else {
-                            tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] * x;
+                            tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
                         }
                     }
                     // barrier
