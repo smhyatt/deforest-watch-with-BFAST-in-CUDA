@@ -126,7 +126,7 @@ void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* 
 
 
 
-void transpose(float* M, float* MT, uint m, uint N) {
+void transposeOPTIM(float* M, float* MT, uint m, uint N) {
     for (int row = 0; row < m; row++) {
         for (int col = 0; col < N; col++) {
             MT[col*m + row] = M[row*N + col];
