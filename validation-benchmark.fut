@@ -43,8 +43,7 @@ let absError x y = f32.abs (x - y) < epsilon
 
 -- Kernel 1: X
 let Xtfs = map2 (\x y ->
-                 map2 (\x' y' -> (f32.abs(x'-y') /
-                                 (f32.max (f32.abs(x')) (f32.abs(y')))) < epsilon) x y
+                 map2 absError x y
                  ) X Xseq
 let XallTrue = map (\x -> and x) Xtfs
                |> and
