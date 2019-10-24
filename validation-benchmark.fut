@@ -38,7 +38,7 @@ let max (x:f32, y:f32) = f32.max x y
 let relError x y =
     let x' = f32.abs(x)
     let y' = f32.abs(y)
-    in f32.abs(x-y) / (max (x', y')) < epsilon
+    in f32.abs(x-y) / f32.max x' y' < epsilon
 
 -- Kernel 1: X
 let Xtfs = map2 (\x y ->
