@@ -54,6 +54,8 @@ void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* 
 }
 #endif
 
+// ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_sample, d_Xsqr, K);
+
 __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
                      float* Xsqr, uint K) {
 
@@ -62,8 +64,9 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
     int j = threadIdx.x;
     float accum = 0.0f;
 
-    for(int k = 0; k < n; k ++) {
+    for(int k = 0; k < n; k++) {
         int valid = !(sample[pix*N+k] == F32_MIN);
+        printf("%d\n", valid);
         accum += X[i*N+k] * XT[k*K+j] * valid;
     }
 
