@@ -310,10 +310,9 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
                 float cur_y = sample[pix*N+k];
                 int mask = isNotNan(cur_y);
                 acc += X[i*N+k] * cur_y * mask;
+                printf("\n\n\n***** y: %f ***** X: %f ***** Xidx: %d ***** mask: %d *****\n\n\n", cur_y, X[i*N+k], (i*N+k), mask);
             }
-            int b0idx = pix*K + i;
-            printf("\n\n\n\n\n\n\n\n***** %d *****\n\n\n\n\n\n\n", b0idx);
-            B0[b0idx] = acc;
+            B0[pix*K + i] = acc;
         }
     }
 }    
