@@ -138,7 +138,7 @@ void transpose(float* M, float* MT, uint m, uint N) {
 
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
     
-    const int R = 30;
+    const int R = 1;
     for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
         //for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
         //    for (int jj2 = 0; jj2 < K; jj2+=T2){                       // forall, grid.x
