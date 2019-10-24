@@ -244,6 +244,7 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 2
    /////////////////////////////////////////////////////////////////////////
    {
+#if 0
       dim3 block(K, K, 1);
       dim3 grid (m, 1, 1);
 
@@ -264,8 +265,21 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_Xsqr, d_Xsqr, Xsqr_size, cudaMemcpyDeviceToHost);
+#endif
+       for (uint pix = 0; pix < m; pix++) {    // pix = blockIdx.x
+           for (int i = 0; i < K; i++) {       // i = threadIdx.y
+               for (int j = 0; j < K; j++) {   // j = threadIdx.x
+                   float acc = 0.0;
+                   for (uint k = 0; k < n; k++) {
+                       int mask = isNotNan(h_sample[pix*N+k]);
+                       acc += h_X[i*N+k] * h_XT[k*K+j] * mask;
+                   }
+                   h_Xsqr[pix*K*K + i*K + j] = acc;
+               }
+           }
+       }
 
-      // add to validation
+      // validation
       printM(fpV, h_Xsqr, m, K);
 
 
