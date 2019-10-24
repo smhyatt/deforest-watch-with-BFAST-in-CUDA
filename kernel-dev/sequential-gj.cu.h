@@ -17,9 +17,9 @@ typedef unsigned int uint;
 // Ash is the [K][2*K]
 // AI is the inverse A [K][K]
 void gaussJordanG(uint M, uint K, float* A, float* AI){
-    float* Ash    = (float*) calloc(2*K*K,sizeof(float));
 
     for (uint i = 0; i < M; i++){
+        float* Ash    = (float*) calloc(2*K*K,sizeof(float));
         // Pad A with identity matrix to the right
         for (uint k1 = 0; k1 < K; k1++){
             for (uint k2 = 0; k2 < 2*K; k2++){
@@ -56,13 +56,11 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
         }
 
         // collective copy shared-to-global mem:
-        for (int pix = 0; pix < M; pix++) {
-            for (int k1 = 0; k1 < K; k1++) {
-                for (int j = 0; j < K; j++) {
-                    uint XinvIdx  = pix*K*(2*K) + k1*(K*2) + j+K;
-                    uint XlessIdx = pix*K*K + k1*K + j;
-                    AI[XlessIdx] = Ash[XinvIdx];
-                }
+        for (int k1 = 0; k1 < K; k1++) {
+            for (int j = 0; j < K; j++) {
+                uint XinvIdx  = k1*(K*2) + j+K;
+                uint XlessIdx = i*K*K + k1*K + j;
+                AI[XlessIdx] = Ash[XinvIdx];
             }
         }
 
