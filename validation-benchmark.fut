@@ -39,6 +39,8 @@ let relError x y =
     let x' = f32.abs(x)
     let y' = f32.abs(y)
     in f32.abs(x-y) / f32.max x' y' < epsilon
+let absError x y = f32.abs (x - y) < 0.01
+
 
 -- Kernel 1: X
 let Xtfs = map2 (\x y ->
@@ -51,7 +53,7 @@ let XallTrue = map (\x -> and x) Xtfs
 -- Kernel 2: Xsqr
 let XsqrTfs = map2 (\x y ->
                         map2 (\x' y' ->
-                              map2 relError x' y'
+                              map2 absError x' y'
                               ) x y
                         ) Xsqr  Xsqrseq
 
