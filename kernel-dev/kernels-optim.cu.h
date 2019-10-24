@@ -112,9 +112,9 @@ __global__ void ker4(uint m, uint n, uint N, float* X, uint K, float* sample, fl
         float cur_y = sample[pix*N+k];
 
         if (cur_y == F32_MIN) { 
-            acc += 0.0;
+            accum += 0.0;
         } else {
-            acc += X[i*N+k] * cur_y;
+            accum += X[i*N+k] * cur_y;
         }
     }
 
