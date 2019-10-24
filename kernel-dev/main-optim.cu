@@ -204,10 +204,7 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 1
    /////////////////////////////////////////////////////////////////////////
    {
-      // int  dimx = ceil( ((float) 1024)/1 );
-      // int  dimy = ceil( ((float) 1)/1024 );
       dim3 block(1024, 1, 1);
-      // dim3 grid (dimx, dimy, 1);
       dim3 grid (1024, 1, 1);
 
       unsigned long int elapsed;
@@ -266,13 +263,16 @@ int main(int argc, char const *argv[]) {
       // copy result from device to host
       cudaMemcpy(h_Xsqr, d_Xsqr, Xsqr_size, cudaMemcpyDeviceToHost);
 #endif
+      
        for (uint pix = 0; pix < m; pix++) {    // pix = blockIdx.x
            for (int i = 0; i < K; i++) {       // i = threadIdx.y
                for (int j = 0; j < K; j++) {   // j = threadIdx.x
                    float acc = 0.0;
                    for (uint k = 0; k < n; k++) {
-                       int mask = isNotNan(h_sample[pix*N+k]);
-                       acc += h_X[i*N+k] * h_XT[k*K+j] * mask;
+                     if (h_sample[pix*N+k] != F32_MIN) {
+                       acc += h_X[i*N+k] * h_XT[k*K+j];
+                     }
+                       // int mask = isNotNan(h_sample[pix*N+k]);
                    }
                    h_Xsqr[pix*K*K + i*K + j] = acc;
                }
