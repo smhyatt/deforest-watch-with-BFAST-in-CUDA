@@ -31,7 +31,7 @@ entry main (X:[][]f32)
 
 -- in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss,
 --     sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
-let epsilon = 1
+let epsilon = 0.01
 
 let relError x y =
     let x' = f32.abs(x)
