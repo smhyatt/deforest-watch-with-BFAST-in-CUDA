@@ -145,7 +145,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
     // printf("\n\n\n");
 
     float* YT = (float*) calloc(N*m,sizeof(float));
-    transpose(sample, YT, m, N);
+    transposeOPTIM(sample, YT, m, N);
     // printf("************** EFTER TRANSPOSE ****************\n");
     // for (int i = 0; i < N*m; i++) {
     //     printf("%f, ", YT[i]);
