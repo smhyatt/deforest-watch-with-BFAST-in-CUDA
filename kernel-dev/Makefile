@@ -30,6 +30,11 @@ compileSeq: $(EXECUTABLE1)
 $(EXECUTABLE1): $(SRC1) $(HELPERS)
 	$(CXX) -o $(EXECUTABLE1) $(SRC1)
 
+compileNaive: $(EXECUTABLE3)
+
+$(EXECUTABLE2): $(SRC2) $(HELPERS)
+	$(CXX) -o $(EXECUTABLE2) $(SRC2)
+
 
 compileOptim: $(EXECUTABLE3)
 
@@ -63,20 +68,20 @@ futV:
 clear:
 	.././bfast-irreg < ../data/testset_sahara_2pix.in > ../data/val.data
 
-seqV: compileSeq clear seqbfast
+seqV: compileSeq futV clear seqbfast
 	$(info )
 	$(info The validation for the sequential implementation.)
-	cat ../data/val.data
+# 	cat ../data/val.data
 	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
-naiveV: clear naivebfast
+naiveV: compileNaive futV clear naivebfast
 	$(info )
 	$(info The validation for the naive implementation.)
 	.././validation-benchmark < ../data/val.data
 	rm ../data/val.data
 
-optimV: compileOptim clear optimbfast
+optimV: compileOptim futV clear optimbfast
 	$(info )
 	$(info The validation for the optimized implementation.)
 # 	cat ../data/val.data
