@@ -31,14 +31,13 @@ entry main (X:[][]f32)
 
 -- in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss,
 --     sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
-let epsilon = 0.001
-
+let epsilon = 0.00001
+let relError = (\x y -> f32.abs(x-y) / f32.max(f32.abs(x),f32.abs(y) < epsilon)
 -- abs(v1-v2) / max(abs(v1),abs(v2) < epsilon
 
 -- Kernel 1: X
 let Xtfs = map2 (\x y ->
-                 map2 (\x' y' -> f32.abs(x'-y') /
-                                 f32.max(f32.abs(x'),f32.abs(y') < epsilon) x y
+                 map2 (\x' y' -> relError x' y') x y
                  ) X Xseq
 let XallTrue = map (\x -> and x) Xtfs
                |> and
@@ -46,7 +45,7 @@ let XallTrue = map (\x -> and x) Xtfs
 -- Kernel 2: Xsqr
 let XsqrTfs = map2 (\x y ->
                         map2 (\x' y' ->
-                              map2 (\x'' y'' -> f32.abs (x'' - y'') < 0.1) x' y'
+                              map2 (\x'' y'' -> relError x''  y'') x' y'
                               ) x y
                         ) Xsqr  Xsqrseq
 
