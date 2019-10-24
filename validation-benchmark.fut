@@ -33,11 +33,10 @@ entry main (X:[][]f32)
 --     sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
 let epsilon = 0.1
 
--- abs(v1-v2) / max(abs(v1),abs(v2) < epsilon
 let relError x y =
     let x' = f32.abs(x)
     let y' = f32.abs(y)
-    in (f32.abs(x-y) / f32.max x' y') < epsilon
+    in ( (f32.abs(x-y) / f32.max x' y') < epsilon, (x,y))
 let absError x y = f32.abs (x - y) < epsilon
 
 
@@ -45,8 +44,8 @@ let absError x y = f32.abs (x - y) < epsilon
 let Xtfs = map2 (\x y ->
                  map2 relError x y
                  ) X Xseq
-let XallTrue = map (\x -> and x) Xtfs
-               |> and
+-- let XallTrue = map (\x -> and x) Xtfs
+--                |> and
 
 -- Kernel 2: Xsqr
 let XsqrTfs = map2 (\x y ->
@@ -134,7 +133,7 @@ let XsqrAllTrue = map (\x -> map (\x' -> and x') x ) XsqrTfs
 -- let meansallTrue = map2 (\x' y' -> f32.abs (x' - y') < 1) means meansseq |> and
 
 
-in (XallTrue
+in (--XallTrue
     ,Xtfs
    ,XsqrAllTrue
 --    ,XinvAllTrue
