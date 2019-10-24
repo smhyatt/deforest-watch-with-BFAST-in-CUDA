@@ -124,6 +124,7 @@ let beta0allTrue = map (\x -> and x) beta0tfs
 
 in (XallTrue
    ,XsqrAllTrue
+   ,XsqrTfs
 --    ,XinvAllTrue
    ,beta0allTrue
 --    ,betaallTrue
