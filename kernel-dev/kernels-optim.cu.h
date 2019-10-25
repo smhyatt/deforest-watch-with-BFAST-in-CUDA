@@ -58,15 +58,15 @@ void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* 
 __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* sample,
                      float* Xsqr, uint K) {
 
-    int pix = blockIdx.x; 
+    int pix = blockIdx.x;
     int i = threadIdx.y;
     int j = threadIdx.x;
     float accum = 0.0f;
 
     for(int k = 0; k < n; k++) {
-        if (sample[pix*N+k] != F32_MIN) { 
+        if (sample[pix*N+k] != F32_MIN) {
             accum += X[i*N+k] * XT[k*K+j];
-        } 
+        }
     }
 
     Xsqr[pix*K*K + i*K + j] = accum;
@@ -83,7 +83,7 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             for (uint k = 0; k < n; k++) {
                 float cur_y = sample[pix*N+k];
 
-                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan. 
+                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan.
                     acc += 0.0;
                 } else {
                     acc += X[i*N+k] * cur_y;
@@ -92,7 +92,7 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             B0[pix*K + i] = acc;
         }
     }
-}    
+}
 #endif
 
 __global__ void ker4(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
@@ -105,14 +105,14 @@ __global__ void ker4(uint m, uint n, uint N, float* X, uint K, float* sample, fl
         // setting valid bit of valid pixel data
         float cur_y = sample[pix*N+k];
 
-        if (cur_y == F32_MIN) { 
+        if (cur_y == F32_MIN) {
             accum += 0.0;
         } else {
             accum += X[i*N+k] * cur_y;
         }
     }
 
-    // adding results to beta0 
+    // adding results to beta0
     B0[pix*K + i] = accum;
 }
 
@@ -131,7 +131,113 @@ void mkB(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
             }
             B[pix*K + i] = acc;
         }
-    }        
+    }
+}
+#endif
+
+
+__global__ void gaussJordanG(uint M, uint K, float* A, float* AI){
+    int i = blockIdx.x;
+    int k1 = threadIdx.x;
+    int k2 = threadIdx.y;
+
+    // float* Ash    = (float*) calloc(2*K*K,sizeof(float));
+    __shared__ float Ash[2*K*K];
+    // float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
+    __shared__ float AshTmp[2*K*K];
+
+    if (k2<K) {
+        Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
+    } else {
+        Ash[k1*2*K + k2] = (float) (k2 == (K+k1));
+    }
+
+    #pragma unroll
+    for (uint q = 0; q < K; q++){               // sequential
+        float vq = Ash[q];
+        // for k1 for k2
+        float tmp = 0.0;
+        if (vq == 0.0) {
+            tmp = Ash[k1*2*K + k2];
+        } else {
+            float x = Ash[k2] / vq;
+            if (k1 == (K-1)){
+                tmp = x;
+            } else {
+                tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
+            }
+        }
+        // barrier for block-level sync
+        AshTmp[k1*2*K + k2] = tmp;
+        // barrier for block-level sync
+
+        float* tmp2 = AshTmp;
+        AshTmp = Ash;
+        Ash = tmp2;
+    }
+}
+
+#if 0
+// M is the number of pixels
+// K is the width and height of each of the matrix in A
+// A is the input data [M][K][K]
+// Ash is the [K][2*K]
+// AI is the inverse A [K][K]
+void gaussJordanG(uint M, uint K, float* A, float* AI){
+
+    for (uint i = 0; i < M; i++){
+        float* Ash    = (float*) calloc(2*K*K,sizeof(float));
+        float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
+
+        // Pad A with identity matrix to the right
+        for (uint k1 = 0; k1 < K; k1++){
+            for (uint k2 = 0; k2 < 2*K; k2++){
+                if (k2<K) {
+                    Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
+                } else {
+                    Ash[k1*2*K + k2] = (float) (k2 == (K+k1));
+                }
+                // barrier
+            }
+        }
+
+        // Gauss-Jordan Elimination the other version:
+        for (uint q = 0; q < K; q++){               // sequential
+            float vq = Ash[q];
+            for (uint k1 = 0; k1 < K; k1++){        // parallel block.y
+                for (uint k2 = 0; k2 < 2*K; k2++){  // parallel block.x
+                    float tmp = 0.0;
+                    if (vq == 0.0) {
+                        tmp = Ash[k1*2*K + k2];
+                    } else {
+                        float x = Ash[k2] / vq;
+                        if (k1 == (K-1)){
+                            tmp = x;
+                        } else {
+                            tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
+                        }
+                    }
+                    // barrier for block-level sync
+                    AshTmp[k1*2*K + k2] = tmp;
+                    // barrier for block-level sync
+                }
+            }
+            // switch pointer
+            float* tmp2 = AshTmp;
+            AshTmp = Ash;
+            Ash = tmp2;
+        }
+
+        // collective copy shared-to-global mem:
+        for (int k1 = 0; k1 < K; k1++) {
+            for (int k2 = 0; k2 < K; k2++) {
+                uint XinvIdx  = k1*(K*2) + k2+K;
+                uint XlessIdx = i*K*K + k1*K + k2;
+                AI[XlessIdx] = Ash[XinvIdx];
+            }
+        }
+        free(Ash);
+    }
 }
 #endif
 
