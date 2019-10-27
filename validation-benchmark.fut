@@ -153,7 +153,7 @@
 -- --    ,meansallTrue
 --    )
 
-let epsilon = 2.1f32
+let epsilon = 0.9f32
 
 let relError x y =
     let x' = f32.abs(x)
@@ -162,7 +162,7 @@ let relError x y =
     -- else  let m = f32.max (f32.max x' y') 1.0
     --       in  f32.abs(x'-y') / m < epsilon
     else  let m = f32.max x' y'
-          in  f32.abs(x-y) / m < epsilon
+          in  f32.abs(x'-y') / m < epsilon
 
 let validate1Dfloat [n] (xs : [n]f32) (ys: [n]f32) : (bool, i32, f32, f32) =
   let diffs = map3 (\x y i -> if (relError x y)
