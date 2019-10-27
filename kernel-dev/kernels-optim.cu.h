@@ -139,8 +139,8 @@ void mkB(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
 
 __global__ void ker3(uint M, uint K, float* A, float* AI){
     int i = blockIdx.x;
-    int k1 = threadIdx.x;
-    int k2 = threadIdx.y;
+    int k1 = threadIdx.y;
+    int k2 = threadIdx.x;
 
     extern __shared__ float shared[]; // 2*K*K
     float* Ash = &shared[0];
@@ -155,10 +155,13 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     // float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
     // extern __shared__ float AT[];
 
-    // copy the data from the device memory to the first half of the shared mem
-    Ash[k1*K + k2]     = A[i*K*K + k1*K + k2];
-    // writes the identity matrix to the second half
-    Ash[k1*2*K + K + k2] = (float) (k2 == k1);
+    if (k2 < K) {
+        // copy the data from the device memory to the first half of the sh_mem
+        Ash[k1*K + k2]     = A[i*K*K + k1*K + k2];
+    } else {
+        // writes the identity matrix to the second half
+        Ash[k1*2*K + k2] = (float) (k1+K == k2);
+    }
 
     #pragma unroll
     for (uint q = 0; q < 2*K; q++){               // sequential
@@ -189,8 +192,9 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
         Ash    = tmp2;
     }
 
-    AI[i*K*K + k1*K + k2] = Ash[k1*2*K + K + k2];
-
+    if (K <= k2) {
+        AI[i*K*K + k1*K + k2] = Ash[k1*2*K + k2];
+    }
 }
 
 #if 0
