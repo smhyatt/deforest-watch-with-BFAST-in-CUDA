@@ -191,23 +191,23 @@ let absError x y = f32.abs (x - y) < epsilon
 entry main (X:[][]f32)
            (Xsqr:[][][]f32)
            (Xinv:[][][]f32)
-           (beta0:[][]f32)
-           (beta:[][]f32)
-           (y_preds:[][]f32)
+        --    (beta0:[][]f32)
+        --    (beta:[][]f32)
+        --    (y_preds:[][]f32)
 
            (Xseq:[][]f32)
            (Xsqrseq:[][][]f32)
            (Xinvseq:[][][]f32)
-           (beta0seq:[][]f32)
-           (betaseq:[][]f32)
-           (y_predsseq:[][]f32)
+        --    (beta0seq:[][]f32)
+        --    (betaseq:[][]f32)
+        --    (y_predsseq:[][]f32)
             =
 
 let valX     = validate2Dfloat X Xseq
 let valXsqr  = validate3Dfloat Xsqr Xsqrseq
 let valXinv  = validate3Dfloat Xinv Xinvseq
-let valbeta0 = validate2Dfloat beta0 beta0seq
-let valbeta  = validate2Dfloat beta betaseq
-let valyhat  = validate2Dfloat y_preds y_predsseq
+-- let valbeta0 = validate2Dfloat beta0 beta0seq
+-- let valbeta  = validate2Dfloat beta betaseq
+-- let valyhat  = validate2Dfloat y_preds y_predsseq
 
-in valyhat
+in valX, valXsqr, valXinv
