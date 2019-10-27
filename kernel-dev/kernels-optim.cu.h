@@ -166,13 +166,13 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
         // for k1 for k2
         float tmp = 0.0;
         if (vq == 0.0) {
-            tmp = Ash[k1*2*K + k2];
+            tmp = Ash[k1*K + k2];
         } else {
             float x = Ash[k2] / vq;
             if (k1 == (K-1)){
                 tmp = x;
             } else {
-                tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
+                tmp = Ash[(k1+1)*K + k2] - Ash[(k1+1)*K + q] *x;
             }
         }
 
