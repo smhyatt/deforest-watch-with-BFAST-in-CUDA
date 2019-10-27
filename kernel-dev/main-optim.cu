@@ -193,7 +193,7 @@ int main(int argc, char const *argv[]) {
    float* h_B0     = (float*) calloc(K*m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
-   float *d_X, *d_XT, *d_Xsqr, *d_B0;
+   float *d_X, *d_XT, *d_Xsqr, *d_Xinv, *d_B0;
    cudaMalloc((void**) &d_X, X_size);
    cudaMalloc((void**) &d_XT, X_size);
    cudaMalloc((void**) &d_Xsqr, Xsqr_size);
