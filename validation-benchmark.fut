@@ -212,4 +212,4 @@ let valXinv  = validate3Dfloat Xinv Xinvseq
 -- let valbeta  = validate2Dfloat beta betaseq
 -- let valyhat  = validate2Dfloat y_preds y_predsseq
 
-in valXsqr
+in valX
