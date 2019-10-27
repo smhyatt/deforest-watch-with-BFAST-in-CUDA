@@ -171,8 +171,10 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
             }
         }
         // barrier for block-level sync
+        __syncthreads();
         AshTmp[k1*2*K + k2] = tmp;
         // barrier for block-level sync
+        __syncthreads();
 
         float* tmp2 = AshTmp;
         AshTmp = Ash;
