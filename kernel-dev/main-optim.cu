@@ -182,12 +182,14 @@ int main(int argc, char const *argv[]) {
 
    uint X_size     = K*N*sizeof(float);
    uint Xsqr_size  = K*K*m*sizeof(float);
+   uint Xinv_size  = K*K*m*sizeof(float);
    uint B0_size    = K*m*sizeof(float);
 
    // allocate host memory for X
    float* h_X      = (float*) calloc(N*K,sizeof(float));
    float* h_XT     = (float*) calloc(K*N,sizeof(float));
    float* h_Xsqr   = (float*) calloc(K*K*m,sizeof(float));
+   float* h_Xinv   = (float*) calloc(K*K*m,sizeof(float));
    float* h_B0     = (float*) calloc(K*m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
@@ -195,6 +197,7 @@ int main(int argc, char const *argv[]) {
    cudaMalloc((void**) &d_X, X_size);
    cudaMalloc((void**) &d_XT, X_size);
    cudaMalloc((void**) &d_Xsqr, Xsqr_size);
+   cudaMalloc((void**) &d_Xinv, Xinv_size);
    cudaMalloc((void**) &d_B0, B0_size);
 
 
@@ -283,7 +286,7 @@ int main(int argc, char const *argv[]) {
     gettimeofday(&t_start, NULL);
 
     // GPU call to kernel 3
-    ker3<<< grid, block >>>(m, K, d_Xsqr, d_XsqrInv, d_XsqrInvLess);
+    ker3<<< grid, block >>>(m, K, d_Xsqr, d_Xinv);
     // cudaDeviceSynchronize();
 
     gettimeofday(&t_end, NULL);
@@ -294,8 +297,8 @@ int main(int argc, char const *argv[]) {
     gpuAssert( cudaPeekAtLastError() );
 
     // copy result from device to host
-    cudaMemcpy(h_XsqrInv, d_XsqrInvLess, X_size, cudaMemcpyDeviceToHost);
-    printM(fpV, h_XsqrInv, m, K);
+    cudaMemcpy(h_Xinv, d_Xinv, Xinv_size, cudaMemcpyDeviceToHost);
+    printM(fpV, h_Xinv, m, K);
     // printM(fpV, h_Xsqr, m, K);
 
     printf("GPU Optimized Kernel 3 runs in: %lu microsecs\n", elapsed);
