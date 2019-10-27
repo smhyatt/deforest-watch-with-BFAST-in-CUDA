@@ -189,7 +189,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     //     Ash = tmp2;
     // }
 
-    AI[i*K*K + k1*2*K + k2] = Ash[k1*K + K + k2];
+    AI[i*K*K + k1*K + k2] = Ash[k1*2*K + K + k2];
 
 }
 
