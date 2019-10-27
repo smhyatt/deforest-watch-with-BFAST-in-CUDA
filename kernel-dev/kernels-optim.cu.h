@@ -165,7 +165,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
 
 #if 1
     #pragma unroll
-    for (uint q = 0; q < 2*K; q++){               // sequential
+    for (uint q = 0; q < K; q++){               // sequential
         float vq = Ash[q];
         // for k1 for k2
         float tmp = 0.0;
