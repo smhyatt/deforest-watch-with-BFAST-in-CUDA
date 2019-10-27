@@ -144,11 +144,11 @@ __global__ void gaussJordanG(uint M, uint K, float* A, float* AI){
 
     // extern __shared__ float Ash[];
     // float* Ash    = (float*) calloc(2*K*K,sizeof(float));
-    extern __shared__ float A[]; // 2*K*K
+    extern __shared__ float shared[]; // 2*K*K
     // float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
-    extern __shared__ float AT[];
-    auto* Ash = &A[0];
-    auto* AshTmp = &AT[0];
+    // extern __shared__ float AT[];
+    float* Ash = &shared[0];
+    float* AshTmp = &shared[2*K*K];
 
     if (k2<K) {
         Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
