@@ -142,7 +142,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     int k1 = threadIdx.x;
     int k2 = threadIdx.y;
 
-    AI[i*K*K + k1*2*K + k2] = A[i*K*K + k1*2*K + k2];
+    AI[i*K*K + k1*K + k2] = A[i*K*K + k1*K + k2];
 
     // extern __shared__ float Ash[];
     // float* Ash    = (float*) calloc(2*K*K,sizeof(float));
