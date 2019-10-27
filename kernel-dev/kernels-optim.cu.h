@@ -142,15 +142,17 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     int k1 = threadIdx.x;
     int k2 = threadIdx.y;
 
-    AI[i*K*K + k1*K + k2] = A[i*K*K + k1*K + k2];
+    extern __shared__ float shared[]; // 2*K*K
+    float* Ash = &shared[0];
+    float* AshTmp = &shared[2*K*K];
+    Ash[k1*K + k2] = A[i*K*K + k1*K + k2] - 1;
+
+    AI[i*K*K + k1*K + k2] = Ash[k1*K + k2];
 
     // extern __shared__ float Ash[];
     // float* Ash    = (float*) calloc(2*K*K,sizeof(float));
-    // extern __shared__ float shared[]; // 2*K*K
     // float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
     // extern __shared__ float AT[];
-    // float* Ash = &shared[0];
-    // float* AshTmp = &shared[2*K*K];
 
     // // copy the data from the device memory to the first half of the shared mem
     // Ash[k1*2*K + k2]     = A[i*K*K + k1*K + k2];
