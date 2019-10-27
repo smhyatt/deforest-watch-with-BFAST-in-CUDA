@@ -144,7 +144,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
 
     extern __shared__ float shared[]; // 2*K*K
     float* Ash = &shared[0];
-    float* AshTmp = &shared[4*K*K];
+    float* AshTmp = &shared[2*K*K];
 
     // Ash[k1*K + k2] = A[i*K*K + k1*K + k2] - 1;
 
@@ -158,8 +158,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     // copy the data from the device memory to the first half of the shared mem
     Ash[k1*K + k2]     = A[i*K*K + k1*K + k2];
     // writes the identity matrix to the second half
-    // Ash[k1*2*K + K + k2] = 25.0; //(float) (k2 == k1);
-    Ash[k1*2*K + k2] = 25.0; //(float) (k2 == k1);
+    Ash[k1*2*K + K + k2] = 25.0; //(float) (k2 == k1);
 
     // #pragma unroll
     // for (uint q = 0; q < 2*K; q++){               // sequential
@@ -190,7 +189,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     //     Ash = tmp2;
     // }
 
-    AI[i*K*K + k1*K + k2] = Ash[k1*2*K + k2];
+    AI[i*K*K + k1*K + k2] = Ash[k1*2*K + K + k2];
 
 }
 
