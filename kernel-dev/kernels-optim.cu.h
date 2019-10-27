@@ -135,11 +135,6 @@ void mkB(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
 }
 #endif
 
-__global__ void swap(float* &a, float* &b){
-  float *temp = a;
-  a = b;
-  b = temp;
-}
 
 
 __global__ void gaussJordanG(uint M, uint K, float* A, float* AI){
@@ -149,10 +144,11 @@ __global__ void gaussJordanG(uint M, uint K, float* A, float* AI){
 
     // extern __shared__ float Ash[];
     // float* Ash    = (float*) calloc(2*K*K,sizeof(float));
-    extern __shared__ float Ash[]; // 2*K*K
+    extern __shared__ float A[]; // 2*K*K
     // float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
-    extern __shared__ float AshTmp[];
-    // size_t As = &Ash[0];
+    extern __shared__ float AT[];
+    size_t* Ash = &A[0];
+    size_t* AshTmp = &AT[0];
 
     if (k2<K) {
         Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
@@ -179,10 +175,9 @@ __global__ void gaussJordanG(uint M, uint K, float* A, float* AI){
         AshTmp[k1*2*K + k2] = tmp;
         // barrier for block-level sync
 
-        swap(Ash,AshTmp);
-        // float* tmp2 = AshTmp;
-        // AshTmp = Ash;
-        // Ash = tmp2;
+        float* tmp2 = AshTmp;
+        AshTmp = Ash;
+        Ash = tmp2;
     }
 }
 
