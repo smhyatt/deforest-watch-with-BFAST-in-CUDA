@@ -286,7 +286,7 @@ int main(int argc, char const *argv[]) {
     gettimeofday(&t_start, NULL);
 
     // GPU call to kernel 3
-    ker3<<< grid, block, 4*sizeof(float) >>>(m, K, d_Xsqr, d_Xinv);
+    ker3<<< grid, block, 4*K*K*sizeof(float) >>>(m, K, d_Xsqr, d_Xinv);
     // cudaDeviceSynchronize();
 
     gettimeofday(&t_end, NULL);
