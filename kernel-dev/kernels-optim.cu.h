@@ -193,7 +193,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     // }
 
     if (K <= k2) {
-        AI[i*K*K + k1*K + k2] = Ash[k1*2*K + K + k2];
+        AI[i*K*K + k1*K + k2 - K] = Ash[k1*2*K + k2];
     }
 }
 
