@@ -159,7 +159,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     Ash[k1*K + k2]     = A[i*K*K + k1*K + k2];
     // writes the identity matrix to the second half
     // Ash[k1*2*K + K + k2] = 25.0; //(float) (k2 == k1);
-    Ash[k1*K + k2] = 25.0; //(float) (k2 == k1);
+    Ash[k1*2*K + k2] = 25.0; //(float) (k2 == k1);
 
     // #pragma unroll
     // for (uint q = 0; q < 2*K; q++){               // sequential
@@ -190,7 +190,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     //     Ash = tmp2;
     // }
 
-    AI[i*K*K + k1*K + k2] = Ash[k1*K + k2];
+    AI[i*K*K + k1*K + k2] = Ash[k1*2*K + k2];
 
 }
 
