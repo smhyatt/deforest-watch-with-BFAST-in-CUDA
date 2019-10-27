@@ -144,7 +144,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
 
     extern __shared__ float shared[]; // 2*K*K
     float* Ash = &shared[0];
-    float* AshTmp = &shared[2*K*K];
+    float* AshTmp = &shared[4*K*K];
 
     // Ash[k1*K + k2] = A[i*K*K + k1*K + k2] - 1;
 
@@ -175,12 +175,15 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
                 tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
             }
         }
+
         // barrier for block-level sync
         __syncthreads();
         AshTmp[k1*2*K + k2] = tmp;
+
         // barrier for block-level sync
         __syncthreads();
 
+        // swap pointers
         float* tmp2 = AshTmp;
         AshTmp = Ash;
         Ash = tmp2;
