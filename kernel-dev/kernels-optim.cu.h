@@ -156,7 +156,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     // extern __shared__ float AT[];
 
     // copy the data from the device memory to the first half of the shared mem
-    Ash[k1*2*K + k2]     = A[i*K*K + k1*K + k2];
+    Ash[k1*K + k2]     = A[i*K*K + k1*K + k2];
     // writes the identity matrix to the second half
     Ash[k1*2*K + K + k2] = (float) (k2 == (K+k1));
 
