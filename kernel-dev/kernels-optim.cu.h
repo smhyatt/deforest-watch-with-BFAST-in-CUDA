@@ -157,13 +157,13 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
 
     if (k2 < K) {
         // copy the data from the device memory to the first half of the sh_mem
-        Ash[k1*2*K + k2]     = A[i*K*K + k1*K + k2];
+        Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
     } else {
         // writes the identity matrix to the second half
         Ash[k1*2*K + k2] = (float) (k1+K == k2);
     }
 
-#if 0
+#if 1
     #pragma unroll
     for (uint q = 0; q < 2*K; q++){               // sequential
         float vq = Ash[q];
@@ -196,7 +196,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
 #endif
 
     if (K <= k2) {
-        AI[i*K*K + k1*K + k2 - K] = Ash[k1*2*K + k2 -K];
+        AI[i*K*K + k1*K + k2 - K] = Ash[k1*2*K + k2];
     }
 }
 
