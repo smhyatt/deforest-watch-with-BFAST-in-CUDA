@@ -142,7 +142,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     int k1 = threadIdx.x;
     int k2 = threadIdx.y;
 
-    // extern __shared__ float shared[]; // 2*K*K
+    extern __shared__ float shared[]; // 2*K*K
     // float* Ash = &shared[0];
     // float* AshTmp = &shared[2*K*K];
 
