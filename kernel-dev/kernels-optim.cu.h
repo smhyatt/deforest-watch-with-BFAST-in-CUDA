@@ -178,7 +178,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
 
         // barrier for block-level sync
         __syncthreads();
-        AshTmp[k1*2*K + k2] = tmp;
+        AshTmp[k1*K + k2] = tmp;
 
         // barrier for block-level sync
         __syncthreads();
@@ -186,7 +186,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
         // swap pointers
         float* tmp2 = AshTmp;
         AshTmp = Ash;
-        Ash = tmp2;
+        Ash    = tmp2;
     }
 
     AI[i*K*K + k1*K + k2] = Ash[k1*2*K + K + k2];
