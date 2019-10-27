@@ -142,46 +142,48 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     int k1 = threadIdx.x;
     int k2 = threadIdx.y;
 
+    AI[i*K*K + k1*2*K + k2] = A[i*K*K + k1*2*K + k2];
+
     // extern __shared__ float Ash[];
     // float* Ash    = (float*) calloc(2*K*K,sizeof(float));
-    extern __shared__ float shared[]; // 2*K*K
+    // extern __shared__ float shared[]; // 2*K*K
     // float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
     // extern __shared__ float AT[];
-    float* Ash = &shared[0];
-    float* AshTmp = &shared[2*K*K];
+    // float* Ash = &shared[0];
+    // float* AshTmp = &shared[2*K*K];
 
-    // copy the data from the device memory to the first half of the shared mem
-    Ash[k1*2*K + k2]     = A[i*K*K + k1*K + k2];
-    // writes the identity matrix to the second half
-    Ash[k1*2*K + K + k2] = (float) (k2 == (K+k1));
+    // // copy the data from the device memory to the first half of the shared mem
+    // Ash[k1*2*K + k2]     = A[i*K*K + k1*K + k2];
+    // // writes the identity matrix to the second half
+    // Ash[k1*2*K + K + k2] = (float) (k2 == (K+k1));
 
-    #pragma unroll
-    for (uint q = 0; q < 2*K; q++){               // sequential
-        float vq = Ash[q];
-        // for k1 for k2
-        float tmp = 0.0;
-        if (vq == 0.0) {
-            tmp = Ash[k1*2*K + k2];
-        } else {
-            float x = Ash[k2] / vq;
-            if (k1 == (K-1)){
-                tmp = x;
-            } else {
-                tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
-            }
-        }
-        // barrier for block-level sync
-        __syncthreads();
-        AshTmp[k1*2*K + k2] = tmp;
-        // barrier for block-level sync
-        __syncthreads();
+    // #pragma unroll
+    // for (uint q = 0; q < 2*K; q++){               // sequential
+    //     float vq = Ash[q];
+    //     // for k1 for k2
+    //     float tmp = 0.0;
+    //     if (vq == 0.0) {
+    //         tmp = Ash[k1*2*K + k2];
+    //     } else {
+    //         float x = Ash[k2] / vq;
+    //         if (k1 == (K-1)){
+    //             tmp = x;
+    //         } else {
+    //             tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
+    //         }
+    //     }
+    //     // barrier for block-level sync
+    //     __syncthreads();
+    //     AshTmp[k1*2*K + k2] = tmp;
+    //     // barrier for block-level sync
+    //     __syncthreads();
 
-        float* tmp2 = AshTmp;
-        AshTmp = Ash;
-        Ash = tmp2;
-    }
+    //     float* tmp2 = AshTmp;
+    //     AshTmp = Ash;
+    //     Ash = tmp2;
+    // }
 
-    AI[i*K*K + k1*2*K + k2] = Ash[k1*K + K + k2];
+    // AI[i*K*K + k1*2*K + k2] = Ash[k1*K + K + k2];
 
 }
 
