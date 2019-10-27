@@ -278,7 +278,7 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 3
    /////////////////////////////////////////////////////////////////////////
    {
-    dim3 block(K*K, 1, 1);
+    dim3 block(K, K, 1);
     dim3 grid (n, 1, 1);
 
     unsigned long int elapsed;
