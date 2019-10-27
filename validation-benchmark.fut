@@ -154,15 +154,28 @@
 --    )
 
 let epsilon = 0.9f32
+-- NOTE: Should be kept sharply under 1.0, so that zero values are not accepted.
 
 let relError x y =
     let x' = f32.abs(x)
     let y' = f32.abs(y) in
     if x' == 0.0f32 && y' == 0.0f32 then true
+    -- Old verification
     -- else  let m = f32.max (f32.max x' y') 1.0
     --       in  f32.abs(x'-y') / m < epsilon
+    -- New verification
     else  let m = f32.max x' y'
           in  f32.abs(x'-y') / m < epsilon
+
+    -- NOTE: Example of a case were the modification produces a more correct
+    -- evaluation. Where all the floats of the expected result is under one and
+    -- the our values are all zero because of a pointer error.
+        -- x: 0.041273f32
+        -- y: 0.000000f32
+        -- old result: abs(abs(x)-abs(y))/max(abs(x),abs(y),1)
+        --             = 0.0413/1.0000 = 0.0413
+        -- new result: abs(abs(x)-abs(y))/max(abs(x),abs(y)  )
+        --             = 0.0413/0.0413 = 1.0000
 
 let validate1Dfloat [n] (xs : [n]f32) (ys: [n]f32) : (bool, i32, f32, f32) =
   let diffs = map3 (\x y i -> if (relError x y)
