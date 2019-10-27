@@ -153,7 +153,7 @@
 -- --    ,meansallTrue
 --    )
 
-let epsilon = 2.0f32
+let epsilon = 2.1f32
 
 let relError x y =
     let x' = f32.abs(x)
