@@ -275,37 +275,34 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 3
    /////////////////////////////////////////////////////////////////////////
    {
-      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
-      dim3 grid (dimx, dimy, 1);
+    dim3 block(K*K, 1, 1);
+    dim3 grid (n, 1, 1);
 
-      unsigned long int elapsed;
-      struct timeval t_start, t_end, t_diff;
-      gettimeofday(&t_start, NULL);
+    unsigned long int elapsed;
+    struct timeval t_start, t_end, t_diff;
+    gettimeofday(&t_start, NULL);
 
-      // GPU call to kernel 3
-      // ker3 <<< grid, block >>> ();
-      // cudaDeviceSynchronize();
+    // GPU call to kernel 3
+    // ker3<<< grid, block >>>(m, K, d_Xsqr, d_XsqrInv, d_XsqrInvLess);
+    // cudaDeviceSynchronize();
 
-      gettimeofday(&t_end, NULL);
-      timeval_subtract(&t_diff, &t_end, &t_start);
-      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+    gettimeofday(&t_end, NULL);
+    timeval_subtract(&t_diff, &t_end, &t_start);
+    elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
 
-      // check for cuda errors
-      gpuAssert( cudaPeekAtLastError() );
+    // check for cuda errors
+    gpuAssert( cudaPeekAtLastError() );
 
-      // copy result from device to host
-      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+    // copy result from device to host
+    //   cudaMemcpy(h_XsqrInv, d_XsqrInvLess, X_size, cudaMemcpyDeviceToHost);
+    //   printM(fpV, h_XsqrInv, K, K);
+    printM(fpV, h_Xsqr, K, K);
 
-      // add to validation
-
-
-      printf("GPU Optimized Kernel 3 runs in: %lu microsecs\n", elapsed);
-      float microsecPerMatrixMul = elapsed;
-      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-      // printf( "GPU Optimized Kernel 3 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+    printf("GPU Optimized Kernel 3 runs in: %lu microsecs\n", elapsed);
+    float microsecPerMatrixMul = elapsed;
+    double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+    double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+    // printf( "GPU Optimized Kernel 3 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
    }
 
 
