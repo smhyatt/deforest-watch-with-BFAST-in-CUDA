@@ -160,34 +160,34 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     // writes the identity matrix to the second half
     Ash[k1*2*K + K + k2] = (float) (k2 == (K+k1));
 
-    #pragma unroll
-    for (uint q = 0; q < 2*K; q++){               // sequential
-        float vq = Ash[q];
-        // for k1 for k2
-        float tmp = 0.0;
-        if (vq == 0.0) {
-            tmp = Ash[k1*2*K + k2];
-        } else {
-            float x = Ash[k2] / vq;
-            if (k1 == (K-1)){
-                tmp = x;
-            } else {
-                tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
-            }
-        }
+    // #pragma unroll
+    // for (uint q = 0; q < 2*K; q++){               // sequential
+    //     float vq = Ash[q];
+    //     // for k1 for k2
+    //     float tmp = 0.0;
+    //     if (vq == 0.0) {
+    //         tmp = Ash[k1*2*K + k2];
+    //     } else {
+    //         float x = Ash[k2] / vq;
+    //         if (k1 == (K-1)){
+    //             tmp = x;
+    //         } else {
+    //             tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
+    //         }
+    //     }
 
-        // barrier for block-level sync
-        __syncthreads();
-        AshTmp[k1*2*K + k2] = tmp;
+    //     // barrier for block-level sync
+    //     __syncthreads();
+    //     AshTmp[k1*2*K + k2] = tmp;
 
-        // barrier for block-level sync
-        __syncthreads();
+    //     // barrier for block-level sync
+    //     __syncthreads();
 
-        // swap pointers
-        float* tmp2 = AshTmp;
-        AshTmp = Ash;
-        Ash = tmp2;
-    }
+    //     // swap pointers
+    //     float* tmp2 = AshTmp;
+    //     AshTmp = Ash;
+    //     Ash = tmp2;
+    // }
 
     AI[i*K*K + k1*2*K + k2] = Ash[k1*K + K + k2];
 
