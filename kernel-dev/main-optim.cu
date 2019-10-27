@@ -296,7 +296,7 @@ int main(int argc, char const *argv[]) {
     // copy result from device to host
     //   cudaMemcpy(h_XsqrInv, d_XsqrInvLess, X_size, cudaMemcpyDeviceToHost);
     //   printM(fpV, h_XsqrInv, K, K);
-    printM(fpV, h_Xsqr, K, K);
+    printM(fpV, h_Xsqr, m, K);
 
     printf("GPU Optimized Kernel 3 runs in: %lu microsecs\n", elapsed);
     float microsecPerMatrixMul = elapsed;
