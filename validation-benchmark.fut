@@ -153,7 +153,7 @@
 -- --    ,meansallTrue
 --    )
 
-let epsilon = 0.1f32
+let epsilon = 0.01f32
 -- NOTE: Should be kept sharply under 1.0, so that zero values are not accepted.
 
 let relError x y =
@@ -225,4 +225,4 @@ let valXinv  = validate3Dfloat Xinv Xinvseq
 -- let valbeta  = validate2Dfloat beta betaseq
 -- let valyhat  = validate2Dfloat y_preds y_predsseq
 
-in valXinv
+in valX
