@@ -6,6 +6,11 @@ gzip -d < sahara.in.gz > sahara.in
 ```
 
 ```
+gzip -d < peru.in.gz > peru.in
+```
+
+
+```
 futhark bench --backend=opencl bfast-irreg.fut
 Compiling bfast-irreg.fut...
 Results for bfast-irreg.fut:
