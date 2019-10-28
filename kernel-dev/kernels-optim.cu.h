@@ -146,15 +146,6 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     float* Ash = &shared[0];
     float* AshTmp = &shared[2*K*K];
 
-    // Ash[k1*K + k2] = A[i*K*K + k1*K + k2] - 1;
-
-    // AI[i*K*K + k1*K + k2] = Ash[k1*K + k2];
-
-    // extern __shared__ float Ash[];
-    // float* Ash    = (float*) calloc(2*K*K,sizeof(float));
-    // float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
-    // extern __shared__ float AT[];
-
     if (k2 < K) {
         // copy the data from the device memory to the first half of the sh_mem
         Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
@@ -163,7 +154,6 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
         Ash[k1*2*K + k2] = (float) (k1+K == k2);
     }
 
-#if 1
     #pragma unroll
     for (uint q = 0; q < K; q++){               // sequential
         float vq = Ash[q];
@@ -192,8 +182,6 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
         AshTmp = Ash;
         Ash    = tmp2;
     }
-
-#endif
 
     if (K <= k2) {
         AI[i*K*K + k1*K + k2 - K] = Ash[k1*2*K + k2];

@@ -70,5 +70,6 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
             }
         }
         free(Ash);
+        free(AshTmp);
     }
 }
