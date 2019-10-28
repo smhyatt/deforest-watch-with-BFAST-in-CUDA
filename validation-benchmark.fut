@@ -218,7 +218,7 @@ entry main (X:[][]f32)
         --    (y_predsseq:[][]f32)
             =
 
-let valX     = Xvalidate2Dfloat X Xseq
+let valX     = validate2Dfloat X Xseq
 let valXsqr  = validate3Dfloat Xsqr Xsqrseq
 let valXinv  = validate3Dfloat Xinv Xinvseq
 -- let valbeta0 = validate2Dfloat beta0 beta0seq
