@@ -218,11 +218,11 @@ entry main (X:[][]f32)
         --    (y_predsseq:[][]f32)
             =
 
-let valX     = validate2Dfloat X Xseq
+let valX     = Xvalidate2Dfloat X Xseq
 let valXsqr  = validate3Dfloat Xsqr Xsqrseq
 let valXinv  = validate3Dfloat Xinv Xinvseq
 -- let valbeta0 = validate2Dfloat beta0 beta0seq
 -- let valbeta  = validate2Dfloat beta betaseq
 -- let valyhat  = validate2Dfloat y_preds y_predsseq
 
-in valX
+in valXsqr
