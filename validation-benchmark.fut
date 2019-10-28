@@ -161,7 +161,7 @@ let relError x y =
     let y' = f32.abs(y) in
     if x' == 0.0f32 && y' == 0.0f32 then true
     -- Old verification
-    else  let m = f32.max (f32.max x' y') 0.001
+    else  let m = f32.max (f32.max x' y') 0.01
           in  f32.abs(x'-y') / m < epsilon
     -- New verification
     -- else  let m = f32.max x' y'
