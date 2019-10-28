@@ -153,7 +153,7 @@
 -- --    ,meansallTrue
 --    )
 
-let epsilon = 0.9f32
+let epsilon = 0.1f32
 -- NOTE: Should be kept sharply under 1.0, so that zero values are not accepted.
 
 let relError x y =
