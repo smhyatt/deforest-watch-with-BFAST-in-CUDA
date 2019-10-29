@@ -718,7 +718,7 @@ void MO_fsts_comp(int hmax, int* hs, float* y_errors, uint* nss, float* MO_fsts)
 }
 
 
-void ker9(uint m, uint N, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
+void ker9seq(uint m, uint N, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
     int hmax = I32_MIN;
     for (int i = 0; i < m; i++) {
         int cur = hs[i];
