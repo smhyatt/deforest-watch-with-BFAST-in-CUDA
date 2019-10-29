@@ -716,7 +716,7 @@ void ker8naive(uint m, uint n, uint N, float hfrac, float* y_errors, uint K,
             }
         }
 
-        hs[pix] = (int)(((float) * nss[pix]) * hfrac);
+        hs[pix] = (int)(((float) nss[pix]) * hfrac);
         // sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
     }
 }
