@@ -348,7 +348,7 @@ int main(int argc, char const *argv[]) {
 
         // validation
         printE(fpV,  h_seq_nss, m);
-        printE(fpV,  h_seq_hs,  m);
+        printEi(fpV, h_seq_hs,  m);
     }
 
 #if 0
