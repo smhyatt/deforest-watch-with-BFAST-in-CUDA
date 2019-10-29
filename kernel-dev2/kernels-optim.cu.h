@@ -616,32 +616,6 @@ void ker8naive(uint m, uint n, uint N, uint K, float hfrac, float* y_errors,
     }
 }
 #endif
-__global__ void ker8optimal(uint m, uint n, uint N, uint K, float hfrac,
-                          float* y_errors, float* Y, uint* nss, int* hs,
-                          float* sigmas) {
-    int pix = blockIdx.x;
-    int i = threadIdx.x;
-
-    extern __shared__ volatile uint shmem[];
-    volatile int* sh_mem_nss = (volatile int*)shmem;
-
-    uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
-    __syncthreads();
-    if (i == N) {
-        nss[pix] = nss_thr;
-    }
-
-    // float acc = 0.0;
-    // if (j < nss[pix]) {
-    //     float y_err = y_errors[pix*N + j];
-    //     acc += y_err * y_err;               // reduce (err^2) [] y_err
-    // }
-
-    // hs[pix] = (int)(((float) nss[pix]) * hfrac);
-    // sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
-}
-
-
 /**
  * Generic Count valid numbers operator that can be instantiated over
  *  numeric-basic types, such as int32_t, int64_t,
@@ -671,6 +645,33 @@ class CountValid {
     static __device__ __host__ inline T remVolatile(volatile T& t)
         { T res = t; return res; }
 };
+
+
+__global__ void ker8optimal(uint m, uint n, uint N, uint K, float hfrac,
+                          float* y_errors, float* Y, uint* nss, int* hs,
+                          float* sigmas) {
+    int pix = blockIdx.x;
+    int i = threadIdx.x;
+
+    extern __shared__ volatile uint shmem[];
+    volatile int* sh_mem_nss = (volatile int*)shmem;
+
+    uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
+    __syncthreads();
+    if (i == N) {
+        nss[pix] = nss_thr;
+    }
+
+    // float acc = 0.0;
+    // if (j < nss[pix]) {
+    //     float y_err = y_errors[pix*N + j];
+    //     acc += y_err * y_err;               // reduce (err^2) [] y_err
+    // }
+
+    // hs[pix] = (int)(((float) nss[pix]) * hfrac);
+    // sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
+}
+
 
 
 
