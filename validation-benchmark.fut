@@ -113,7 +113,7 @@ let valindss = validate2Dint val_indss val_indssseq
 let valnss   = validate1Dint nss nssseq
 let valhs    = validate1Dint hs hsseq
 
-in valhs
+in valnss
 
 
 
