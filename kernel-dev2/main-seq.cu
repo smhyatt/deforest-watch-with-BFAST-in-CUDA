@@ -8,7 +8,6 @@
 
 #include "helper.cu.h"
 #include "sequential.cu.h"
-#include "sequential-gj.cu.h"
 
 #define BLOCK_SIZE 1024//1024 //1024//2048
 #define WIDTH_A  1024//1024 //1024//2048
@@ -132,7 +131,7 @@ int main(int argc, char const *argv[]) {
 
     // allocating host memory for mappingindices and pixels
     int* h_mappingindices = (int*) calloc(N,sizeof(int));
-    float* h_sample = (float*) calloc(N*m,sizeof(float));
+    float* h_Y = (float*) calloc(N*m,sizeof(float));
 
     // inserting data to mappingindices
     while(mapPtr != NULL) {
@@ -147,7 +146,7 @@ int main(int argc, char const *argv[]) {
 
     // inserting data to sample
     while(pixelsPtr != NULL) {
-        h_sample[i] = atof(pixelsPtr);
+        h_Y[i] = atof(pixelsPtr);
         i++;
         pixelsPtr = strtok(NULL, delim);
     }
@@ -159,12 +158,19 @@ int main(int argc, char const *argv[]) {
     FILE* fpV = fopen("../data/val.data","a+");
 
     // allocate host memory for X
-    float* h_seq_X    = (float*) calloc(N*K,sizeof(float));
-    float* h_seq_XT   = (float*) calloc(N*K,sizeof(float));
-    float* h_seq_Xsqr = (float*) calloc(K*K*m,sizeof(float));
-    float* h_seq_XInv = (float*) calloc(K*K*m,sizeof(float));
-    float* h_seq_B0   = (float*) calloc(K*m,sizeof(float));
-    float* h_seq_B    = (float*) calloc(K*m,sizeof(float));
+    float* h_seq_X         = (float*) calloc(N*K,sizeof(float));
+    float* h_seq_XT        = (float*) calloc(N*K,sizeof(float));
+    float* h_seq_Xsqr      = (float*) calloc(K*K*m,sizeof(float));
+    float* h_seq_XInv      = (float*) calloc(K*K*m,sizeof(float));
+    float* h_seq_B0        = (float*) calloc(K*m,sizeof(float));
+    float* h_seq_B         = (float*) calloc(K*m,sizeof(float));
+    float* h_seq_yhat      = (float*) calloc(N*m,sizeof(float));
+    uint * h_seq_Nss       = (uint *) calloc(m  ,sizeof(uint));
+    int  * h_seq_indss     = (int  *) calloc(m*N,sizeof(int));
+    float* h_seq_yerrs     = (float*) calloc(N*m,sizeof(float));
+    float* h_seq_yerrs_all = (float*) calloc(N*m,sizeof(float));
+
+    for (int i = 0; i < m*N; i++) { h_seq_yerrs[i] = F32_MIN; }
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 1
@@ -196,9 +202,9 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 2
-        // mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
-        // mkXsqrG(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
-        mkXsqrOptim(n, N, m, h_seq_X, h_seq_XT, h_sample, h_seq_Xsqr, K);
+        // mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
+        // mkXsqrG(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
+        mkXsqrOptim(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -239,8 +245,10 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 4
-        // mkB0(m, n, N, h_seq_X, K, h_sample, h_seq_B0);
-        mkB0G(m, n, N, h_seq_X, K, h_sample, h_seq_B0);
+        // mkB0(m, n, N, h_seq_X, K, h_Y, h_seq_B0);
+        // mkB0G(m, n, N, h_seq_X, K, h_Y, h_seq_B0);
+        // ker4MkB0(m, n, N, h_seq_X, K, h_Y, h_seq_B0);
+        mkBOPN(m, n, N, h_seq_X, K, h_Y, h_seq_B0);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -248,8 +256,9 @@ int main(int argc, char const *argv[]) {
         printf("Sequential kernel 4 version runs in: %lu microsecs\n", elapsed);
 
         // validation
-        // printVf(fpV, h_seq_B0, m, K);
+        printVf(fpV, h_seq_B0, m, K);
     }
+
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 5
@@ -260,12 +269,16 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 5
-        mkB(m, h_seq_XInv, K, h_seq_B0, h_seq_B);
+        // mkB(m, h_seq_XInv, K, h_seq_B0, h_seq_B);
+        ker5seq(m, h_seq_XInv, K, h_seq_B0, h_seq_B);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 5 version runs in: %lu microsecs\n", elapsed);
+
+        // validation
+        printVf(fpV, h_seq_B, m, K);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -277,11 +290,16 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 6
+        // ker6seq(m, N, h_seq_XT, h_seq_B, K, h_seq_yhat);
+        ker6seqOP(m, N, h_seq_XT, h_seq_B, K, h_seq_yhat);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 6 version runs in: %lu microsecs\n", elapsed);
+
+        // validation
+        printVf(fpV, h_seq_yhat, m, N);
     }
 
 
@@ -294,12 +312,20 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 7
+        ker7seq(m, N, h_seq_yhat, h_seq_yerrs_all, h_seq_Nss, h_seq_yerrs, h_Y, h_seq_indss);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 7 version runs in: %lu microsecs\n", elapsed);
+
+        // validation
+        printE(fpV,  h_seq_Nss, m);
+        printVfnan(fpV, h_seq_yerrs, m, N);
+        printVi(fpV, h_seq_indss, m, N);
     }
+
+#if 0
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 8
@@ -349,15 +375,20 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 10 version runs in: %lu microsecs\n", elapsed);
     }
-
+#endif
 
     fclose(fpV);
 
     // 7. clean up memory
     free(h_mappingindices);
-    free(h_sample);
+    free(h_Y);
     free(h_seq_X);
     free(h_seq_XT);
+    free(h_seq_Xsqr);
+    free(h_seq_XInv);
+    free(h_seq_B0);
+    free(h_seq_B);
+    free(h_seq_yhat);
 }
 
 
