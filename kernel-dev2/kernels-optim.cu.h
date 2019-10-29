@@ -595,7 +595,54 @@ __global__ void ker7(uint m, uint N, float* yhat, float* y_errors_all, uint* Nss
 //// KERNEL 8
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+#if 0
+void ker8naive(uint m, uint n, uint N, uint K, float hfrac, float* y_errors,
+               float* y, uint* nss, int* hs, float* sigmas) {
+    for (uint pix = 0; pix < m; pix++) {            // parallel blocks
+        for (uint i = 0; i < n; i++) {              // parallel threads
+            nss[pix] += (y[pix*N + i] != F32_MIN);  // reduce (p) [] nss
+        }
 
+        float acc = 0.0;
+        for (uint j = 0; j < n; j++) {              // parallel threads
+            if (j < nss[pix]) {
+                float y_err = y_errors[pix*N + j];
+                acc += y_err * y_err;               // reduce (err^2) [] y_err
+            }
+        }
+
+        hs[pix] = (int)(((float) nss[pix]) * hfrac);
+        sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
+    }
+}
+#endif
+
+__global__ void ker8naive(uint m, uint n, uint N, uint K, float hfrac,
+                          float* y_errors, float* y, uint* nss, int* hs,
+                          float* sigmas) {
+    int pix = blockIdx.x;
+    int i = threadIdx.x;
+
+    // for (uint pix = 0; pix < m; pix++) {            // parallel blocks
+    // for (uint i = 0; i < n; i++) {              // parallel threads
+    nss[pix] += (y[pix*N + i] != F32_MIN);  // reduce (p) [] nss
+    // }
+    __syncthreads();
+
+    float acc = 0.0;
+    // for (uint i = 0; i < n; i++) {              // parallel threads
+    if (i < nss[pix]) {
+        float y_err = y_errors[pix*N + i];
+        acc += y_err * y_err;               // reduce (err^2) [] y_err
+    }
+    // }
+    __syncthreads();
+    if(i == blockDim.x) {
+        hs[pix] = (int)(((float) nss[pix]) * hfrac);
+        sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
+    }
+    // }
+}
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 //// KERNEL 9

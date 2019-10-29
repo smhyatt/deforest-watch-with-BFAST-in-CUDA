@@ -76,24 +76,24 @@ int gpuAssert(cudaError_t code) {
     return 0;
 }
 
-// 
+//
 // Cosmin's Matrix Transpose Wrapper from Weekly 3
-// 
-void transposeTiled ( float*     inp_d,  
-                      float*     out_d, 
-                      const uint height, 
+//
+void transposeTiled ( float*     inp_d,
+                      float*     out_d,
+                      const uint height,
                       const uint width,
                       const uint T
 ) {
    // 1. setup block and grid parameters
-   unsigned int sh_mem_size = T * (T+1) * sizeof(float); 
-   int  dimy = (height+T-1) / T; 
+   unsigned int sh_mem_size = T * (T+1) * sizeof(float);
+   int  dimy = (height+T-1) / T;
    int  dimx = (width +T-1) / T;
    dim3 block(T, T, 1);
    dim3 grid (dimx, dimy, 1);
 
    //2. execute the kernel
-   matTransposeTiledKer<<< grid, block, sh_mem_size >>> (inp_d, out_d, height, width, T); 
+   matTransposeTiledKer<<< grid, block, sh_mem_size >>> (inp_d, out_d, height, width, T);
    cudaThreadSynchronize();
 }
 
@@ -257,7 +257,7 @@ int main(int argc, char const *argv[]) {
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
-      
+
       // GPU call to kernel 1
       ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
       cudaDeviceSynchronize();
@@ -295,7 +295,7 @@ int main(int argc, char const *argv[]) {
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
 
-      // transpose Y for kernel 2 optimization 
+      // transpose Y for kernel 2 optimization
       transposeTiled(d_Y, d_YT, m, N, K);
       // GPU call to kernel 2
       ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
@@ -346,7 +346,7 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_Xinv, d_Xinv, Xsqr_size, cudaMemcpyDeviceToHost);
-      
+
       // validation
       printM(fpV, h_Xinv, m, K);
 
@@ -383,7 +383,7 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_B0, d_B0, B0_size, cudaMemcpyDeviceToHost);
-      
+
       // add to validation
       printVf(fpV, h_B0, m, K);
 
@@ -396,7 +396,7 @@ int main(int argc, char const *argv[]) {
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 5
-   /////////////////////////////////////////////////////////////////////////   
+   /////////////////////////////////////////////////////////////////////////
    {
       dim3 block(K, K, 1);
       dim3 grid ((m+K-1)/K, 1, 1);
@@ -419,8 +419,8 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_B, d_B, B0_size, cudaMemcpyDeviceToHost);
-      
-      // validation 
+
+      // validation
       printVf(fpV, h_B, m, K);
 
       printf("GPU Optimized Kernel 5 runs in: %lu microsecs\n", elapsed);
@@ -511,10 +511,8 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 8
    /////////////////////////////////////////////////////////////////////////
    {
-      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
-      dim3 grid (dimx, dimy, 1);
+      dim3 block(N, 1, 1);
+      dim3 grid (m, 1, 1);
 
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
@@ -522,7 +520,10 @@ int main(int argc, char const *argv[]) {
 
       // GPU call to kernel 8
       // ker8 <<< grid, block >>> ();
-      // cudaDeviceSynchronize();
+      ker8naive<<< grid, block >>>(m, n, N, K, hfrac,
+                                  d_yerrs, d_Y,
+                                  d_nss, d_hs, d_sigmas);
+      cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
@@ -532,7 +533,14 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_nss, d_nss, m*sizeof(uint), cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_hs, d_hs, m*sizeof(int), cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_sigmas, d_sigmas, m*sizeof(float), cudaMemcpyDeviceToHost);
+
+      // validation
+      printE(fpV,  h_nss, m);
+      printEi(fpV, h_hs,  m);
+      printEf(fpV, h_sigmas,  m);
 
       printf("GPU Optimized Kernel 8 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;
@@ -566,8 +574,8 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_MOfsts, d_MOfsts, _size, cudaMemcpyDeviceToHost);
-      
-      // validation 
+
+      // validation
       printEf(fpV, h_MOfsts, m);
 
       printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
@@ -614,7 +622,7 @@ int main(int argc, char const *argv[]) {
    }
 #endif
 
-   
+
    fclose(fpV);
 
    // 7. clean up memory
