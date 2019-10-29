@@ -630,7 +630,7 @@ __global__ void ker8naive(uint m, uint n, uint N, uint K, float hfrac,
 
     // for (uint pix = 0; pix < m; pix++) {            // parallel blocks
     //     for (uint i = 0; i < n; i++) {              // parallel threads
-    nss[pix] += (uint) (y[pix*N + i] != F32_MIN);      // reduce (p) [] nss
+    nss[pix] += (y[pix*N + i] != F32_MIN);      // reduce (p) [] nss
     // }
     __syncthreads();
 
