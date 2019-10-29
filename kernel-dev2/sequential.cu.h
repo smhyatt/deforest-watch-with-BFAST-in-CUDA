@@ -700,8 +700,8 @@ void ker8(uint m, uint n, uint N, float hfrac, float* y_errors, uint K, int* hs,
 }
 
 
-void ker8naive(uint m, uint n, uint N, float hfrac, float* y_errors, uint K,
-             int* hs, uint* nss, float* sigmas, float* y) {
+void ker8naive(uint m, uint n, uint N, uint K, float hfrac, float* y_errors, float* y, uint* nss,
+             int* hs, float* sigmas) {
     for (uint pix = 0; pix < m; pix++) {
 
         for (uint i = 0; i < n; i++) {
