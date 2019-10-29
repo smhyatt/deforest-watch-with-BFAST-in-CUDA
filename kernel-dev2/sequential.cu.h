@@ -137,7 +137,7 @@ void transposeMatrix(float* M, float* MT, uint m, uint N) {
 
 
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
-    
+
     float* YT = (float*) calloc(N*m,sizeof(float));
     transposeMatrix(sample, YT, m, N);
 
@@ -157,7 +157,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
                         for (int i = 0; i < R; i++) {                   // fully unroll
                             acc[i] = 0.0;
                         }
-                        float a, b, ab; //, y; 
+                        float a, b, ab; //, y;
                         for (int q = 0; q < n; q++) {
                             a = X[j1*N + q];       // a = X[j1, q];
                             b = XT[q*K + j2];      // b = XT[q, j2];
@@ -166,7 +166,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
                             // for (int idx = 0; idx < R; idx++) {
                             //     yqsh[idx] = YT[q, ii]; // YT[q,ii:min(ii+R,M)] ?????????????
                             // }
-                            // barrier; // block-level synch         
+                            // barrier; // block-level synch
 
                             for (int i1 = 0; i1 < R; i1++) { // fully unroll
                                 if (ii+i1 < m) {
@@ -195,7 +195,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
 
 
 // void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
-    
+
 //     const int R = 1;
 //     for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
 //         //for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
@@ -209,7 +209,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
 //                         for (int i = 0; i < R; i++) {                   // fully unroll
 //                             acc[i] = 0.0;
 //                         }
-//                         float a, b, ab; //, y; 
+//                         float a, b, ab; //, y;
 //                         for (int q = 0; q < n; q++) {
 //                             a = X[j1*N + q];       // a = X[j1, q];
 //                             b = XT[q*K + j2];      // b = XT[q, j2];
@@ -218,7 +218,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
 //                             // for (int idx = 0; idx < R; idx++) {
 //                             //     yqsh[idx] = YT[q, ii]; // YT[q,ii:min(ii+R,M)] ?????????????
 //                             // }
-//                             // barrier; // block-level synch         
+//                             // barrier; // block-level synch
 
 //                             for (int i1 = 0; i1 < R; i1++) { // fully unroll
 //                                 if (ii+i1 < m) {
@@ -394,6 +394,68 @@ void mkXsqrInv(uint m, float* Xsqr, float* XsqrInv, uint K){
 
 }
 
+// M is the number of pixels
+// K is the width and height of each of the matrix in A
+// A is the input data [M][K][K]
+// Ash is the [K][2*K]
+// AI is the inverse A [K][K]
+void gaussJordanG(uint M, uint K, float* A, float* AI){
+
+    for (uint i = 0; i < M; i++){
+        float* Ash    = (float*) calloc(2*K*K,sizeof(float));
+        float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
+
+        // Pad A with identity matrix to the right
+        for (uint k1 = 0; k1 < K; k1++){
+            for (uint k2 = 0; k2 < 2*K; k2++){
+                if (k2<K) {
+                    Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
+                } else {
+                    Ash[k1*2*K + k2] = (float) (k2 == (K+k1));
+                }
+                // barrier
+            }
+        }
+
+        // Gauss-Jordan Elimination the other version:
+        for (uint q = 0; q < K; q++){               // sequential
+            float vq = Ash[q];
+            for (uint k1 = 0; k1 < K; k1++){        // parallel block.y
+                for (uint k2 = 0; k2 < 2*K; k2++){  // parallel block.x
+                    float tmp = 0.0;
+                    if (vq == 0.0) {
+                        tmp = Ash[k1*2*K + k2];
+                    } else {
+                        float x = Ash[k2] / vq;
+                        if (k1 == (K-1)){
+                            tmp = x;
+                        } else {
+                            tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
+                        }
+                    }
+                    // barrier for block-level sync
+                    AshTmp[k1*2*K + k2] = tmp;
+                    // barrier for block-level sync
+                }
+            }
+            // switch pointer
+            float* tmp2 = AshTmp;
+            AshTmp = Ash;
+            Ash = tmp2;
+        }
+
+        // collective copy shared-to-global mem:
+        for (int k1 = 0; k1 < K; k1++) {
+            for (int k2 = 0; k2 < K; k2++) {
+                uint XinvIdx  = k1*(K*2) + k2+K;
+                uint XlessIdx = i*K*K + k1*K + k2;
+                AI[XlessIdx] = Ash[XinvIdx];
+            }
+        }
+        free(Ash);
+        free(AshTmp);
+    }
+}
 
 
 // let matvecmul_row_filt [n][m] (xss: [n][m]f32) (ys: [m]f32) =
@@ -428,7 +490,7 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             for (uint k = 0; k < n; k++) {
                 float cur_y = sample[pix*N+k];
 
-                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan. 
+                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan.
                     acc += 0.0;
                 } else {
                     acc += X[i*N+k] * cur_y;
@@ -437,7 +499,7 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             B0[pix*K + i] = acc;
         }
     }
-}    
+}
 
 
 
@@ -475,7 +537,7 @@ void mkB(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
             }
             B[pix*K + i] = acc;
         }
-    }        
+    }
 }
 
 
