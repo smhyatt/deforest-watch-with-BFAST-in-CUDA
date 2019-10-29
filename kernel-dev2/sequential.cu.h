@@ -12,6 +12,13 @@
 typedef unsigned int uint;
 
 
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 1
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
+
 void mkX(uint N, int kp, int f, int* mappingindices, float* X){
     for (uint i = 0; i < kp; i++){
         for (uint j = 0; j < N; j++){
@@ -46,9 +53,13 @@ void transpose(uint N, int K, float* X, float* XT) {
     }
 }
 
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 2
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
-// let dotprod_filt [n] (vct: [n]f32) (xs: [n]f32) (ys: [n]f32) : f32 =
-//   f32.sum (map3 (\v x y -> x * y * if (f32.isnan v) then 0.0 else 1.0) vct xs ys)
+
 float dotProdFilt(uint n, float* Xvct, float* XTvct, float* yvct) {
     float acc = 0.0;
     for (uint i = 0; i < n; i++) {
@@ -60,20 +71,6 @@ float dotProdFilt(uint n, float* Xvct, float* XTvct, float* yvct) {
 }
 
 
-
-// let matmul_filt [n][p][m] (xss: [n][p]f32) (yss: [p][m]f32) (vct: [p]f32) : [n][m]f32 =
-//   map (\xs -> map (dotprod_filt vct xs) (transpose yss)) xss
-// [p][m]
-// [3][2]
-// XT = [[1,2],
-//       [3,4],
-//       [5,6]]
-// [n][p]
-// [2][3]
-// X  = [[1,3,5],
-//       [2,4,6]]
-// y  = [8,9,7]
-// xss = Xn, yss = XTn, vct = y
 void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint K){
     float* tspVct = (float*)calloc(n,sizeof(float));
     for (int i = 0; i < K; i++) {
@@ -107,7 +104,6 @@ int isNotNan(float x){
     else return 1;
 }
 
-
 // the squared MM multiplication in one gathered function
 void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K){
     for (uint pix = 0; pix < m; pix++) {    // pix = blockIdx.x
@@ -125,7 +121,6 @@ void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* 
 }
 
 
-
 void transposeMatrix(float* M, float* MT, uint m, uint N) {
     for (int row = 0; row < m; row++) {
         for (int col = 0; col < N; col++) {
@@ -135,21 +130,18 @@ void transposeMatrix(float* M, float* MT, uint m, uint N) {
 }
 
 
-
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
-
+    
     float* YT = (float*) calloc(N*m,sizeof(float));
     transposeMatrix(sample, YT, m, N);
 
-    printf("\n\n\n");
-    int R = 30;
 
-
-    for (int ii = 0; ii < m; ii+=R) {                                 // forall, grid.z
-        for (int jj1 = 0; jj1 < K; jj1+=K) {                          // forall, grid.y
-            for (int jj2 = 0; jj2 < K; jj2+=K){                       // forall, grid.x
-                for (int j1 = jj1; j1 < min(jj1+K, K); j1++) {        // forall, block.y
-                    for (int j2 = jj2; j2 < min(jj2+K, K); j2++) {    // forall, block.x
+    const int R = 30;
+    for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
+        //for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
+        //    for (int jj2 = 0; jj2 < K; jj2+=T2){                       // forall, grid.x
+                for (int j1 = 0; j1 < K; j1++) {        // forall, block.y
+                    for (int j2 = 0; j2 < K; j2++) {    // forall, block.x
 
                         // float yqsh[R];          // size R, shared memory
                         float acc[R]; //  = calloc(R,sizeof(float));          // size R, registers
@@ -157,7 +149,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
                         for (int i = 0; i < R; i++) {                   // fully unroll
                             acc[i] = 0.0;
                         }
-                        float a, b, ab; //, y;
+                        float a, b, ab; //, y; 
                         for (int q = 0; q < n; q++) {
                             a = X[j1*N + q];       // a = X[j1, q];
                             b = XT[q*K + j2];      // b = XT[q, j2];
@@ -166,122 +158,115 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
                             // for (int idx = 0; idx < R; idx++) {
                             //     yqsh[idx] = YT[q, ii]; // YT[q,ii:min(ii+R,M)] ?????????????
                             // }
-                            // barrier; // block-level synch
+                            // barrier; // block-level synch         
 
                             for (int i1 = 0; i1 < R; i1++) { // fully unroll
                                 if (ii+i1 < m) {
-                                    if (YT[q*m + (ii+i1)] != F32_MIN) {
+                                    if (YT[q*m + ii+i1] != F32_MIN) {
                                     // if (sample[(ii+i1)*N + q] != F32_MIN) {
                                         acc[i1] += ab;          // acc[i1] += ab * (1.0-isnan(yqsh[i1]));
                                     }
                                 }
                             }
 
-                            for (int i2 = 0; i2 < R; i2++) { // fully unroll
-                                if ((ii+i2) < m) {
-                                    // Xsqr[pix*K*K + i*K + j] = acc;
-                                    Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
-                                }
+                        }
+                        for (int i2 = 0; i2 < R; i2++) { // fully unroll
+                            if (ii+i2 < m) {
+                                // Xsqr[pix*K*K + i*K + j] = acc;
+                                Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
                             }
                         }
                     }
                 }
             }
-        }
-    }
 
 }
 
 
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 3
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
-// void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
+// M is the number of pixels
+// K is the width and height of each of the matrix in A
+// A is the input data [M][K][K]
+// Ash is the [K][2*K]
+// AI is the inverse A [K][K]
+void gaussJordanG(uint M, uint K, float* A, float* AI){
 
-//     const int R = 1;
-//     for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
-//         //for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
-//         //    for (int jj2 = 0; jj2 < K; jj2+=T2){                       // forall, grid.x
-//                 for (int j1 = 0; j1 < K; j1++) {        // forall, block.y
-//                     for (int j2 = 0; j2 < K; j2++) {    // forall, block.x
+    for (uint i = 0; i < M; i++){
+        float* Ash    = (float*) calloc(2*K*K,sizeof(float));
+        float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
 
-//                         // float yqsh[R];          // size R, shared memory
-//                         float acc[R]; //  = calloc(R,sizeof(float));          // size R, registers
+        // Pad A with identity matrix to the right
+        for (uint k1 = 0; k1 < K; k1++){
+            for (uint k2 = 0; k2 < 2*K; k2++){
+                if (k2<K) {
+                    Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
+                } else {
+                    Ash[k1*2*K + k2] = (float) (k2 == (K+k1));
+                }
+                // barrier
+            }
+        }
 
-//                         for (int i = 0; i < R; i++) {                   // fully unroll
-//                             acc[i] = 0.0;
-//                         }
-//                         float a, b, ab; //, y;
-//                         for (int q = 0; q < n; q++) {
-//                             a = X[j1*N + q];       // a = X[j1, q];
-//                             b = XT[q*K + j2];      // b = XT[q, j2];
-//                             ab = a*b;
-//                             // collective copy global-to-shared
-//                             // for (int idx = 0; idx < R; idx++) {
-//                             //     yqsh[idx] = YT[q, ii]; // YT[q,ii:min(ii+R,M)] ?????????????
-//                             // }
-//                             // barrier; // block-level synch
-
-//                             for (int i1 = 0; i1 < R; i1++) { // fully unroll
-//                                 if (ii+i1 < m) {
-//                                     // if (YT[q*m + ii+i1] != F32_MIN) {
-//                                     if (sample[(ii+i1)*N + q] != F32_MIN) {
-//                                         acc[i1] += ab;          // acc[i1] += ab * (1.0-isnan(yqsh[i1]));
-//                                     }
-//                                 }
-//                             }
-
-//                         }
-//                         for (int i2 = 0; i2 < R; i2++) { // fully unroll
-//                             if (ii+i2 < m) {
-//                                 // Xsqr[pix*K*K + i*K + j] = acc;
-//                                 Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
-//                             }
-//                         }
-//                     }
-//                 }
-//             }
-
-// }
+        // for (uint k1 = 0; k1 < K; k1++){
+        //     for (uint k2 = 0; k2 < 2*K; k2++){
+        //            Ash[k1*K*2 + k2] = (k2<K) ? A[i*K*K + k1*K + k2] : (k2==K+k1) ? 1.0 : 0.0;
+        //     }
+        // }
 
 
-// ----------
-//   let Xinv = intrinsics.opaque <|
-//              map mat_inv Xsqr
+        // Gauss-Jordan Elimination the other version:
+        for (uint q = 0; q < K; q++){               // sequential
+            float vq = Ash[q];
+            for (uint k1 = 0; k1 < K; k1++){        // parallel block.y
+                for (uint k2 = 0; k2 < 2*K; k2++){  // parallel block.x
+                    float tmp = 0.0;
+                    if (vq == 0.0) {
+                        tmp = Ash[k1*2*K + k2];
+                    } else {
+                        float x = Ash[k2] / vq;
+                        if (k1 == (K-1)){
+                            tmp = x;
+                        } else {
+                            tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
+                        }
+                    }
+                    // barrier
+                    AshTmp[k1*2*K + k2] = tmp;
+                    // barrier
+                }
+            }
+            // switch pointer
+            float* tmp2 = AshTmp;
+            AshTmp = Ash;
+            Ash = tmp2;
+        }
+        // // after gauss jordan copies id matrix to AI
+        // for (int k1 = 0; k1 < K; k1++) {
+        //     for (int k2 = 0; k2 < K; k2++) {
+        //         uint XinvIdx  = k1*(K*2) + k2;
+        //         uint XlessIdx = i*K*K + k1*K + k2;
+        //         AI[XlessIdx] = Ash[XinvIdx];
+        //     }
+        // }
 
-//   let gauss_jordan [nm] (n:i32) (m:i32) (A: *[nm]f32): [nm]f32 =
-//     loop A for i < n do
-//       let v1 = A[i]
-//       let A' = map (\ind -> let (k, j) = (ind / m, ind % m)
-//                             in if v1 == 0.0 then unsafe A[k*m+j] else
-//                             let x = unsafe (A[j] / v1) in
-//                                 if k < n-1  -- Ap case
-//                                 then unsafe ( A[(k+1)*m+j] - A[(k+1)*m+i] * x )
-//                                 else x      -- irow case
-//                    ) (iota nm)
-//       in  scatter A (iota nm) A'
+        // collective copy shared-to-global mem:
+        for (int k1 = 0; k1 < K; k1++) {
+            for (int k2 = 0; k2 < K; k2++) {
+                uint XinvIdx  = k1*(K*2) + k2+K;
+                uint XlessIdx = i*K*K + k1*K + k2;
+                AI[XlessIdx] = Ash[XinvIdx];
+            }
+        }
+        free(Ash);
+    }
+}
 
 
-// procedure Naive Gauss(n, (ai j ), (bi ), (xi ))
-// integer i, j, k, n; real sum, xmult
-// real array (ai j )1:n×1:n , (bi )1:n , (xi )1:n
-// for k = 1 to n − 1 do           // row
-//     for i = k + 1 to n do       // row we are working on
-//         xmult ← aik/akk
-//         aik ← xmult
-//         for j = k + 1 to n do   // column
-//             aij ← aij −(xmult)akj
-//         end for
-//         bi ← bi − (xmult)bk
-//     end for
-// end for
-// xn ←bn/ann
-// for i =n−1to1 step−1do
-//     sum ← bi
-//     for j = i + 1 to n do
-//         sum ← sum − ai j x j
-//     end for
-// xi ← sum/aii
-// end for
-// end procedure Naive Gauss
 
 void gaussJordan(float* XsqrInv, uint cols, uint K){
     // Making the upper triangle
@@ -352,20 +337,6 @@ void mkXsqrIdent(float* Xsqr, float* XsqrInv, uint K) {
 }
 
 
-//   let mat_inv [n] (A: [n][n]f32): [n][n]f32 =
-//     let m = 2*n
-//     let nm= n*m
-//     -- Pad the matrix with the identity matrix.
-//     let Ap = map (\ind -> let (i, j) = (ind / m, ind % m)
-//                           in  if j < n then unsafe ( A[i,j] )
-//                                        else if j == n+i
-//                                             then 1.0
-//                                             else 0.0
-//                  ) (iota nm)
-//     let Ap' = gauss_jordan n m Ap
-//     -- Drop the identity matrix at the front!
-//     in (unflatten n m Ap')[0:n,n:2*n]
-
 void mkXsqrInv(uint m, float* Xsqr, float* XsqrInv, uint K){
     uint cols = 2*K;        // 2*8=16
     uint identIdx = K*cols; // 8*16=128
@@ -394,73 +365,14 @@ void mkXsqrInv(uint m, float* Xsqr, float* XsqrInv, uint K){
 
 }
 
-// M is the number of pixels
-// K is the width and height of each of the matrix in A
-// A is the input data [M][K][K]
-// Ash is the [K][2*K]
-// AI is the inverse A [K][K]
-void gaussJordanG(uint M, uint K, float* A, float* AI){
 
-    for (uint i = 0; i < M; i++){
-        float* Ash    = (float*) calloc(2*K*K,sizeof(float));
-        float* AshTmp    = (float*) calloc(2*K*K,sizeof(float));
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 4
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
-        // Pad A with identity matrix to the right
-        for (uint k1 = 0; k1 < K; k1++){
-            for (uint k2 = 0; k2 < 2*K; k2++){
-                if (k2<K) {
-                    Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
-                } else {
-                    Ash[k1*2*K + k2] = (float) (k2 == (K+k1));
-                }
-                // barrier
-            }
-        }
-
-        // Gauss-Jordan Elimination the other version:
-        for (uint q = 0; q < K; q++){               // sequential
-            float vq = Ash[q];
-            for (uint k1 = 0; k1 < K; k1++){        // parallel block.y
-                for (uint k2 = 0; k2 < 2*K; k2++){  // parallel block.x
-                    float tmp = 0.0;
-                    if (vq == 0.0) {
-                        tmp = Ash[k1*2*K + k2];
-                    } else {
-                        float x = Ash[k2] / vq;
-                        if (k1 == (K-1)){
-                            tmp = x;
-                        } else {
-                            tmp = Ash[(k1+1)*2*K + k2] - Ash[(k1+1)*2*K + q] *x;
-                        }
-                    }
-                    // barrier for block-level sync
-                    AshTmp[k1*2*K + k2] = tmp;
-                    // barrier for block-level sync
-                }
-            }
-            // switch pointer
-            float* tmp2 = AshTmp;
-            AshTmp = Ash;
-            Ash = tmp2;
-        }
-
-        // collective copy shared-to-global mem:
-        for (int k1 = 0; k1 < K; k1++) {
-            for (int k2 = 0; k2 < K; k2++) {
-                uint XinvIdx  = k1*(K*2) + k2+K;
-                uint XlessIdx = i*K*K + k1*K + k2;
-                AI[XlessIdx] = Ash[XinvIdx];
-            }
-        }
-        free(Ash);
-        free(AshTmp);
-    }
-}
-
-
-// let matvecmul_row_filt [n][m] (xss: [n][m]f32) (ys: [m]f32) =
-//     map (\xs -> map2 (\x y -> if (f32.isnan y) then 0 else x*y) xs ys |> f32.sum) xss
-
+#if 0
 void mvMulFilt(uint n, uint N, float* X, float* y, uint K, float* B0){
 
     for (int i = 0; i < K; i++) {
@@ -469,18 +381,12 @@ void mvMulFilt(uint n, uint N, float* X, float* y, uint K, float* B0){
         B0[i] = dotProdFilt(n, &X[XIdx], y, y);
     }
 }
-
-
-
-// let beta0  = map (matvecmul_row_filt Xh) Yh   -- [2k+2]
-//                |> intrinsics.opaque
-// let β0 = mvMulFilt X[:,:n] y[:n]
 void mkB0(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
     for (uint pix = 0; pix < m; pix++) {
         mvMulFilt(n, N, X, &sample[pix*N], K, &B0[pix*K]);
     }
 }
-
+#endif
 
 void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
     float acc = 0.0;
@@ -490,7 +396,7 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             for (uint k = 0; k < n; k++) {
                 float cur_y = sample[pix*N+k];
 
-                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan.
+                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan. 
                     acc += 0.0;
                 } else {
                     acc += X[i*N+k] * cur_y;
@@ -499,86 +405,195 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             B0[pix*K + i] = acc;
         }
     }
-}
+}    
 
 
-
-void mvMul(float* M, float* v, uint rows, uint cols, float* res_v) {
-
-    // for ker6 er rows = N og cols = K
-    for (int i = 0; i < rows; i++) {
-        float acc = 0.0;
-
-        for (uint elm = 0; elm < cols; elm++) {
-            uint MIdx = i*cols + elm;
-            acc += M[MIdx] * v[elm];
+void mkBOPN(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
+    float acc = 0.0;
+    for (uint pix_out = 0; pix_out < m; pix_out+=K) {   // blockIdx.x*K
+        for (int pix_in = 0; pix_in < K; pix_in++) {    // pix_in = threadIdx.x
+            uint pix = pix_out + pix_in;
+            for (int i = 0; i < K; i++) {               // i = threadIdx.y
+                acc = 0.0;
+                for (uint kk = 0; kk < n; kk+=K) {
+                    // copy to Xsh and to Ysh
+                    for(uint k=0; k < K; k++) {
+                        if(kk+k < n && pix < m) {
+                            float y = sample[pix*N+(kk+k)];
+                            if (y != F32_MIN) {             // we only accumulate if y is not nan. 
+                                acc += X[i*N+(kk+k)] * y;
+                            }    
+                        }
+                    }
+                }
+                if(pix < m) {
+                    B0[pix*K + i] = acc;
+                }
+            }
         }
-        res_v[i] = acc;
     }
-}
+}    
 
 
-// let β = mvMul Xsqr−1 β0
-void ker5(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
-    for (uint pix = 0; pix < m; pix++) {
-        mvMul(&XsqrInvLess[pix*(K*K)], &B0[pix*K], K, K, &B[pix*K]);
-    }
-}
+// void ker4MkB0(uint m, uint n, uint N, float* X, uint K, float* Y, float* B0) {
+
+//     for (int i = 0; i < m; i+=(K*K)) {                  // K*K, it. through pixels ??????????????
+//         for (int j = 0; j < K; j+=1) {                  // block
+            
+
+//             for (int kk = 0; kk < n; kk+=K) {
+//                 // parallel version does copy to shared memory 
+//                 // Y[i,k] X[j,k]
+
+//                 for (int k = 0; k < K; k++) {           // fully unroll
+
+//                     float y = Y[(i+k)* N + kk];         // Y[i,k]
+//                     if (y != F32_MIN) {                 // we only accumulate if y is not nan. 
+//                         acc[k] += X[i*N+k] * y;         // Xsh[j,k] * Ysh[?,k] - hvor du laver et tjek om dens validitet inden
+//                     }
+//                 }
+//             }
+
+//             for (int i1 = 0; i1 < K; i1++) {
+//                 // B0[pix*K + i] = acc;
+//                 B0[(i+j)*N + i1] = acc[i1]; // index ?????????
+//                 // B0[(i+i1)*K] = acc[i1]; // index ?????????
+//             }
+
+//         }
+//     }
+// }
 
 
 
-void mkB(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 5
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
+
+// void mvMul(float* M, float* v, uint rows, uint cols, float* res_v) {
+
+//     // for ker6 er rows = N og cols = K
+//     for (int i = 0; i < rows; i++) {
+//         float acc = 0.0;
+
+//         for (uint elm = 0; elm < cols; elm++) {
+//             uint MIdx = i*cols + elm;
+//             acc += M[MIdx] * v[elm];
+//         }
+//         res_v[i] = acc;
+//     }
+// }
+
+// void ker5seq(uint m, float* XsqrInvLess, uint K, float* B0, float* B){
+//     for (uint pix = 0; pix < m; pix++) {
+//         mvMul(&XsqrInvLess[pix*(K*K)], &B0[pix*K], K, K, &B[pix*K]);
+//     }
+// }
+
+
+
+void mkB(uint m, float* XsqrInv, uint K, float* B0, float* B){
     for (uint pix = 0; pix < m; pix++) {
         for (int i = 0; i < K; i++) {
             float acc = 0.0;
 
             for (uint j = 0; j < K; j++) {
-                acc += XsqrInvLess[pix*(K*K) + i*K + j] * B0[pix*K + j];
+                acc += XsqrInv[pix*(K*K) + i*K + j] * B0[pix*K + j];
             }
             B[pix*K + i] = acc;
+        }
+    }        
+}
+
+
+void ker5seq(uint m, float* XsqrInv, uint K, float* B0, float* B){
+    for (uint pix_out = 0; pix_out < m; pix_out+=K) {
+        for (uint pix_in = 0; pix_in < K; pix_in++) { 
+            uint pix = pix_in + pix_out;
+
+            for (int i = 0; i < K; i++) {
+                float acc = 0.0;
+
+                for (uint j = 0; j < K; j++) {
+                    if (pix < m) {
+                        acc += XsqrInv[pix*(K*K) + i*K + j] * B0[pix*K + j];
+                    }
+                }
+                if(pix < m) {
+                    B[pix*K + i] = acc;
+                }
+            }
+        }
+    }        
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 6
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
+#if 0
+void ker6(uint m, uint N, float* XT, float* B, uint K, float* yhat) {
+    for (uint pix = 0; pix < m; pix++) {
+        mvMul(XT, &B[pix*K], N, K, &yhat[pix*N]);
+    }
+}    
+#endif
+
+
+void ker6seq(uint m, uint N, float* XT, float* B, uint K, float* yhat) {
+    for (int pix = 0; pix < m; pix++) {
+
+        for (int i = 0; i < N; i++) {
+            float acc = 0.0;
+
+            for (int k = 0; k < K; k++) {
+                acc += XT[i*K + k] * B[pix*K + k];
+            }
+            yhat[pix*N + i] = acc;
+        }
+    }
+}
+
+
+void ker6seqOP(uint m, uint N, float* XT, float* B, uint K, float* yhat) {
+
+    for (uint pix_out = 0; pix_out < m; pix_out+=K) {
+
+        for (int ii = 0; ii < N; ii+=K) {
+        
+            for (uint pix_in = 0; pix_in < K; pix_in++) { 
+                uint pix = pix_out + pix_in;
+
+                for (int i = 0; i < K; i++) {
+                    float acc = 0.0;
+                    for (int k = 0; k < K; k++) {
+                        
+                        if(pix < m && i+ii < N) {
+                            acc += XT[(i+ii)*K + k] * B[pix*K + k];
+                        }
+                    }
+                    if(pix < m && ii+i < N) {
+                        yhat[pix*N + (ii+i)] = acc;
+                    }
+                }
+            }
         }
     }
 }
 
 
 
-// -- yˆ,r,I : [N]f32
-// let yˆ = mvMul XT β
-void ker6(uint m, uint N, float* XT, float* B, uint K, float* yhat) {
-    for (uint pix = 0; pix < m; pix++) {
-        mvMul(XT, &B[pix*K], N, K, &yhat[pix*N]);
-    }
-
-}
-
-
-
-// -- filterPadWithKeys (\y -> !(f32.isnan y)) (f32.nan) y_error_all
-// -- Input:   p:(p->value:true or nan:false) dummy:nan arr:[nan,float,nan,float]
-// -- Returns: ([(float,int),(float,int)],int)
-// let filterPadWithKeys [n] 't
-//            (p : (t -> bool))
-//            (dummy : t)
-//            (arr : [n]t) : ([n](t,i32), i32) =
-//   -- [0,1,0,1] <- [nan,float,nan,float]
-//   let tfs = map (\a -> if p a then 1 else 0) arr
-//   -- number of valid
-//   let isT = scan (+) 0 tfs
-//   let i   = last isT
-//   -- isT:  [0,1,1,2]
-//   -- inds: [-1,0,-1,1]
-//   let inds= map2 (\a iT -> if p a then iT-1 else -1) arr isT
-//   --X [nan,nan,nan,nan]
-//   --I inds: [-1,0,-1,1]
-//   --D [nan,float,nan,float]
-//   --R [float,float,nan,nan]
-//   let rs  = scatter (replicate n dummy) inds arr
-//   --X [0,0,0,0]
-//   --I inds: [-1,0,-1,1]
-//   --D [0,1,2,3]
-//   --R [1,3,0,0]
-//   let ks  = scatter (replicate n 0) inds (iota n)
-//   in  (zip rs ks, i)
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 7
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
 
 void filterNaNsWKeys(uint N, float* diffVct, uint* valid, float* y_errors, int* val_indss) {
@@ -599,22 +614,8 @@ void filterNaNsWKeys(uint N, float* diffVct, uint* valid, float* y_errors, int* 
 
 }
 
-  // let (Nss, y_y_errors, val_indss) = ( intrinsics.opaque <| unzip3 <|
-  //   -- y p
-  //   map2 (\y y_pred ->
-  //           let y_error_all = zip y y_pred |>
-  //               map (\(ye,yep) -> if !(f32.isnan ye)
-  //                                 then ye-yep else f32.nan )
-  //           -- [nan,dif,nan,dif]
-  //           let (tups, Ns) = filterPadWithKeys (\y -> !(f32.isnan y)) (f32.nan) y_error_all
-  //           -- (tups:([false,],[nan,dif,nan,dif]), Ns:float#ofvalid)
-  //           let (y_error, val_inds) = unzip tups
-  //           in  (Ns, y_error, val_inds)
-  //        ) images y_preds )
 
-
-// let (N,r,I)= map2 (-) y yˆ |> filterNaNsWKeys
-void ker7(uint m, uint N, float* yhat, float* y_errors_all, uint* Nss, float* y_errors, float* sample, int* val_indss) {
+void ker7seq(uint m, uint N, float* yhat, float* y_errors_all, uint* Nss, float* y_errors, float* sample, int* val_indss) {
     for (uint pix = 0; pix < m; pix++) {
         for (uint i = 0; i < N; i++) {
             float y  = sample[pix*N+i];
@@ -633,6 +634,45 @@ void ker7(uint m, uint N, float* yhat, float* y_errors_all, uint* Nss, float* y_
 }
 
 
+// void ker7G(uint m, uint N, float* yhat, float* y_errors_all, uint* Nss, float* y_errors, float* sample, int* val_indss) {
+//     for (uint pix = 0; pix < m; pix++) {
+//         for (uint i = 0; i < N; i++) {
+//             float y  = sample[pix*N+i];
+//             float yh = yhat[pix*N + i];
+
+//             if (y != F32_MIN) {
+//                 y_errors_all[pix*N + i] = y-yh;
+//             } else {
+//                 y_errors_all[pix*N + i] = F32_MIN;
+//             }
+//         }
+
+//         filterNaNsWKeys(N, &y_errors_all[pix*N], &Nss[pix], &y_errors[pix*N], &val_indss[pix*N]);
+//         void filterNaNsWKeys(uint N, float* diffVct, uint* valid, float* y_errors, int* val_indss)
+
+//         uint idx = 0;
+//         *valid   = 0;
+
+//         for (int i = 0; i < N; i++) {
+//             uint check = (diffVct[i] != F32_MIN);
+//             *valid    += check;
+//             int ind    = (check * (*valid) - 1);
+
+//             if (ind != -1) {
+//                 y_errors[idx]  = diffVct[i];
+//                 val_indss[idx] = i;
+//                 idx++;
+//             }
+//         }
+//     }
+// }
+
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 8
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
 void comp(uint n, float hfrac, float* yh, float* y_errors, uint K, int* hs, uint* nss, float* sigmas) {
     float acc = 0.0;
@@ -659,30 +699,13 @@ void ker8(uint m, uint n, uint N, float hfrac, float* y_errors, uint K, int* hs,
     }
 }
 
-void ker8new(uint m, uint n, uint N, float hfrac, float* y_errors, uint K, int* hs, uint* nss, float* sigmas, float* sample) {
-    for (uint pix = 0; pix < m; pix++) {
-        // comp(n, hfrac, &sample[pix*N], &y_errors[pix*N], K, &hs[pix], &nss[pix], &sigmas[pix]);
-        float* yh = &sample[pix*N];
-        uint* local_nss = &nss[pix];
 
-        // &hs[pix],
-        // &sigmas[pix]);
-        float acc = 0.0;
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 9
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
-        for (uint i = 0; i < n; i++) {
-            *local_nss += (yh[i] != F32_MIN);
-        }
-
-        // for (uint j = 0; j < n; j++) {
-        //     if (j < *nss) {
-        //         float y_err = y_errors[j];
-        //         acc += y_err*y_err;
-        //     }
-        // }
-        // *sigmas = sqrt(acc/((float)(*nss-K)));
-        // *hs = (int)(((float)*nss) * hfrac);
-    }
-}
 void MO_fsts_comp(int hmax, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
 
     for (int i = 0; i < hmax; i++) {
@@ -708,6 +731,15 @@ void ker9(uint m, uint N, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
         MO_fsts_comp(hmax, &hs[pix], &y_errors[pix*N], &nss[pix], &MO_fsts[pix]);
     }
 }
+
+
+
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+//// KERNEL 10
+/////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
 
 float logplus(float x){
     if(x>exp(1.0)){
@@ -827,8 +859,8 @@ void MOppComp(uint Nmn, float* MOp, int* val_indsP, float* MOpp) {
 
 
 void ker10(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
-		   uint* nss, float* sigmas, int* hs, int* mappingindices,
-		   float* MO_fsts, float* y_errors, int* val_indss, float* MOp,
+           uint* nss, float* sigmas, int* hs, int* mappingindices,
+           float* MO_fsts, float* y_errors, int* val_indss, float* MOp,
            float* means, int* fstBreakP, float* MOpp){
 
     uint Nmn = N-n;
