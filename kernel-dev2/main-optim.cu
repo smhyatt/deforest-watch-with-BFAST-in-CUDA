@@ -228,7 +228,7 @@ int main(int argc, char const *argv[]) {
 
    // allocate device memory for X, XT and Xsqr
    float *d_X, *d_XT, *d_Xsqr, *d_Xinv, *d_YT, *d_B0, *d_B, *d_yhat;
-   float *d_yerall, *d_yerr, *d_MOfsts;
+   float *d_yerall, *d_yerrs, *d_MOfsts;
    uint  *d_Nss;
    int   *d_indss, *d_hs;
    cudaMalloc((void**) &d_X, X_size);
