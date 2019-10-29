@@ -659,7 +659,30 @@ void ker8(uint m, uint n, uint N, float hfrac, float* y_errors, uint K, int* hs,
     }
 }
 
+void ker8new(uint m, uint n, uint N, float hfrac, float* y_errors, uint K, int* hs, uint* nss, float* sigmas, float* sample) {
+    for (uint pix = 0; pix < m; pix++) {
+        // comp(n, hfrac, &sample[pix*N], &y_errors[pix*N], K, &hs[pix], &nss[pix], &sigmas[pix]);
+        float* yh = &sample[pix*N];
+        uint* local_nss = &nss[pix];
 
+        // &hs[pix],
+        // &sigmas[pix]);
+        float acc = 0.0;
+
+        for (uint i = 0; i < n; i++) {
+            *local_nss += (yh[i] != F32_MIN);
+        }
+
+        // for (uint j = 0; j < n; j++) {
+        //     if (j < *nss) {
+        //         float y_err = y_errors[j];
+        //         acc += y_err*y_err;
+        //     }
+        // }
+        // *sigmas = sqrt(acc/((float)(*nss-K)));
+        // *hs = (int)(((float)*nss) * hfrac);
+    }
+}
 void MO_fsts_comp(int hmax, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
 
     for (int i = 0; i < hmax; i++) {
