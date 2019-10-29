@@ -338,7 +338,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         ker8naive(m, n, N, hfrac, h_seq_yerrs, K,
-                  h_seq_hs, h_seq_nss, h_seq_sigmas, h_Y)
+                  h_seq_hs, h_seq_nss, h_seq_sigmas, h_Y);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
