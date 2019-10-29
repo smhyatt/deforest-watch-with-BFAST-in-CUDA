@@ -233,8 +233,8 @@ int main(int argc, char const *argv[]) {
 
    // allocate device memory for X, XT and Xsqr
    float *d_X, *d_XT, *d_Xsqr, *d_Xinv, *d_YT, *d_B0, *d_B, *d_yhat;
-   float *d_yerall, *d_yerrs, *d_MOfsts;
-   uint  *d_Nss, d_nss;
+   float *d_yerall, *d_yerrs, *d_MOfsts, *d_sigmas;
+   uint  *d_Nss, *d_nss;
    int   *d_indss, *d_hs;
    cudaMalloc((void**) &d_X, X_size);
    cudaMalloc((void**) &d_XT, X_size);
@@ -527,8 +527,8 @@ int main(int argc, char const *argv[]) {
        // GPU call to kernel 8
        // ker8 <<< grid, block >>> ();
        ker8naive<<< grid, block >>>(m, n, N, K, hfrac,
-        d_yerrs, d_Y,
-        d_nss, d_hs, d_sigmas);
+                                   d_yerrs, d_Y,
+                                   d_nss, d_hs, d_sigmas);
         cudaDeviceSynchronize();
 
         gettimeofday(&t_end, NULL);
