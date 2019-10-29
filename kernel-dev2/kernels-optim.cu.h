@@ -658,7 +658,7 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     volatile uint* sh_mem_nss = (volatile uint*)shmem;
 
     // typename OP::RedElTp red = OP::mapFun(elm);
-    sh_mem_nss[i] = (uint) (Y[pix*N + i] != F32_MIN)
+    sh_mem_nss[i] = (uint) (Y[pix*N + i] != F32_MIN);
 
     uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
     __syncthreads();
