@@ -208,7 +208,7 @@ int main(int argc, char const *argv[]) {
    uint Nss_size   = N*m*sizeof(uint);
    uint nss_size   = m*sizeof(uint);
    uint hs_size    = m*sizeof(int);
-   uint sigma_size = m*sizeof(float);
+   uint sigmas_size= m*sizeof(float);
    uint I_size     = N*m*sizeof(int);
    uint Xsqr_size  = K*K*m*sizeof(float);
    uint B0_size    = K*m*sizeof(float);
@@ -226,10 +226,9 @@ int main(int argc, char const *argv[]) {
    float* h_yerrs  = (float*) calloc(m*N,sizeof(float));
    uint * h_Nss    = (uint *) calloc(m*N,sizeof(uint));
    uint * h_nss    = (uint *) calloc(m,sizeof(uint));
-   int  * h_hs     = (uint *) calloc(m,sizeof(int));
-   float* h_sigmas = (uint *) calloc(m,sizeof(float));
-   int  * h_indss  = (int  *) calloc(m*N,sizeof(int));
    int  * h_hs     = (int  *) calloc(m,sizeof(int));
+   float* h_sigmas = (float*) calloc(m,sizeof(float));
+   int  * h_indss  = (int  *) calloc(m*N,sizeof(int));
    float* h_MOfsts = (float*) calloc(m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
@@ -250,7 +249,7 @@ int main(int argc, char const *argv[]) {
    cudaMalloc((void**) &d_Nss, Nss_size);
    cudaMalloc((void**) &d_nss, nss_size);
    cudaMalloc((void**) &d_hs, hs_size);
-   cudaMalloc((void**) &d_sigma, sigma_size);
+   cudaMalloc((void**) &d_sigmas, sigmas_size);
    cudaMalloc((void**) &d_indss, I_size);
    cudaMalloc((void**) &d_MOfsts, MO_size);
 
