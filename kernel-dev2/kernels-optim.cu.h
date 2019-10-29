@@ -625,23 +625,23 @@ __global__ void ker8naive(uint m, uint n, uint N, uint K, float hfrac,
 
     // for (uint pix = 0; pix < m; pix++) {            // parallel blocks
     // for (uint i = 0; i < n; i++) {              // parallel threads
-    nss[pix] += (y[pix*N + i] != F32_MIN);  // reduce (p) [] nss
+    nss[pix] += (uint) (y[pix*N + i] != F32_MIN);  // reduce (p) [] nss
     // }
     __syncthreads();
 
-    float acc = 0.0;
-    // for (uint i = 0; i < n; i++) {              // parallel threads
-    if (i < nss[pix]) {
-        float y_err = y_errors[pix*N + i];
-        acc += y_err * y_err;               // reduce (err^2) [] y_err
-    }
+    // float acc = 0.0;
+    // // for (uint i = 0; i < n; i++) {              // parallel threads
+    // if (i < nss[pix]) {
+    //     float y_err = y_errors[pix*N + i];
+    //     acc += y_err * y_err;               // reduce (err^2) [] y_err
     // }
-    __syncthreads();
-    if(i == blockDim.x) {
-        hs[pix] = (int)(((float) nss[pix]) * hfrac);
-        sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
-    }
+    // // }
+    // __syncthreads();
+    // if(i == blockDim.x) {
+    //     hs[pix] = (int)(((float) nss[pix]) * hfrac);
+    //     sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
     // }
+    // // }
 }
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
