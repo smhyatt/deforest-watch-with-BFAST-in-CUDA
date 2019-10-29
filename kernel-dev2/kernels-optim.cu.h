@@ -654,7 +654,7 @@ __global__ void ker8optimal(uint m, uint n, uint N, uint K, float hfrac,
     int i = threadIdx.x;
 
     extern __shared__ volatile uint shmem[];
-    volatile uint* sh_mem_nss = (volatile int*)shmem;
+    volatile uint* sh_mem_nss = (volatile uint*)shmem;
 
     uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
     __syncthreads();
