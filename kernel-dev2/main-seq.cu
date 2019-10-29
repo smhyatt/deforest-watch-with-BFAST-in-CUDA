@@ -349,6 +349,7 @@ int main(int argc, char const *argv[]) {
         // validation
         printE(fpV,  h_seq_nss, m);
         printEi(fpV, h_seq_hs,  m);
+        printEf(fpV, h_seq_sigmas,  m);
     }
 
 #if 0
