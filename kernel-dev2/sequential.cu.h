@@ -700,19 +700,18 @@ void ker8(uint m, uint n, uint N, float hfrac, float* y_errors, uint K, int* hs,
 }
 
 
-void ker8naive(uint m, uint n, uint N, uint K, float hfrac, float* y_errors, float* y, uint* nss,
-             int* hs, float* sigmas) {
-    for (uint pix = 0; pix < m; pix++) {
-
-        for (uint i = 0; i < n; i++) {
-            nss[pix] += (y[pix*N + i] != F32_MIN);
+void ker8naive(uint m, uint n, uint N, uint K, float hfrac, float* y_errors,
+               float* y, uint* nss, int* hs, float* sigmas) {
+    for (uint pix = 0; pix < m; pix++) {            // parallel blocks
+        for (uint i = 0; i < n; i++) {              // parallel threads
+            nss[pix] += (y[pix*N + i] != F32_MIN);  // reduce (p) [] nss
         }
 
         float acc = 0.0;
-        for (uint j = 0; j < n; j++) {
+        for (uint j = 0; j < n; j++) {              // parallel threads
             if (j < nss[pix]) {
                 float y_err = y_errors[pix*N + j];
-                acc += y_err * y_err;
+                acc += y_err * y_err;               // reduce (err^2) [] y_err
             }
         }
 
