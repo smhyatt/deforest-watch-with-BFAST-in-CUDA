@@ -618,7 +618,7 @@ void ker8naive(uint m, uint n, uint N, uint K, float hfrac, float* y_errors,
 #endif
 
 __global__ void ker8naive(uint m, uint n, uint N, uint K, float hfrac,
-                          float* y_errors, float* y, uint* nss, int* hs,
+                          float* y_errors, float* Y, uint* nss, int* hs,
                           float* sigmas) {
     int pix = blockIdx.x;
     int i = threadIdx.x;
@@ -630,7 +630,7 @@ __global__ void ker8naive(uint m, uint n, uint N, uint K, float hfrac,
 
     // for (uint pix = 0; pix < m; pix++) {            // parallel blocks
     //     for (uint i = 0; i < n; i++) {              // parallel threads
-    nss[pix] += (y[pix*N + i] != F32_MIN);      // reduce (p) [] nss
+    nss[pix] += 1;// (Y[pix*N + i] != F32_MIN);      // reduce (p) [] nss
     // }
     __syncthreads();
 
