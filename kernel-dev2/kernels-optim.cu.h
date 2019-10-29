@@ -660,7 +660,8 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     // typename OP::RedElTp red = OP::mapFun(elm);
     sh_mem_nss[i] = (uint) (Y[pix*N + i] != F32_MIN);
 
-    uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
+    // uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
+    uint nss_thr = scanIncBlock<Add<uint> >(sh_mem_nss, threadIdx.x);
     __syncthreads();
     if (i == n) {
         nss[pix] = nss_thr;
