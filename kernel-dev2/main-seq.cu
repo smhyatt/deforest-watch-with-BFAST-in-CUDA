@@ -167,8 +167,8 @@ int main(int argc, char const *argv[]) {
     float* h_seq_yhat      = (float*) calloc(N*m,sizeof(float));
     uint * h_seq_Nss       = (uint *) calloc(m  ,sizeof(uint));
     uint * h_seq_nss       = (uint *) calloc(m  ,sizeof(uint));
-    uint * h_seq_hs        = (int  *) calloc(m  ,sizeof(int));
-    uint * h_seq_sigmas    = (float*) calloc(m  ,sizeof(float));
+    int  * h_seq_hs        = (int  *) calloc(m  ,sizeof(int));
+    float* h_seq_sigmas    = (float*) calloc(m  ,sizeof(float));
     int  * h_seq_indss     = (int  *) calloc(m*N,sizeof(int));
     float* h_seq_yerrs     = (float*) calloc(N*m,sizeof(float));
     float* h_seq_yerrs_all = (float*) calloc(N*m,sizeof(float));
