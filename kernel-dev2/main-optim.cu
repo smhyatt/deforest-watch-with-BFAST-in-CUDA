@@ -191,6 +191,9 @@ int main(int argc, char const *argv[]) {
    float* h_Xsqr   = (float*) calloc(K*K*m,sizeof(float));
    float* h_Xinv   = (float*) calloc(K*K*m,sizeof(float));
    float* h_B0     = (float*) calloc(K*m,sizeof(float));
+   uint*  h_nss    = (uint*)  calloc(m,sizeof(uint));
+   int*   h_hs     = (int*)   calloc(m,sizeof(int));
+   float* h_sigmas = (float*) calloc(m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
    float *d_X, *d_XT, *d_Xsqr, *d_Xinv, *d_B0;
@@ -200,6 +203,12 @@ int main(int argc, char const *argv[]) {
    cudaMalloc((void**) &d_Xinv, Xinv_size);
    cudaMalloc((void**) &d_B0, B0_size);
 
+   uint* d_nss;
+   int* d_hs;
+   float* d_sigmas;
+   cudaMalloc((void**) &d_nss, m*sizeof(uint));
+   cudaMalloc((void**) &d_hs,  m*sizeof(int));
+   cudaMalloc((void**) &d_hs,  m*sizeof(float));
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 1
@@ -454,18 +463,19 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 8
    /////////////////////////////////////////////////////////////////////////
    {
-      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
-      dim3 grid (dimx, dimy, 1);
+      dim3 block(N, 1, 1);
+      dim3 grid (m, 1, 1);
 
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 8
-      // ker8 <<< grid, block >>> ();
-      // cudaDeviceSynchronize();
+      ker8<<< grid, block >>>(m, n, N, hfrac,
+        // d_errors, K, d_hs, d_nss,
+        K, d_hs, d_nss,
+        d_sigmas, d_sample);
+      cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
@@ -475,7 +485,7 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_nss, d_nss, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Optimized Kernel 8 runs in: %lu microsecs\n", elapsed);
       float microsecPerMatrixMul = elapsed;

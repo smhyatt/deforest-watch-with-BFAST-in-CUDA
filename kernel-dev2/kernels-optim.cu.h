@@ -255,6 +255,37 @@ void gaussJordanG(uint M, uint K, float* A, float* AI){
 
 
 
+#if 1
+// void comp(uint n, float hfrac, float* yh, float* y_errors, uint K, int* hs, uint* nss, float* sigmas) {
+void comp(uint n, float hfrac, float* yh,  uint K, int* hs, uint* nss, float* sigmas) {
+    float acc = 0.0;
+
+    for (uint i = 0; i < n; i++) {
+        *nss += (yh[i] != F32_MIN);
+    }
+
+    // for (uint j = 0; j < n; j++) {
+    //     if (j < *nss) {
+    //         float y_err = y_errors[j];
+    //         acc += y_err*y_err;
+    //     }
+    // }
+    // *sigmas = sqrt(acc/((float)(*nss-K)));
+    // *hs = (int)(((float)*nss) * hfrac);
+}
+
+
+
+// void ker8(uint m, uint n, uint N, float hfrac, float* y_errors, uint K, int* hs, uint* nss, float* sigmas, float* sample) {
+__global__ void ker8(uint m, uint n, uint N, float hfrac, uint K, int* hs, uint* nss, float* sigmas, float* sample) {
+    for (uint pix = 0; pix < m; pix++) {
+        // comp(n, hfrac, &sample[pix*N], &y_errors[pix*N], K, &hs[pix], &nss[pix], &sigmas[pix]);
+        comp(n, hfrac, &sample[pix*N], K, &hs[pix], &nss[pix], &sigmas[pix]);
+    }
+}
+#endif
+
+
 #endif
 
 
