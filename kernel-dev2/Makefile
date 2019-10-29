@@ -83,7 +83,7 @@ naiveV: compileNaive futV clear naivebfast
 optimV: compileOptim futV clear optimbfast
 	$(info )
 	$(info The validation for the optimized implementation.)
-	cat ../data/val.data
+	# cat ../data/val.data
 	.././validation-benchmark < ../data/val.data
 
 fullV: compile futV optimV seqV naiveV
