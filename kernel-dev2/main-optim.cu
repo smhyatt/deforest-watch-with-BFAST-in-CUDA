@@ -8,7 +8,7 @@
 
 #include "helper.cu.h"
 #include "kernels-optim.cu.h"
-#include "sequential.cu.h"
+// #include "sequential.cu.h"
 
 #define BLOCK_SIZE 1024//1024 //1024//2048
 #define WIDTH_A  1024//1024 //1024//2048
