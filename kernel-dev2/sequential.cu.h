@@ -703,26 +703,21 @@ void ker8(uint m, uint n, uint N, float hfrac, float* y_errors, uint K, int* hs,
 void ker8naive(uint m, uint n, uint N, float hfrac, float* y_errors, uint K,
              int* hs, uint* nss, float* sigmas, float* y) {
     for (uint pix = 0; pix < m; pix++) {
-        // comp(n, hfrac, &sample[pix*N], &y_errors[pix*N], K, &hs[pix], &nss[pix], &sigmas[pix]);
-        // float* yh = &y[pix*N];
-        // uint* local_nss = &nss[pix];
-
-        // &hs[pix],
-        // &sigmas[pix]);
 
         for (uint i = 0; i < n; i++) {
             nss[pix] += (y[pix*N + i] != F32_MIN);
         }
 
-        // float acc = 0.0;
-        // for (uint j = 0; j < n; j++) {
-        //     if (j < *nss) {
-        //         float y_err = y_errors[j];
-        //         acc += y_err*y_err;
-        //     }
-        // }
-        // *sigmas = sqrt(acc/((float)(*nss-K)));
-        // *hs = (int)(((float)*nss) * hfrac);
+        float acc = 0.0;
+        for (uint j = 0; j < n; j++) {
+            if (j < nss[pix]) {
+                float y_err = y_errors[pix*N + j];
+                acc += y_err * y_err;
+            }
+        }
+
+        hs[pix] = (int)(((float) * nss[pix]) * hfrac);
+        // sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
     }
 }
 
