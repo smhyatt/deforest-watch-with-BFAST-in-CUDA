@@ -111,8 +111,9 @@ let valyerr  = validate2Dfloat y_errors y_errorsseq
 let valNss   = validate1Dint Nss Nssseq
 let valindss = validate2Dint val_indss val_indssseq
 let valnss   = validate1Dint nss nssseq
+let valhs    = validate1Dint hs hsseq
 
-in valnss
+in valhs
 
 
 
