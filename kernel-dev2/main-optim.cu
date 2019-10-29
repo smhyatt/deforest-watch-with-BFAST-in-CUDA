@@ -526,7 +526,7 @@ int main(int argc, char const *argv[]) {
 
        // GPU call to kernel 8
        // ker8 <<< grid, block >>> ();
-       ker8naive<<< grid, block >>>(m, n, N, K, hfrac,
+       ker8naive<<< grid, block, N*sizeof(uint) >>>(m, n, N, K, hfrac,
                                    d_yerrs, d_Y,
                                    d_nss, d_hs, d_sigmas);
         cudaDeviceSynchronize();
