@@ -113,7 +113,7 @@ let valNss   = validate1Dint Nss Nssseq
 let valindss = validate2Dint val_indss val_indssseq
 let valnss   = validate1Dint nss nssseq
 let valhs    = validate1Dint hs hsseq
-let valsigmas    = validate1Dint sigmas sigmasseq
+let valsigmas= validate1Dfloat sigmas sigmasseq
 
 in valsigmas
 
