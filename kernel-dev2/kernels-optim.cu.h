@@ -647,7 +647,7 @@ class CountValid {
 };
 
 
-__global__ void ker8optimal(uint m, uint n, uint N, uint K, float hfrac,
+__global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
                           float* y_errors, float* Y, uint* nss, int* hs,
                           float* sigmas) {
     int pix = blockIdx.x;
