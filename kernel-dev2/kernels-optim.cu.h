@@ -629,7 +629,8 @@ class CountValid {
     typedef T RedElTp;
     static const bool commutative = true;
     static __device__ __host__ inline T identInp()
-        { return (T) F32_MIN;}
+        { return (T) 0;}
+        // { return (T) F32_MIN;}
 
     static __device__ __host__ inline T mapFun(const T& el)
         { return (T) (el != F32_MIN);}
