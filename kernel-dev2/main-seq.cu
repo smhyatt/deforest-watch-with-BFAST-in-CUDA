@@ -166,6 +166,9 @@ int main(int argc, char const *argv[]) {
     float* h_seq_B         = (float*) calloc(K*m,sizeof(float));
     float* h_seq_yhat      = (float*) calloc(N*m,sizeof(float));
     uint * h_seq_Nss       = (uint *) calloc(m  ,sizeof(uint));
+    uint * h_seq_nss       = (uint *) calloc(m  ,sizeof(uint));
+    uint * h_seq_hs        = (int  *) calloc(m  ,sizeof(int));
+    uint * h_seq_sigmas    = (float*) calloc(m  ,sizeof(float));
     int  * h_seq_indss     = (int  *) calloc(m*N,sizeof(int));
     float* h_seq_yerrs     = (float*) calloc(N*m,sizeof(float));
     float* h_seq_yerrs_all = (float*) calloc(N*m,sizeof(float));
@@ -325,7 +328,6 @@ int main(int argc, char const *argv[]) {
         printVi(fpV, h_seq_indss, m, N);
     }
 
-#if 0
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 8
@@ -335,7 +337,8 @@ int main(int argc, char const *argv[]) {
         struct timeval t_start, t_end, t_diff;
         gettimeofday(&t_start, NULL);
 
-        // calling sequential kernel 8
+        ker8naive(m, n, N, hfrac, h_seq_yerrs, K,
+                  h_seq_hs, h_seq_nss, h_seq_sigmas, h_Y)
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -343,6 +346,7 @@ int main(int argc, char const *argv[]) {
         printf("Sequential kernel 8 version runs in: %lu microsecs\n", elapsed);
     }
 
+#if 0
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 9
