@@ -668,13 +668,13 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
         nss[pix] = nss_thr;
     }
 
-    // float acc = 0.0;
-    // if (j < nss[pix]) {
-    //     float y_err = y_errors[pix*N + j];
-    //     acc += y_err * y_err;               // reduce (err^2) [] y_err
-    // }
+    float acc = 0.0;
+    if (j < nss[pix]) {
+        float y_err = y_errors[pix*N + j];
+        acc += y_err * y_err;               // reduce (err^2) [] y_err
+    }
 
-    // hs[pix] = (int)(((float) nss[pix]) * hfrac);
+    hs[pix] = (int)(((float) nss[pix]) * hfrac);
     // sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
 }
 
