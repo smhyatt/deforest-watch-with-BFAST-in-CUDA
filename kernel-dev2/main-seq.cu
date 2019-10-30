@@ -352,7 +352,6 @@ int main(int argc, char const *argv[]) {
         printEf(fpV, h_seq_sigmas,  m);
     }
 
-#if 0
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 9
@@ -363,6 +362,10 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 9
+        float* MO_fsts = calloc(m,sizeof(float));
+        // ker9(hs, y_errors, nss, MO_fsts);
+        ker9seq(m, N, hs, y_errors, nss, MO_fsts)
+        printEf(MO_fsts, m);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -379,13 +382,20 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 10
+        ker10(bound, Nss, nss, sigmas, hs, MO_fsts, y_errors, val_indss, MOp, means,
+            fstBreakP, MOpp);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 10 version runs in: %lu microsecs\n", elapsed);
-    }
-#endif
+
+        // validation
+        // printVf(MOpp, m, N-n);
+        // printVf(MOp, m, N-n);
+        printEi(fstBreakP, m);
+        printEf(means, m);
+        }
 
     fclose(fpV);
 
