@@ -944,13 +944,13 @@ void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
         float acc = 0.0;
         for (uint i = 0; i < Nmn; i++){
             if(i >= Nss[pix]-nss[pix]){
-                MO[pix*Nmn * i] = acc;
+                MO[pix*Nmn + i] = acc;
             } else if(i==0) {
                 acc += MO_fsts[pix];
-                MO[pix*Nmn * i] = acc;
+                MO[pix*Nmn + i] = acc;
             } else {
                 acc += -y_errors[pix*N + nss[pix] - hs[pix] + i] + y_errors[nss[pix] + i];
-                MO[pix*Nmn * i] = acc;
+                MO[pix*Nmn + i] = acc;
             }
         }
 
