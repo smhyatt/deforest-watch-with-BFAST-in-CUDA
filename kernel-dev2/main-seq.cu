@@ -387,9 +387,18 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 10
-        ker10(h_seq_bound, h_seq_Nss, h_seq_nss, h_seq_sigmas, h_seq_hs,
-              h_seq_MO_fsts, h_seq_y_errors, h_seq_val_indss, h_seq_MOp, h_seq_means,
-              h_seq_fstBreakP, h_seq_MOpp);
+        ker10(h_seq_bound,
+              h_seq_Nss,
+              h_seq_nss,
+              h_seq_sigmas,
+              h_seq_hs,
+              h_seq_MO_fsts,
+              h_seq_yerrs,
+              h_seq_indss,
+              h_seq_MOp,
+              h_seq_means,
+              h_seq_fstBreakP,
+              h_seq_MOpp);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
