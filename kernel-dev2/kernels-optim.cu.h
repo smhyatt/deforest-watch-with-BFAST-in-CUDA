@@ -655,7 +655,8 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     int i = threadIdx.x;
 
     extern __shared__ volatile uint shmem[];
-    volatile uint* sh_mem_nss = (volatile uint*)shmem;
+    volatile uint* sh_mem_nss = (volatile uint*) shmem;
+    volatile float* sh_mem_acc = (volatile float*) (shmem + n*sizeof(float));
 
     // typename OP::RedElTp red = OP::mapFun(elm);
     sh_mem_nss[i] = (uint) (Y[pix*N + i] != F32_MIN);
@@ -663,19 +664,22 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
 
     // uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
     uint nss_thr = scanIncBlock<Add<uint> >(sh_mem_nss, threadIdx.x);
+
     __syncthreads();
+
+    float y_err = y_errors[pix*N + i];
+    int p = (float) (i < nss[pix]);
+
+    sh_mem_acc[i] = y_err * y_err * p;
+    uint nss_thr = scanIncBlock<Add<uint> >(sh_mem_acc, threadIdx.x);
+
+    __syncthreads();
+
     if (i == n-1) {
         nss[pix] = nss_thr;
+        hs[pix] = (int)(((float) nss[pix]) * hfrac);
+        sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
     }
-
-    float acc = 0.0;
-    if (i < nss[pix]) {
-        float y_err = y_errors[pix*N + i];
-        acc += y_err * y_err;               // reduce (err^2) [] y_err
-    }
-
-    hs[pix] = (int)(((float) nss[pix]) * hfrac);
-    // sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
 }
 
 
