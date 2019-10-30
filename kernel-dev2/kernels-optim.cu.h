@@ -671,7 +671,7 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     int p = (float) (i < nss[pix]);
 
     sh_mem_acc[i] = y_err * y_err * p;
-    float acc = scanIncBlock<Add<uint> >(sh_mem_acc, threadIdx.x);
+    float acc = scanIncBlock<Add<float> >(sh_mem_acc, threadIdx.x);
 
     __syncthreads();
 
