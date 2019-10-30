@@ -118,7 +118,7 @@ let valsigmas= validate1Dfloat sigmas sigmasseq
 let valbreaks= validate1Dint breaks breaksseq
 let valmeans = validate1Dfloat means meansseq
 
-in valbreaks
+in valmeans
 
 
 
