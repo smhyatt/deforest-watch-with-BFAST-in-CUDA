@@ -672,14 +672,14 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     float y_err = y_errors[pix*N + i] != F32_MIN? y_errors[pix*N + i] : 0.0;
     int p = (float) (i < nss[pix]);
 
-    sh_mem_acc[i] = p;// * y_err * y_err;
+    sh_mem_acc[i] = p * y_err * y_err;
     float acc = scanIncBlock<Add<float> >(sh_mem_acc, threadIdx.x);
 
     __syncthreads();
 
     if (i == n-1) {
         hs[pix] = (int) (((float) nss[pix]) * hfrac);
-        sigmas[pix] = acc; //sqrt(acc / ((float)(nss[pix] - K)));
+        sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
     }
 }
 
