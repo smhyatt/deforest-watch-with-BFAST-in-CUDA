@@ -664,7 +664,7 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     // uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
     // uint nss_thr = scanIncBlock<Add<uint> >(sh_mem_nss, threadIdx.x);
     __syncthreads();
-    if (i == n) {
+    if (i == n-1) {
         nss[pix] = sh_mem_nss[i]; //nss_thr;
     }
 
