@@ -363,8 +363,7 @@ int main(int argc, char const *argv[]) {
 
         // calling sequential kernel 9
         float* MO_fsts = calloc(m,sizeof(float));
-        // ker9(hs, y_errors, nss, MO_fsts);
-        ker9seq(m, N, hs, y_errors, nss, MO_fsts)
+        ker9seq(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, MO_fsts);
         printEf(MO_fsts, m);
 
         gettimeofday(&t_end, NULL);
