@@ -752,6 +752,24 @@ void ker9seq(uint m, uint N, int* hs, float* y_errors, uint* nss, float* MO_fsts
     }
 }
 
+void ker9merged(uint m, uint N, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
+    int hmax = I32_MIN;
+    for (int i = 0; i < m; i++) {
+        int cur = hs[i];
+        if (cur >= hmax) {
+            hmax = cur;
+        }
+    }
+
+    for (uint pix = 0; pix < m; pix++) {
+        for (int i = 0; i < hmax; i++) {
+            if (i < hs[pix]) {
+                uint idx = i + nss[pix] - hs[pix] + 1;
+                MO_fsts[pix] += y_errors[pix*N + idx];
+            }
+        }
+    }
+}
 
 
 /////////////////////////////////////////////////////////////////////////
