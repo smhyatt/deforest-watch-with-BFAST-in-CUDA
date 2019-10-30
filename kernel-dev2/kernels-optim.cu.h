@@ -668,9 +668,9 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     __syncthreads();
 
     float y_err = y_errors[pix*N + i] != F32_MIN? y_errors[pix*N + i]: 0.0;
-    int p = (float) (i < nss[pix]);
+    int p = (float) (i+1 < nss[pix]);
 
-    sh_mem_acc[i] = y_err * y_err;
+    sh_mem_acc[i] = p * y_err * y_err;
     float acc = scanIncBlock<Add<float> >(sh_mem_acc, threadIdx.x);
 
     __syncthreads();
