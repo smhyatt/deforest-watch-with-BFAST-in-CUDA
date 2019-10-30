@@ -926,7 +926,7 @@ void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
     uint Nmn = N-n;
 
 
-    float* MO        = (float*) calloc(N*Nmn*m,sizeof(float));
+    float* MO        = (float*) calloc(Nmn*m,sizeof(float));
     int* isBreak     = (int*) calloc(m,sizeof(int));
     int* fstBreak    = (int*) calloc(m,sizeof(int));
     int* adjBreak    = (int*) calloc(m,sizeof(int));
