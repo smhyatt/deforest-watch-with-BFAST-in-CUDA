@@ -991,8 +991,8 @@ void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
         }
 
         for (int i = 0; i < Nmn; i++) {
-            val_indssP[pix*Nmn + i] = (fstBreak < Nss[pix]-nss[pix])?
-                                      (val_indss[pix*N + fstBreak+nss[pix]]-n)
+            val_indssP[pix*Nmn + i] = (fstBreakP[pix] < Nss[pix]-nss[pix])?
+                                      (val_indss[pix*N + fstBreakP[pix]+nss[pix]]-n)
                                     : -1;
         }
 
