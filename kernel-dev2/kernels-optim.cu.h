@@ -667,7 +667,8 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
 
     __syncthreads();
 
-    float y_err = y_errors[pix*N + i] != F32_MIN? y_errors[pix*N + i] : 0.0;
+    // float y_err = y_errors[pix*N + i] != F32_MIN? y_errors[pix*N + i] : 0.0;
+    float y_err = y_errors[pix*N + i];
     // int p = (float) (i < nss[pix]);
 
     sh_mem_acc[i] = (i < nss[pix])? y_err * y_err : 0.0;
