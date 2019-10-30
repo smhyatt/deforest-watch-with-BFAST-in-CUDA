@@ -607,7 +607,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 10
-      // ker10 <<< grid, block >>> ();
+    //   ker10 <<< grid, block >>> ();
       // cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
