@@ -703,6 +703,7 @@ __global__ void ker8naive(uint m, uint n, uint N, uint K, float hfrac,
 //// KERNEL 10
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+#if 0
 
 __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
                             uint* Nss, uint* nss, float* sigmas, int* hs,
@@ -770,7 +771,6 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
     }
 
 }
-#if 0
 void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
            uint* nss, float* sigmas, int* hs, int* mappingindices,
            float* MO_fsts, float* y_errors, int* val_indss, float* MOp,
