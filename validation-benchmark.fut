@@ -3,7 +3,7 @@
 
 -- Validating float arrays
 
-let epsilon = 0.001f32
+let epsilon = 0.01f32
 
 let relError x y =
     let x' = f32.abs(x)
