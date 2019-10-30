@@ -3,7 +3,7 @@
 
 -- Validating float arrays
 
-let epsilon = 0.01f32
+let epsilon = 0.1f32
 
 let relError x y =
     let x' = f32.abs(x)
@@ -11,7 +11,7 @@ let relError x y =
     if f32.isnan x' && f32.isnan y' then true
     else
       if x' == 0.0f32 && y' == 0.0f32 then true
-      else  let m = f32.max (f32.max x' y') 0.001
+      else  let m = f32.max (f32.max x' y') 0.01
             in  f32.abs(x'-y') / m < epsilon
 
 let validate1Dfloat [n] (xs : [n]f32) (ys: [n]f32) : (bool, i32, f32, f32) =
