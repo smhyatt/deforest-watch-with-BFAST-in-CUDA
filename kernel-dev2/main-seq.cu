@@ -387,7 +387,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 10
-        ker10(h_seq_bound,
+        ker10(lam, m, n N, h_seq_bound,
               h_seq_Nss,
               h_seq_nss,
               h_seq_sigmas,
