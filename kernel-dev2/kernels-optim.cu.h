@@ -665,20 +665,20 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     // uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
     uint nss_thr = scanIncBlock<Add<uint> >(sh_mem_nss, threadIdx.x);
 
-    __syncthreads();
+    // __syncthreads();
 
-    float y_err = y_errors[pix*N + i];
-    int p = (float) (i < nss[pix]);
+    // float y_err = y_errors[pix*N + i];
+    // int p = (float) (i < nss[pix]);
 
-    sh_mem_acc[i] = y_err * y_err * p;
-    float acc = scanIncBlock<Add<float> >(sh_mem_acc, threadIdx.x);
+    // sh_mem_acc[i] = y_err * y_err * p;
+    // float acc = scanIncBlock<Add<float> >(sh_mem_acc, threadIdx.x);
 
     __syncthreads();
 
     if (i == n-1) {
         nss[pix] = nss_thr;
-        hs[pix] = (int)hfrac ;//(((float) nss[pix]) * hfrac);
-        sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
+        hs[pix] = (int) (((float) nss[pix]) * hfrac);
+        // sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
     }
 }
 
