@@ -669,8 +669,8 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     }
 
     float acc = 0.0;
-    if (j < nss[pix]) {
-        float y_err = y_errors[pix*N + j];
+    if (i < nss[pix]) {
+        float y_err = y_errors[pix*N + i];
         acc += y_err * y_err;               // reduce (err^2) [] y_err
     }
 
