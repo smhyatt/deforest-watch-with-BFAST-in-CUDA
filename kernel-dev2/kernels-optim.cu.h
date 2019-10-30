@@ -676,7 +676,7 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     __syncthreads();
 
     if (i == n-1) {
-        nss[pix] = nss_thr;
+        nss[pix] = nss_thr-1;
         hs[pix] = (int) (((float) nss[pix]) * hfrac);
         sigmas[pix] = acc; //sqrt(acc / ((float)(nss[pix] - K)));
     }
