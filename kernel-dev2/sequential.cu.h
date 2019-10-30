@@ -7,6 +7,7 @@
 #include "helper.cu.h"
 
 #define PI 3.14159265
+// #define PI 3.141592653589793115997963468544185161590576171875
 #define F32_MIN -FLT_MAX
 #define I32_MIN -2147483648
 typedef unsigned int uint;
@@ -29,9 +30,9 @@ void mkX(uint N, int kp, int f, int* mappingindices, float* X){
             } else if(i==1){
                 X[index] = ind;
             } else {
-                float ip = (float)(i / 2);
-                float jp = ind;
-                float angle = 2 * PI * ip * jp / f;
+                double ip = (double)(i / 2);
+                double jp = ind;
+                double angle = 2 * PI * ip * jp / f;
                 if(i%2 == 0) {
                     X[index] = sin(angle);
                 } else {
@@ -131,7 +132,7 @@ void transposeMatrix(float* M, float* MT, uint m, uint N) {
 
 
 void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
-    
+
     float* YT = (float*) calloc(N*m,sizeof(float));
     transposeMatrix(sample, YT, m, N);
 
@@ -149,7 +150,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
                         for (int i = 0; i < R; i++) {                   // fully unroll
                             acc[i] = 0.0;
                         }
-                        float a, b, ab; //, y; 
+                        float a, b, ab; //, y;
                         for (int q = 0; q < n; q++) {
                             a = X[j1*N + q];       // a = X[j1, q];
                             b = XT[q*K + j2];      // b = XT[q, j2];
@@ -158,7 +159,7 @@ void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, flo
                             // for (int idx = 0; idx < R; idx++) {
                             //     yqsh[idx] = YT[q, ii]; // YT[q,ii:min(ii+R,M)] ?????????????
                             // }
-                            // barrier; // block-level synch         
+                            // barrier; // block-level synch
 
                             for (int i1 = 0; i1 < R; i1++) { // fully unroll
                                 if (ii+i1 < m) {
@@ -396,7 +397,7 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             for (uint k = 0; k < n; k++) {
                 float cur_y = sample[pix*N+k];
 
-                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan. 
+                if (cur_y == F32_MIN) {             // we only accumulate if y is not nan.
                     acc += 0.0;
                 } else {
                     acc += X[i*N+k] * cur_y;
@@ -405,7 +406,7 @@ void mkB0G(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             B0[pix*K + i] = acc;
         }
     }
-}    
+}
 
 
 void mkBOPN(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
@@ -420,9 +421,9 @@ void mkBOPN(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
                     for(uint k=0; k < K; k++) {
                         if(kk+k < n && pix < m) {
                             float y = sample[pix*N+(kk+k)];
-                            if (y != F32_MIN) {             // we only accumulate if y is not nan. 
+                            if (y != F32_MIN) {             // we only accumulate if y is not nan.
                                 acc += X[i*N+(kk+k)] * y;
-                            }    
+                            }
                         }
                     }
                 }
@@ -432,23 +433,23 @@ void mkBOPN(uint m, uint n, uint N, float* X, uint K, float* sample, float* B0){
             }
         }
     }
-}    
+}
 
 
 // void ker4MkB0(uint m, uint n, uint N, float* X, uint K, float* Y, float* B0) {
 
 //     for (int i = 0; i < m; i+=(K*K)) {                  // K*K, it. through pixels ??????????????
 //         for (int j = 0; j < K; j+=1) {                  // block
-            
+
 
 //             for (int kk = 0; kk < n; kk+=K) {
-//                 // parallel version does copy to shared memory 
+//                 // parallel version does copy to shared memory
 //                 // Y[i,k] X[j,k]
 
 //                 for (int k = 0; k < K; k++) {           // fully unroll
 
 //                     float y = Y[(i+k)* N + kk];         // Y[i,k]
-//                     if (y != F32_MIN) {                 // we only accumulate if y is not nan. 
+//                     if (y != F32_MIN) {                 // we only accumulate if y is not nan.
 //                         acc[k] += X[i*N+k] * y;         // Xsh[j,k] * Ysh[?,k] - hvor du laver et tjek om dens validitet inden
 //                     }
 //                 }
@@ -505,13 +506,13 @@ void mkB(uint m, float* XsqrInv, uint K, float* B0, float* B){
             }
             B[pix*K + i] = acc;
         }
-    }        
+    }
 }
 
 
 void ker5seq(uint m, float* XsqrInv, uint K, float* B0, float* B){
     for (uint pix_out = 0; pix_out < m; pix_out+=K) {
-        for (uint pix_in = 0; pix_in < K; pix_in++) { 
+        for (uint pix_in = 0; pix_in < K; pix_in++) {
             uint pix = pix_in + pix_out;
 
             for (int i = 0; i < K; i++) {
@@ -527,7 +528,7 @@ void ker5seq(uint m, float* XsqrInv, uint K, float* B0, float* B){
                 }
             }
         }
-    }        
+    }
 }
 
 
@@ -542,7 +543,7 @@ void ker6(uint m, uint N, float* XT, float* B, uint K, float* yhat) {
     for (uint pix = 0; pix < m; pix++) {
         mvMul(XT, &B[pix*K], N, K, &yhat[pix*N]);
     }
-}    
+}
 #endif
 
 
@@ -566,14 +567,14 @@ void ker6seqOP(uint m, uint N, float* XT, float* B, uint K, float* yhat) {
     for (uint pix_out = 0; pix_out < m; pix_out+=K) {
 
         for (int ii = 0; ii < N; ii+=K) {
-        
-            for (uint pix_in = 0; pix_in < K; pix_in++) { 
+
+            for (uint pix_in = 0; pix_in < K; pix_in++) {
                 uint pix = pix_out + pix_in;
 
                 for (int i = 0; i < K; i++) {
                     float acc = 0.0;
                     for (int k = 0; k < K; k++) {
-                        
+
                         if(pix < m && i+ii < N) {
                             acc += XT[(i+ii)*K + k] * B[pix*K + k];
                         }
@@ -700,6 +701,26 @@ void ker8(uint m, uint n, uint N, float hfrac, float* y_errors, uint K, int* hs,
 }
 
 
+void ker8seq(uint m, uint n, uint N, uint K, float hfrac, float* y_errors,
+               float* y, uint* nss, int* hs, float* sigmas) {
+    for (uint pix = 0; pix < m; pix++) {            // parallel blocks
+        for (uint i = 0; i < n; i++) {              // parallel threads
+            nss[pix] += (y[pix*N + i] != F32_MIN);  // reduce (p) [] nss
+        }
+
+        float acc = 0.0;
+        for (uint j = 0; j < n; j++) {              // parallel threads
+            if (j < nss[pix]) {
+                float y_err = y_errors[pix*N + j];
+                acc += y_err * y_err;               // reduce (err^2) [] y_err
+            }
+        }
+
+        hs[pix] = (int)(((float) nss[pix]) * hfrac);
+        sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 //// KERNEL 9
@@ -732,6 +753,24 @@ void ker9seq(uint m, uint N, int* hs, float* y_errors, uint* nss, float* MO_fsts
     }
 }
 
+void ker9merged(uint m, uint N, int* hs, float* y_errors, uint* nss, float* MO_fsts) {
+    int hmax = I32_MIN;
+    for (int i = 0; i < m; i++) {
+        int cur = hs[i];
+        if (cur >= hmax) {
+            hmax = cur;
+        }
+    }
+
+    for (uint pix = 0; pix < m; pix++) {
+        for (int i = 0; i < hmax; i++) {
+            if (i < hs[pix]) {
+                uint idx = i + nss[pix] - hs[pix] + 1;
+                MO_fsts[pix] += y_errors[pix*N + idx];
+            }
+        }
+    }
+}
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -894,6 +933,102 @@ void ker10(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
     free(val_indssP);
 }
 
+// *****************************************************************************
+// ************************* WORKED ON IT **************************************
+// *****************************************************************************
+
+void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
+           uint* nss, float* sigmas, int* hs, int* mappingindices,
+           float* MO_fsts, float* y_errors, int* val_indss, float* MOp,
+           float* means, int* fstBreakP, float* MOpp){
+
+    uint Nmn = N-n;
+
+
+    float* MO        = (float*) calloc(Nmn*m,sizeof(float));
+    int* isBreak     = (int*) calloc(m,sizeof(int));
+    int* fstBreak    = (int*) calloc(m,sizeof(int));
+    int* adjBreak    = (int*) calloc(m,sizeof(int));
+    int* val_indssP  = (int*) calloc(m*Nmn,sizeof(int));
+
+    for (uint s   = 0; s < Nmn; s++){
+        uint t    = n+s;
+        int time  = mappingindices[t];
+        float x   = (float)time / (float)mappingindices[N-1];
+        float tmp = x>exp(1.0)? log(x) : 1.0;
+        bound[s]  = lam * sqrt(tmp);
+    }
+
+    for (uint pix = 0; pix < m; pix++){
+        float acc = 0.0;
+        for (uint i = 0; i < Nmn; i++){
+            if(i >= Nss[pix]-nss[pix]){
+                MO[pix*Nmn + i] = acc;
+            } else if(i==0) {
+                acc += MO_fsts[pix];
+                MO[pix*Nmn + i] = acc;
+            } else {
+                acc += -y_errors[pix*N + nss[pix] - hs[pix] + i] + y_errors[pix*N + nss[pix] + i];
+                MO[pix*Nmn + i] = acc;
+            }
+        }
+
+        for (uint i = 0; i < Nmn; i++){
+            float mo = MO[pix*Nmn + i];
+            MOp[pix*Nmn + i] = mo / (sigmas[pix] * (sqrt( (float) nss[pix] )));
+        }
+
+        for (uint i = 0; i < Nmn; i++){
+            float mop = MOp[pix*Nmn + i];
+
+            if(i < (Nss[pix]-nss[pix]) && mop != F32_MIN){
+                if (fabsf(mop) > bound[i] == 1) {
+                    isBreak[pix]  = 1;
+                    fstBreak[pix] = i;
+                    break;
+                }
+            }
+        }
+
+        for (uint i = 0; i < Nmn; i++) {
+            if (i < (Nss[pix]-nss[pix])) {
+                means[pix] += MOp[pix*Nmn + i];
+            }
+        }
+
+        if (!isBreak[pix]){
+            fstBreak[pix] = -1;
+        } else {
+            adjBreak[pix] = (fstBreak[pix] < Nss[pix]-nss[pix])?
+                            (val_indss[pix*N + fstBreak[pix] + nss[pix]]-n)
+                          : -1;
+            fstBreakP[pix] = ((adjBreak[pix]-1) / 2) * 2 + 1;
+        }
+
+        if (nss[pix] <= 5 || Nss[pix]-nss[pix] <= 5) {
+            fstBreakP[pix] = -2;
+        }
+
+        for (int i = 0; i < Nmn; i++) {
+            val_indssP[pix*Nmn + i] = (fstBreakP[pix] < Nss[pix]-nss[pix])?
+                                      (val_indss[pix*N + fstBreakP[pix]+nss[pix]]-n)
+                                    : -1;
+        }
+
+        for (int i = 0; i < Nmn; i++) {
+            int currIdx = val_indssP[pix*Nmn + i];
+            if (currIdx != -1 ) {
+                MOpp[pix*Nmn + currIdx] = MOp[pix*Nmn + i];
+            }
+        }
+    }
+
+    free(MO);
+    free(isBreak);
+    free(fstBreak);
+    free(adjBreak);
+    free(val_indssP);
+}
 
 
 

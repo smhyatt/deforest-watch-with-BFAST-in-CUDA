@@ -1,5 +1,7 @@
 CXX = nvcc
 
+NV_FLAGS = -ftz=false -prec-div=true -prec-sqrt=true
+
 SRC1 = main-seq.cu
 SRC2 = main-naive.cu
 SRC3 = main-optim.cu
@@ -12,7 +14,7 @@ EXECUTABLE3 = optim-bfast-project
 default: compile run
 
 .cu.o: $(SOURCES_CPP) $(HELPERS)
-	$(CXX) -c $@ $<
+	$(CXX) $(NV_FLAGS) -c $@ $<
 
 
 seqbfast: $(EXECUTABLE1)
@@ -28,30 +30,30 @@ optimbfast: $(EXECUTABLE3)
 compileSeq: $(EXECUTABLE1)
 
 $(EXECUTABLE1): $(SRC1) $(HELPERS)
-	$(CXX) -o $(EXECUTABLE1) $(SRC1)
+	$(CXX) $(NV_FLAGS) -o $(EXECUTABLE1) $(SRC1)
 
 compileNaive: $(EXECUTABLE3)
 
 $(EXECUTABLE2): $(SRC2) $(HELPERS)
-	$(CXX) -o $(EXECUTABLE2) $(SRC2)
+	$(CXX) $(NV_FLAGS) -o $(EXECUTABLE2) $(SRC2)
 
 
 compileOptim: $(EXECUTABLE3)
 
 $(EXECUTABLE3): $(SRC3) $(HELPERS)
-	$(CXX) -o $(EXECUTABLE3) $(SRC3)
+	$(CXX) $(NV_FLAGS) -o $(EXECUTABLE3) $(SRC3)
 
 
 compile: $(EXECUTABLE1) $(EXECUTABLE2) $(EXECUTABLE3)
 
 $(EXECUTABLE1): $(SRC1) $(HELPERS)
-	$(CXX) -o $(EXECUTABLE1) $(SRC1)
+	$(CXX) $(NV_FLAGS) -o $(EXECUTABLE1) $(SRC1)
 
 $(EXECUTABLE2): $(SRC2) $(HELPERS)
-	$(CXX) -o $(EXECUTABLE2) $(SRC2)
+	$(CXX) $(NV_FLAGS) -o $(EXECUTABLE2) $(SRC2)
 
 $(EXECUTABLE3): $(SRC3) $(HELPERS)
-	$(CXX) -o $(EXECUTABLE3) $(SRC3)
+	$(CXX) $(NV_FLAGS) -o $(EXECUTABLE3) $(SRC3)
 
 
 
@@ -83,10 +85,10 @@ naiveV: compileNaive futV clear naivebfast
 optimV: compileOptim futV clear optimbfast
 	$(info )
 	$(info The validation for the optimized implementation.)
-# 	cat ../data/val.data
+	# cat ../data/val.data
 	.././validation-benchmark < ../data/val.data
 
-fullV: compile futV optimV seqV naiveV 
+fullV: compile futV optimV seqV naiveV
 	rm ../validation-benchmark
 	rm ../validation-benchmark.c
 	rm ../bfast-irreg
