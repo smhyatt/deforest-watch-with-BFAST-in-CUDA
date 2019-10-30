@@ -401,7 +401,7 @@ int main(int argc, char const *argv[]) {
         // printVf(h_seq_MOp, m, N-n);
         printEi(fpV, h_seq_fstBreakP, m);
         printEf(fpV, h_seq_means, m);
-        }
+    }
 
     fclose(fpV);
 
