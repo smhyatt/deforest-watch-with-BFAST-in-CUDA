@@ -595,59 +595,6 @@ __global__ void ker7(uint m, uint N, float* yhat, float* y_errors_all, uint* Nss
 //// KERNEL 8
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-#if 0
-void ker8naive(uint m, uint n, uint N, uint K, float hfrac, float* y_errors,
-               float* y, uint* nss, int* hs, float* sigmas) {
-    for (uint pix = 0; pix < m; pix++) {            // parallel blocks
-        for (uint i = 0; i < n; i++) {              // parallel threads
-            nss[pix] += (y[pix*N + i] != F32_MIN);  // reduce (p) [] nss
-        }
-
-        float acc = 0.0;
-        for (uint j = 0; j < n; j++) {              // parallel threads
-            if (j < nss[pix]) {
-                float y_err = y_errors[pix*N + j];
-                acc += y_err * y_err;               // reduce (err^2) [] y_err
-            }
-        }
-
-        hs[pix] = (int)(((float) nss[pix]) * hfrac);
-        sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
-    }
-}
-#endif
-/**
- * Generic Count valid numbers operator that can be instantiated over
- *  numeric-basic types, such as int32_t, int64_t,
- *  float, double, etc.
-    nss[pix] += (y[pix*N + i] != F32_MIN);  // reduce (p) [] nss
- */
-template<class T>
-class CountValid {
-  public:
-    typedef T InpElTp;
-    typedef T RedElTp;
-    static const bool commutative = true;
-    static __device__ __host__ inline T identInp()
-        { return (T) 0;}
-        // { return (T) F32_MIN;}
-
-    static __device__ __host__ inline T mapFun(const T& el)
-        { return (T) (el != F32_MIN);}
-
-    static __device__ __host__ inline T identity()
-        { return (T) 0;}
-
-    static __device__ __host__ inline T apply(const T t1, const T t2)
-        { return t1 + t2;}
-
-    // static __device__ __host__ inline bool equals(const T t1, const T t2)
-    //     { return (t1 == t2); }
-    static __device__ __host__ inline T remVolatile(volatile T& t)
-        { T res = t; return res; }
-};
-
-
 __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
                           float* y_errors, float* Y, uint* nss, int* hs,
                           float* sigmas) {
@@ -658,11 +605,9 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     volatile uint* sh_mem_nss = (volatile uint*) shmem;
     volatile float* sh_mem_acc = (volatile float*) (shmem + n);
 
-    // typename OP::RedElTp red = OP::mapFun(elm);
     sh_mem_nss[i] = (uint) (Y[pix*N + i] != F32_MIN);
     __syncthreads();
 
-    // uint nss_thr = scanIncBlock<CountValid<uint> >(sh_mem_nss, threadIdx.x);
     uint nss_thr = scanIncBlock<Add<uint> >(sh_mem_nss, threadIdx.x);
     if (i == n-1) {
         nss[pix] = nss_thr;
@@ -682,8 +627,6 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
         sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
     }
 }
-
-
 
 
 __global__ void ker8naive(uint m, uint n, uint N, uint K, float hfrac,

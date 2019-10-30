@@ -81,8 +81,8 @@ entry main (X:[][]f32)
            (y_preds:[][]f32)
            (Nss:[]i32) (y_errors:[][]f32)(val_indss:[][]i32)
            (nss:[]i32) (hs:[]i32) (sigmas:[]f32)
-           --(MO_fsts:[]f32)
-        --    (MOpp:[][]f32)  (MOp:[][]f32) (breaks:[]i32) (means:[]f32)
+           --(MO_fsts:[]f32) (MOpp:[][]f32) (MOp:[][]f32)
+            (breaks:[]i32) (means:[]f32)
 
            (Xseq:[][]f32)
            (Xsqrseq:[][][]f32)
@@ -92,8 +92,8 @@ entry main (X:[][]f32)
            (y_predsseq:[][]f32)
            (Nssseq:[]i32) (y_errorsseq:[][]f32) (val_indssseq:[][]i32)
            (nssseq:[]i32) (hsseq:[]i32) (sigmasseq:[]f32)
-        --       (MO_fstsseq:[]f32)
-        --    (MOppseq:[][]f32) (MOpseq:[][]f32) (breaksseq:[]i32) (meansseq:[]f32)
+            --(MO_fstsseq:[]f32) (MOppseq:[][]f32) (MOpseq:[][]f32)
+            (breaksseq:[]i32) (meansseq:[]f32)
             =
 -- , Xsqr, Xinv, beta0,
 --                   beta, y_preds, Nss, y_errors,
@@ -114,8 +114,11 @@ let valindss = validate2Dint val_indss val_indssseq
 let valnss   = validate1Dint nss nssseq
 let valhs    = validate1Dint hs hsseq
 let valsigmas= validate1Dfloat sigmas sigmasseq
+-- ker 9 ting
+let valbreaks= validate1Dint breaks breaksseq
+let valmeans = validate1Dfloat means meansseq
 
-in valsigmas
+in valbreaks
 
 
 

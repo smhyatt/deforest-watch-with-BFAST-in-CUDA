@@ -914,6 +914,102 @@ void ker10(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
     free(val_indssP);
 }
 
+// *****************************************************************************
+// ************************* WORKING ON IT *************************************
+// *****************************************************************************
+
+void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
+           uint* nss, float* sigmas, int* hs, int* mappingindices,
+           float* MO_fsts, float* y_errors, int* val_indss, float* MOp,
+           float* means, int* fstBreakP, float* MOpp){
+
+    uint Nmn = N-n;
+
+
+    float* MO        = (float*) calloc(Nmn*m,sizeof(float));
+    int* isBreak     = (int*) calloc(m,sizeof(int));
+    int* fstBreak    = (int*) calloc(m,sizeof(int));
+    int* adjBreak    = (int*) calloc(m,sizeof(int));
+    int* val_indssP  = (int*) calloc(m*Nmn,sizeof(int));
+
+    for (uint s   = 0; s < Nmn; s++){
+        uint t    = n+s;
+        int time  = mappingindices[t];
+        float x   = (float)time / (float)mappingindices[N-1];
+        float tmp = x>exp(1.0)? log(x) : 1.0;
+        bound[s]  = lam * sqrt(tmp);
+    }
+
+    for (uint pix = 0; pix < m; pix++){
+        float acc = 0.0;
+        for (uint i = 0; i < Nmn; i++){
+            if(i >= Nss[pix]-nss[pix]){
+                MO[pix*Nmn * i] = acc;
+            } else if(i==0) {
+                acc += MO_fsts[pix];
+                MO[pix*Nmn * i] = acc;
+            } else {
+                acc += - y_error[pix*N nss[pix] - hs[pix] + i] + y_error[nss[pix] + i];
+                MO[pix*Nmn * i] = acc;
+            }
+        }
+
+        for (uint i = 0; i < Nmn; i++){
+            float mo = MO[pix*Nmn + i];
+            MOp[pix*Nmn + i] = mo / (sigmas[pix] * (sqrt( (float) nss[pix] )));
+        }
+
+        for (uint i = 0; i < Nmn; i++){
+            float mop = MOp[pix*Nmn + i];
+
+            if(i < (Nss[pix]-nss[pix]) && mop != F32_MIN){
+                if (fabsf(mop) > bound[i] == 1) {
+                    isBreak[pix]  = 1;
+                    fstBreak[pix] = i;
+                    break;
+                }
+            }
+        }
+
+        for (uint i = 0; i < Nmn; i++) {
+            if (i < (Nss[pix]-nss[pix])) {
+                means[pix] += MOp[pix*Nmn + i];
+            }
+        }
+
+        if (!isBreak[pix]){
+            fstBreak[pix] = -1;
+        } else {
+            adjBreak[pix] = (fstBreak[pix] < Nss[pix]-nss[pix])?
+                            (val_indss[pix*N + fstBreak[pix] + nss[pix]]-n)
+                          : -1;
+            fstBreakP[pix] = ((adjBreak[pix]-1) / 2) * 2 + 1;
+        }
+
+        if (nss[pix] <= 5 || Nss[pix]-nss[pix] <= 5) {
+            fstBreakP[pix] = -2;
+        }
+
+        for (int i = 0; i < Nmn; i++) {
+            val_indssP[pix*Nmn + i] = (fstBreak < Nss[pix]-nss[pix])?
+                                      (val_indss[pix*N + fstBreak+nss[pix]]-n)
+                                    : -1
+        }
+
+        for (int i = 0; i < Nmn; i++) {
+            int currIdx = val_indssP[pix*Nmn + i];
+            if (currIdx != -1 ) {
+                MOpp[pix*Nmn + currIdx] = MOp[pix*Nmn + i];
+            }
+        }
+    }
+
+    free(MO);
+    free(isBreak);
+    free(fstBreak);
+    free(adjBreak);
+    free(val_indssP);
+}
 
 
 
