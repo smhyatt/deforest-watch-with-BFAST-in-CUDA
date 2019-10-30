@@ -334,7 +334,7 @@ int main(int argc, char const *argv[]) {
    /////////////////////////////////////////////////////////////////////////
    {
       dim3 block(2*K, K, 1);
-      dim3 grid (n, 1, 1);
+      dim3 grid (m, 1, 1);
 
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
