@@ -949,7 +949,7 @@ void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
                 acc += MO_fsts[pix];
                 MO[pix*Nmn * i] = acc;
             } else {
-                acc += - y_error[pix*N nss[pix] - hs[pix] + i] + y_error[nss[pix] + i];
+                acc += - y_error[pix*N nss[pix] - hs[pix] + i] + y_errors[nss[pix] + i];
                 MO[pix*Nmn * i] = acc;
             }
         }
@@ -993,7 +993,7 @@ void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
         for (int i = 0; i < Nmn; i++) {
             val_indssP[pix*Nmn + i] = (fstBreak < Nss[pix]-nss[pix])?
                                       (val_indss[pix*N + fstBreak+nss[pix]]-n)
-                                    : -1
+                                    : -1;
         }
 
         for (int i = 0; i < Nmn; i++) {
