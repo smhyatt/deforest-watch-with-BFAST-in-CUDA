@@ -391,6 +391,7 @@ int main(int argc, char const *argv[]) {
               h_seq_nss,
               h_seq_sigmas,
               h_seq_hs,
+              h_mappingindices,
               h_seq_MO_fsts,
               h_seq_yerrs,
               h_seq_indss,
