@@ -370,7 +370,7 @@ int main(int argc, char const *argv[]) {
 
         // calling sequential kernel 9
         ker9seq(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, h_seq_MO_fsts);
-        printEf(h_seq_MO_fsts, m);
+        printEf(fpV, h_seq_MO_fsts, m);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -399,8 +399,8 @@ int main(int argc, char const *argv[]) {
         // validation
         // printVf(h_seq_MOpp, m, N-n);
         // printVf(h_seq_MOp, m, N-n);
-        printEi(h_seq_fstBreakP, m);
-        printEf(h_seq_means, m);
+        printEi(fpV, h_seq_fstBreakP, m);
+        printEf(fpV, h_seq_means, m);
         }
 
     fclose(fpV);
