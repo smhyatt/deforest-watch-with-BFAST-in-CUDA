@@ -126,7 +126,7 @@ let valMOp    = validate2Dfloat MOp MOpseq
 let valbreaks= validate1Dint breaks breaksseq
 let valmeans = validate1Dfloat means meansseq
 
-in valMOpp
+in valX
 
 
 
