@@ -677,7 +677,7 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
 
     if (i == n-1) {
         nss[pix] = nss_thr;
-        hs[pix] = (int)(((float) nss[pix]) * hfrac);
+        hs[pix] = (int)hfrac ;//(((float) nss[pix]) * hfrac);
         sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
     }
 }
