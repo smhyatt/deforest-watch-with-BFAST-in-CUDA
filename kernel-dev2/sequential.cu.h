@@ -6,8 +6,8 @@
 
 #include "helper.cu.h"
 
-// #define PI 3.14159265
-#define PI 3.141592653589793115997963468544185161590576171875
+#define PI 3.14159265
+// #define PI 3.141592653589793115997963468544185161590576171875
 #define F32_MIN -FLT_MAX
 #define I32_MIN -2147483648
 typedef unsigned int uint;
@@ -30,9 +30,9 @@ void mkX(uint N, int kp, int f, int* mappingindices, float* X){
             } else if(i==1){
                 X[index] = ind;
             } else {
-                double ip = (float)(i / 2);
+                float ip = (float)(i / 2);
                 float jp = ind;
-                double angle = 2 * PI * ip * jp / f;
+                float angle = 2 * PI * ip * jp / f;
                 if(i%2 == 0) {
                     X[index] = sin(angle);
                 } else {
