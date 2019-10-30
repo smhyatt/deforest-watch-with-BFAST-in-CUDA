@@ -370,7 +370,7 @@ int main(int argc, char const *argv[]) {
 
         // calling sequential kernel 9
         ker9seq(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, h_seq_MO_fsts);
-        // printEf(fpV, h_seq_MO_fsts, m);
+        printEf(fpV, h_seq_MO_fsts, m);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
