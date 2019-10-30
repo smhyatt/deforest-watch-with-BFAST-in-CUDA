@@ -30,9 +30,9 @@ void mkX(uint N, int kp, int f, int* mappingindices, float* X){
             } else if(i==1){
                 X[index] = ind;
             } else {
-                float ip = (float)(i / 2);
+                double ip = (float)(i / 2);
                 float jp = ind;
-                float angle = 2 * PI * ip * jp / f;
+                double angle = 2 * PI * ip * jp / f;
                 if(i%2 == 0) {
                     X[index] = sin(angle);
                 } else {
