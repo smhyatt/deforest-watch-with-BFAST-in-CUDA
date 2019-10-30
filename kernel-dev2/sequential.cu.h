@@ -926,7 +926,7 @@ void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
     uint Nmn = N-n;
 
 
-    float* MO        = (float*) calloc(Nmn*m,sizeof(float));
+    float* MO        = (float*) calloc(N*Nmn*m,sizeof(float));
     int* isBreak     = (int*) calloc(m,sizeof(int));
     int* fstBreak    = (int*) calloc(m,sizeof(int));
     int* adjBreak    = (int*) calloc(m,sizeof(int));
@@ -942,17 +942,17 @@ void ker10merged(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
 
     for (uint pix = 0; pix < m; pix++){
         float acc = 0.0;
-        // for (uint i = 0; i < Nmn; i++){
-        //     if(i >= Nss[pix]-nss[pix]){
-        //         MO[pix*Nmn * i] = acc;
-        //     } else if(i==0) {
-        //         acc += MO_fsts[pix];
-        //         MO[pix*Nmn * i] = acc;
-        //     } else {
-        //         acc += -y_errors[pix*N + nss[pix] - hs[pix] + i] + y_errors[nss[pix] + i];
-        //         MO[pix*Nmn * i] = acc;
-        //     }
-        // }
+        for (uint i = 0; i < Nmn; i++){
+            if(i >= Nss[pix]-nss[pix]){
+                MO[pix*Nmn * i] = acc;
+            } else if(i==0) {
+                acc += MO_fsts[pix];
+                MO[pix*Nmn * i] = acc;
+            } else {
+                acc += -y_errors[pix*N + nss[pix] - hs[pix] + i] + y_errors[nss[pix] + i];
+                MO[pix*Nmn * i] = acc;
+            }
+        }
 
         // for (uint i = 0; i < Nmn; i++){
         //     float mo = MO[pix*Nmn + i];
