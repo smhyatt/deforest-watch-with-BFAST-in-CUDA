@@ -406,8 +406,8 @@ int main(int argc, char const *argv[]) {
         printf("Sequential kernel 10 version runs in: %lu microsecs\n", elapsed);
 
         // validation
-        // printVf(h_seq_MOpp, m, N-n);
-        // printVf(h_seq_MOp, m, N-n);
+        printVf(h_seq_MOpp, m, N-n);
+        printVf(h_seq_MOp, m, N-n);
         printEi(fpV, h_seq_fstBreakP, m);
         printEf(fpV, h_seq_means, m);
     }
