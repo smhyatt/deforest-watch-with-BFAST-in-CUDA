@@ -173,6 +173,13 @@ int main(int argc, char const *argv[]) {
     float* h_seq_yerrs     = (float*) calloc(N*m,sizeof(float));
     float* h_seq_yerrs_all = (float*) calloc(N*m,sizeof(float));
 
+    float* h_seq_bound     = (float*) calloc(N-n,sizeof(float));
+    float* h_seq_MOp       = (float*) calloc(m*(N-n),sizeof(float));
+    float* h_seq_means     = (float*) calloc(m,sizeof(float));
+    int*   h_seq_fstBreakP = (int*)   calloc(m,sizeof(int));
+    float* h_seq_MOpp      = (float*) calloc(m*(N-n),sizeof(float));
+    float* h_seq_MO_fsts   = (float*) calloc(m,sizeof(float));
+
     for (int i = 0; i < m*N; i++) { h_seq_yerrs[i] = F32_MIN; }
 
     /////////////////////////////////////////////////////////////////////////
@@ -362,8 +369,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 9
-        float* MO_fsts = calloc(m,sizeof(float));
-        ker9seq(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, MO_fsts);
+        ker9seq(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, h_seq_MO_fsts);
         printEf(MO_fsts, m);
 
         gettimeofday(&t_end, NULL);
@@ -381,8 +387,9 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 10
-        ker10(bound, Nss, nss, sigmas, hs, MO_fsts, y_errors, val_indss, MOp, means,
-            fstBreakP, MOpp);
+        ker10(h_seq_bound, h_seq_Nss, h_seq_nss, h_seq_sigmas, h_seq_hs,
+              h_seq_MO_fsts, y_errors, val_indss, h_seq_MOp, h_seq_means,
+              h_seq_fstBreakP, h_seq_MOpp);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
