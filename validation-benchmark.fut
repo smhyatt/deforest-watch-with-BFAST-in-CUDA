@@ -126,7 +126,7 @@ let valMO_fsts= validate1Dfloat MO_fsts MO_fstsseq
 let valbreaks= validate1Dint breaks breaksseq
 let valmeans = validate1Dfloat means meansseq
 
-in valmeans
+in valMO_fsts
 
 
 
