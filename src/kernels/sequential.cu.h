@@ -876,7 +876,7 @@ void MOppComp(uint Nmn, float* MOp, int* val_indsP, float* MOpp) {
 }
 
 
-void ker10(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
+void ker10seq(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
 		   uint* nss, float* sigmas, int* hs, int* mappingindices,
 		   float* MO_fsts, float* y_errors, int* val_indss, float* MOp,
            float* means, int* fstBreakP, float* MOpp){

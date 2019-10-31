@@ -672,14 +672,15 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
                             float* means, int* fstBreakP, float* MOpp) {
     int pix = blockIdx.x;
     int i = threadIdx.x;
+    uint Nmn = N - n;
 
     extern __shared__ volatile uint shmem[];
-    volatile float* shmem_acc = (volatile uint*) shmem;
+    volatile float* shmem_acc = (volatile float*) shmem;
     volatile float* MO = (volatile float*) (shmem + n);
-    volatile float* isBreak = (volatile float*) (shmem + n);
-    volatile float* fstBreak = (volatile float*) (shmem + n);
-    volatile float* adjBreak = (volatile float*) (shmem + n);
-    volatile float* val_indssP = (volatile float*) (shmem + n);
+    // volatile float* isBreak = (volatile float*) (shmem + n);
+    // volatile float* fstBreak = (volatile float*) (shmem + n);
+    // volatile float* adjBreak = (volatile float*) (shmem + n);
+    // volatile float* val_indssP = (volatile float*) (shmem + n);
 
     float acc = 0.0;
     if(i >= Nss[pix]-nss[pix]){
