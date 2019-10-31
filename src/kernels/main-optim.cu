@@ -243,7 +243,7 @@ int main(int argc, char const *argv[]) {
    uint MOpp_size  = Nmn*sizeof(float);
    uint means_size = m*sizeof(float);
    uint breaks_size= m*sizeof(int);
-   uint bound_size = N-n*sizeof(float);
+   uint bound_size = (N-n)*sizeof(float);
    // Tile size for register tiling
    const uint R = 30;
 
