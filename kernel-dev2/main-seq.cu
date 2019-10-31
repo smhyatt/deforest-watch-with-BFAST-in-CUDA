@@ -370,12 +370,13 @@ int main(int argc, char const *argv[]) {
 
         // calling sequential kernel 9
         ker9merged(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, h_seq_MO_fsts);
-        printEf(fpV, h_seq_MO_fsts, m);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 9 version runs in: %lu microsecs\n", elapsed);
+
+        printEf(fpV, h_seq_MO_fsts, m);
     }
 
     /////////////////////////////////////////////////////////////////////////

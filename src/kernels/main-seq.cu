@@ -70,7 +70,7 @@ void readNum(FILE *fp, char* buff) {
   char c = getc(fp);
   while( c != ',' && c != EOF) {
     buff[i++] = c;
-    c = getc(fp); 
+    c = getc(fp);
   }
   buff[i] = '\0';
 }
@@ -140,7 +140,7 @@ int main(int argc, char const *argv[]) {
     float freq  = atof(input4);
     float hfrac = atof(input5);
     float lam   = atof(input6);
-    
+
     int K  = 2*k + 2;
     int mappingLen, imageLen, i = 0;
 
@@ -159,7 +159,7 @@ int main(int argc, char const *argv[]) {
 
     // allocating host memory for mappingindices and pixels
     int* h_mappingindices = (int*) calloc(N,sizeof(int));
-    float* h_Y = (float*) calloc(N*m,sizeof(float));    
+    float* h_Y = (float*) calloc(N*m,sizeof(float));
 
     char buff[1000];
     for (int i = 0; i < N*m; i++) {
@@ -351,7 +351,6 @@ int main(int argc, char const *argv[]) {
         printVi(fpV, h_seq_indss, m, N);
     }
 
-#if 0
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 8
@@ -361,14 +360,21 @@ int main(int argc, char const *argv[]) {
         struct timeval t_start, t_end, t_diff;
         gettimeofday(&t_start, NULL);
 
-        // calling sequential kernel 8
+        ker8seq(m, n, N, K, hfrac, h_seq_yerrs, h_Y,
+            h_seq_nss, h_seq_hs, h_seq_sigmas);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 8 version runs in: %lu microsecs\n", elapsed);
+
+        // validation
+        printE(fpV,  h_seq_nss, m);
+        printEi(fpV, h_seq_hs,  m);
+        printEf(fpV, h_seq_sigmas,  m);
     }
 
+#if 0
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 9
@@ -379,6 +385,8 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 9
+        ker9merged(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, h_seq_MO_fsts);
+        printEf(fpV, h_seq_MO_fsts, m);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -395,11 +403,29 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 10
+        // ker10merged(lam, m, n, N, h_seq_bound, h_seq_Nss,
+            ker10(lam, m, n, N, h_seq_bound, h_seq_Nss,
+                h_seq_nss,
+              h_seq_sigmas,
+              h_seq_hs,
+              h_mappingindices,
+              h_seq_MO_fsts,
+              h_seq_yerrs,
+              h_seq_indss,
+              h_seq_MOp,
+              h_seq_means,
+              h_seq_fstBreakP,
+              h_seq_MOpp);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 10 version runs in: %lu microsecs\n", elapsed);
+        // validation
+        printVfnan(fpV, h_seq_MOpp, m, N-n);
+        printVfnan(fpV, h_seq_MOp, m, N-n);
+        printEi(fpV, h_seq_fstBreakP, m);
+        printEf(fpV, h_seq_means, m);
     }
 #endif
 

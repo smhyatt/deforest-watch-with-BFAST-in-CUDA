@@ -81,34 +81,34 @@ let validate2Dint [n][m] (xs2 : [n][m]i32) (ys2: [n][m]i32) : (bool, i32, i32, f
 --                   (mappingindices : [N]i32)
 --                   (images : [m][N]f32) =
 
-entry main (X:[][]f32)          --1
-           (Xsqr:[][][]f32)     --2
-           (Xinv:[][][]f32)     --3
-           (beta0:[][]f32)      --4
-           (beta:[][]f32)       --5
-           (y_preds:[][]f32)    --6
-           (Nss:[]i32)          --7
-           (y_errors:[][]f32)   --8
-           (val_indss:[][]i32)  --9
-           (nss:[]i32)          --10
-           (hs:[]i32)           --11
-           (sigmas:[]f32)       --12
+entry main (X:[][]f32)          --0
+           (Xsqr:[][][]f32)     --1
+           (Xinv:[][][]f32)     --2
+           (beta0:[][]f32)      --3
+           (beta:[][]f32)       --4
+           (y_preds:[][]f32)    --5
+           (Nss:[]i32)          --6
+           (y_errors:[][]f32)   --7
+           (val_indss:[][]i32)  --8
+           (nss:[]i32)          --9
+           (hs:[]i32)           --10
+           (sigmas:[]f32)       --11
            --(MO_fsts:[]f32)
         --    (MOpp:[][]f32)  (MOp:[][]f32) (breaks:[]i32) (means:[]f32)
 
-           (Xseq:[][]f32)       --13
-           (Xsqrseq:[][][]f32)  --14
-           (Xinvseq:[][][]f32)  --15
-           (beta0seq:[][]f32)   --16
-           (betaseq:[][]f32)    --17
-           (y_predsseq:[][]f32) --18
-           (Nssseq:[]i32)       --19
-           (y_errorsseq:[][]f32)--20
-           (val_indssseq:[][]i32)--21
-           (nssseq:[]i32)       --22
-           (hsseq:[]i32)        --23
-           (sigmasseq:[]f32)    --24
-        -- (MO_fstsseq:[]f32)
+           (Xseq:[][]f32)        --12
+           (Xsqrseq:[][][]f32)   --13
+           (Xinvseq:[][][]f32)   --14
+           (beta0seq:[][]f32)    --15
+           (betaseq:[][]f32)     --16
+           (y_predsseq:[][]f32)  --17
+           (Nssseq:[]i32)        --18
+           (y_errorsseq:[][]f32) --19
+           (val_indssseq:[][]i32)--20
+           (nssseq:[]i32)        --21
+           (hsseq:[]i32)         --22
+           (sigmasseq:[]f32)     --23
+        -- (MO_fstsseq:[]f32)    --24
         --    (MOppseq:[][]f32) (MOpseq:[][]f32) (breaksseq:[]i32) (meansseq:[]f32)
             =
 -- , Xsqr, Xinv, beta0,
