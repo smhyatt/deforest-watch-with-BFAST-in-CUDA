@@ -264,7 +264,7 @@ int main(int argc, char const *argv[]) {
    int  * h_indss  = (int  *) calloc(m*N,sizeof(int));
    float* h_MOfsts = (float*) calloc(m,sizeof(float));
    float* h_bounds = (float*) calloc(N-n,sizeof(float));
-   int* h_breaks = (float*) calloc(m,sizeof(int));
+   int*   h_breaks = (int*) calloc(m,sizeof(int));
    float* h_means = (float*) calloc(m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
