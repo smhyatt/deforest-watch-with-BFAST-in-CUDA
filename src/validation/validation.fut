@@ -49,11 +49,17 @@ let validate1Dint [n] (xs : [n]i32) (ys: [n]i32) : (bool, i32, i32, i32) =
                               then (true, 0, 0, 0)
                               else (false, i, x, y)
                    ) xs ys (iota n)
-  in  reduce (\(b1, i1, x1, y1) (b2, i2, x2, y2) ->
+  let num_inv = map (\(f,_,_,_) -> if f then 0 else 1) diffs
+                  |> reduce (+) 0i32
+  let (valid, ind, v1, v2) =
+    reduce (\(b1, i1, x1, y1) (b2, i2, x2, y2) ->
                 if b1 then (b2, i2, x2, y2)
                       else (b1, i1, x1, y1)
              )
              (true, 0, 0, 0) diffs
+  in (valid, num_inv, ind, v1, v2)
+
+
 
 let validate2Dint [n][m] (xs2 : [n][m]i32) (ys2: [n][m]i32) : (bool, i32, i32, i32) =
   let xs = flatten xs2
