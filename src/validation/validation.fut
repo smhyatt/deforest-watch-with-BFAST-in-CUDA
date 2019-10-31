@@ -61,7 +61,7 @@ let validate1Dint [n] (xs : [n]i32) (ys: [n]i32) : (bool, i32, i32, f32, f32) =
 
 
 
-let validate2Dint [n][m] (xs2 : [n][m]i32) (ys2: [n][m]i32) : (bool, i32, i32, i32, i32) =
+let validate2Dint [n][m] (xs2 : [n][m]i32) (ys2: [n][m]i32) : (bool, i32, i32, f32, f32) =
   let xs = flatten xs2
   let ys = flatten ys2
   in  validate1Dint xs ys
