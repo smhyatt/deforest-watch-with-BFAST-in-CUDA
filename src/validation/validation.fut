@@ -134,9 +134,10 @@ let valindss = validate2Dint val_indss val_indssseq
 let valnss    = validate1Dint nss nssseq
 let valhs     = validate1Dint hs hsseq
 let valsigmas = validate1Dfloat sigmas sigmasseq
-let valMO_fsts = validate1Dfloat MO_fsts MO_fstsseq
-let valMOp  = validate2Dfloat MOp MOpseq
+let valMO_fsts= validate1Dfloat MO_fsts MO_fstsseq
+let valMOp    = validate2Dfloat MOp MOpseq
 let valbreaks = validate1Dint breaks breaksseq
+let valmeans  = validate1Dfloat means meansseq
 
 let fst xs = let (x,_,_,_,_) = xs in x
 let snd xs = let (_,x,_,_,_) = xs in x
@@ -144,7 +145,7 @@ let thr xs = let (_,_,x,_,_) = xs in x
 let frt xs = let (_,_,_,x,_) = xs in x
 let fvt xs = let (_,_,_,_,x) = xs in x
 let results = [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr,
-               valNss, valindss, valnss,valhs,valsigmas,valMO_fsts,valMOp, valbreaks]
+               valNss, valindss, valnss,valhs,valsigmas,valMO_fsts,valMOp, valbreaks, valmeans]
 
 let allTestTrue  = map fst results
 let allTestNumEr = map snd results
