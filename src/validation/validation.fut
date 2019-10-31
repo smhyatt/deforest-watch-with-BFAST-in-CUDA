@@ -95,7 +95,8 @@ entry main (X:[][]f32)          --0
            (sigmas:[]f32)       --11
            (MO_fsts:[]f32)      --12
            (MOp:[][]f32)        --13
-        --    (MOpp:[][]f32)  (MOp:[][]f32) (breaks:[]i32) (means:[]f32)
+        --    (MOpp:[][]f32)  (MOp:[][]f32)
+           (breaks:[]i32) (means:[]f32)
 
            (Xseq:[][]f32)
            (Xsqrseq:[][][]f32)
@@ -111,7 +112,8 @@ entry main (X:[][]f32)          --0
            (sigmasseq:[]f32)     --23
            (MO_fstsseq:[]f32)    --24
            (MOpseq:[][]f32)
-        --    (MOppseq:[][]f32)  (breaksseq:[]i32) (meansseq:[]f32)
+        --    (MOppseq:[][]f32)
+           (breaksseq:[]i32) (meansseq:[]f32)
             =
 -- , Xsqr, Xinv, beta0,
 --                   beta, y_preds, Nss, y_errors,
@@ -134,6 +136,7 @@ let valhs     = validate1Dint hs hsseq
 let valsigmas = validate1Dfloat sigmas sigmasseq
 let valMO_fsts = validate1Dfloat MO_fsts MO_fstsseq
 let valMOp  = validate2Dfloat MOp MOpseq
+let valbreaks = validate1Dfloat breaks breaksseq
 
 let fst xs = let (x,_,_,_,_) = xs in x
 let snd xs = let (_,x,_,_,_) = xs in x
@@ -141,7 +144,7 @@ let thr xs = let (_,_,x,_,_) = xs in x
 let frt xs = let (_,_,_,x,_) = xs in x
 let fvt xs = let (_,_,_,_,x) = xs in x
 let results = [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr,
-               valNss, valindss, valnss,valhs,valsigmas,valMO_fsts,valMOp]
+               valNss, valindss, valnss,valhs,valsigmas,valMO_fsts,valMOp, valbreaks]
 
 let allTestTrue  = map fst results
 let allTestNumEr = map snd results

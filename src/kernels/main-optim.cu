@@ -693,7 +693,10 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_breaks, d_breaks, breaks_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_means, d_means, means_size, cudaMemcpyDeviceToHost);
+      printEi(fpV, h_breaks, m);
+      printEf(fpV, h_means, m);
 
       printf("GPU Optimized Kernel 10 runs in: %lu microsecs\n", elapsed);
     //   float microsecPerMatrixMul = elapsed;
