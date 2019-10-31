@@ -44,7 +44,7 @@ let validate3Dfloat [n][m][l] (xs3 : [n][m][l]f32) (ys3: [n][m][l]f32) =
 let errori32 x y =
     i32.abs(x - y) == 0
 
-let validate1Dint [n] (xs : [n]i32) (ys: [n]i32) : (bool, i32, i32, i32) =
+let validate1Dint [n] (xs : [n]i32) (ys: [n]i32) : (bool, i32, i32, i32, i32) =
   let diffs = map3 (\x y i -> if (errori32 x y)
                               then (true, 0, 0, 0)
                               else (false, i, x, y)
