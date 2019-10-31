@@ -670,8 +670,8 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
                             int* mappingindices, float* MO_fsts,
                             float* y_errors, int* val_indss, float* MOp,
                             float* means, int* fstBreakP, float* MOpp) {
-    extern __shared__ volatile float sh_mem[];
-    volatile int* sh_brk = (volatile int*) sh_mem;
+    extern __shared__ volatile float sh__mem[];
+    volatile int* sh_brk = (volatile int*) sh__mem;
 
     int pix = blockIdx.x;
     int i = threadIdx.x;
@@ -690,16 +690,16 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
     } else {
         tmp = -y_errors[pix*N + ns - h + i] + y_errors[pix*N + ns + i];
     }
-    sh_mem[i] = tmp;
+    sh__mem[i] = tmp;
     __syncthreads();
 
-    float mo = scanIncBlock<Add<float> >(sh_mem, threadIdx.x);
+    float mo = scanIncBlock<Add<float> >(sh__mem, threadIdx.x);
 
     float mop = mo / (sigma * sqrt((float) ns));
     __syncthreads();
-    sh_mem[i] = (i < Ns - ns) ? mop : 0.0;
+    sh__mem[i] = (i < Ns - ns) ? mop : 0.0;
     __syncthreads();
-    float mean = scanIncBlock<Add<float> >(sh_mem, threadIdx.x);
+    float mean = scanIncBlock<Add<float> >(sh__mem, threadIdx.x);
     if(i == blockDim.x-1){
         means[pix] = mean;
     }
