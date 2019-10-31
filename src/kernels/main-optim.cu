@@ -407,8 +407,8 @@ int main(int argc, char const *argv[]) {
 // X validation with the sequential version
 //------------------------------------------------------------------------------
       // mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
-      gaussJordanG(m, K, h_Xsqr, h_XInv);
-      cudaMemcpy(d_XInv, h_XInv, Xsqr_size, cudaMemcpyHostToDevice);
+      gaussJordanG(m, K, h_Xsqr, h_Xinv);
+      cudaMemcpy(d_Xinv, h_Xinv, Xsqr_size, cudaMemcpyHostToDevice);
 //------------------------------------------------------------------------------
       // validation
       printM(fpV, h_Xinv, m, K);
