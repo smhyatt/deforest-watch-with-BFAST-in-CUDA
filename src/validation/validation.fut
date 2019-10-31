@@ -1,5 +1,5 @@
 
--- Validating float arrays 
+-- Validating float arrays
 
 let epsilon = 0.01f32
 
@@ -13,14 +13,14 @@ let relError x y =
             in  f32.abs(x'-y') / m < epsilon
 
 let validate1Dfloat [n] (xs : [n]f32) (ys: [n]f32) : (bool, i32, i32, f32, f32) =
-  let diffs = map3 (\x y i -> if (relError x y) 
+  let diffs = map3 (\x y i -> if (relError x y)
                               then (true, 0, 0.0, 0.0)
                               else (false, i, x, y)
                    ) xs ys (iota n)
-  let num_inv = map (\(f,_,_,_) -> if f then 0 else 1) diffs 
+  let num_inv = map (\(f,_,_,_) -> if f then 0 else 1) diffs
                   |> reduce (+) 0i32
-  let (valid, ind, v1, v2) =   
-      reduce (\(b1, i1, x1, y1) (b2, i2, x2, y2) -> 
+  let (valid, ind, v1, v2) =
+      reduce (\(b1, i1, x1, y1) (b2, i2, x2, y2) ->
                 if b1 then (b2, i2, x2, y2)
                       else (b1, i1, x1, y1)
              )
@@ -39,17 +39,17 @@ let validate3Dfloat [n][m][l] (xs3 : [n][m][l]f32) (ys3: [n][m][l]f32) =
   in  validate2Dfloat xs2 ys2
 
 
--- Validating int arrays 
+-- Validating int arrays
 
 let errori32 x y =
     i32.abs(x - y) == 0
 
 let validate1Dint [n] (xs : [n]i32) (ys: [n]i32) : (bool, i32, i32, i32) =
-  let diffs = map3 (\x y i -> if (errori32 x y) 
+  let diffs = map3 (\x y i -> if (errori32 x y)
                               then (true, 0, 0, 0)
                               else (false, i, x, y)
                    ) xs ys (iota n)
-  in  reduce (\(b1, i1, x1, y1) (b2, i2, x2, y2) -> 
+  in  reduce (\(b1, i1, x1, y1) (b2, i2, x2, y2) ->
                 if b1 then (b2, i2, x2, y2)
                       else (b1, i1, x1, y1)
              )
@@ -81,7 +81,7 @@ entry main (X:[][]f32)
            (beta0:[][]f32)
            (beta:[][]f32)
            (y_preds:[][]f32)
-           (Nss:[]i32) (y_errors:[][]f32)(val_indss:[][]i32) 
+           (Nss:[]i32) (y_errors:[][]f32)(val_indss:[][]i32)
            --(hs:[]i32) (nss:[]i32) (sigmas:[]f32) (MO_fsts:[]f32)
         --    (MOpp:[][]f32)  (MOp:[][]f32) (breaks:[]i32) (means:[]f32)
 
@@ -89,7 +89,7 @@ entry main (X:[][]f32)
            (Xsqrseq:[][][]f32)
            (Xinvseq:[][][]f32)
            (beta0seq:[][]f32)
-           (betaseq:[][]f32) 
+           (betaseq:[][]f32)
            (y_predsseq:[][]f32)
            (Nssseq:[]i32) (y_errorsseq:[][]f32) (val_indssseq:[][]i32)
         --    (hsseq:[]i32) (nssseq:[]i32) (sigmasseq:[]f32) (MO_fstsseq:[]f32)
@@ -112,6 +112,6 @@ let valyerr  = validate2Dfloat y_errors y_errorsseq
 let valnss   = validate1Dint Nss Nssseq
 let valindss = validate2Dint val_indss val_indssseq
 
-in valXinv
+in valX
 
 
