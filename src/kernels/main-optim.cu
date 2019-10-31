@@ -664,10 +664,8 @@ int main(int argc, char const *argv[]) {
    //// KERNEL 10
    /////////////////////////////////////////////////////////////////////////
    {
-      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
-      dim3 grid (dimx, dimy, 1);
+      dim3 block(N-n, 1, 1);
+      dim3 grid (m, 1, 1);
 
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
@@ -677,7 +675,7 @@ int main(int argc, char const *argv[]) {
       cudaMemcpy(d_bounds, h_bounds, bound_size, cudaMemcpyHostToDevice);
 
       // GPU call to kernel 10
-      ker10 <<< grid, block >>> (lam, m, n, N, d_bounds,
+      ker10 <<< grid, block, (N-n)*sizeof(float) >>> (lam, m, n, N, d_bounds,
                                 d_Nss, d_nss, d_sigmas,  d_hs,
                                 d_mappingindices, d_MOfsts,
                                 d_yerrs, d_indss,  d_MOp,
