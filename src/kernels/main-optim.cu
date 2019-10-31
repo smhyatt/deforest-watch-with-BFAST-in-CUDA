@@ -239,10 +239,11 @@ int main(int argc, char const *argv[]) {
    uint Xsqr_size  = K*K*m*sizeof(float);
    uint B0_size    = K*m*sizeof(float);
    uint MO_size    = m*sizeof(float);
-   uint MOp_size    = Nmn*sizeof(float);
-   uint MOpp_size    = Nmn*sizeof(float);
-   uint means_size    = m*sizeof(float);
-   uint breaks_size    = m*sizeof(int);
+   uint MOp_size   = Nmn*sizeof(float);
+   uint MOpp_size  = Nmn*sizeof(float);
+   uint means_size = m*sizeof(float);
+   uint breaks_size= m*sizeof(int);
+   float bound_size = N-n*sizeof(float);
    // Tile size for register tiling
    const uint R = 30;
 
@@ -262,10 +263,11 @@ int main(int argc, char const *argv[]) {
    float* h_sigmas = (float*) calloc(m,sizeof(float));
    int  * h_indss  = (int  *) calloc(m*N,sizeof(int));
    float* h_MOfsts = (float*) calloc(m,sizeof(float));
+   float* h_bound  = (float*) calloc(N-n,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
    float *d_X, *d_XT, *d_Xsqr, *d_Xinv, *d_YT, *d_B0, *d_B, *d_yhat;
-   float *d_yerall, *d_yerrs, *d_MOfsts, *d_sigmas, *d_MOp, *d_means, *d_MOpp;
+   float *d_yerall, *d_yerrs, *d_MOfsts, *d_sigmas, *d_MOp, *d_means, *d_MOpp, *d_bound;
    uint  *d_Nss, *d_nss;
    int   *d_indss, *d_hs, *d_break;
    cudaMalloc((void**) &d_X, X_size);
@@ -289,6 +291,7 @@ int main(int argc, char const *argv[]) {
    cudaMalloc((void**) &d_MOpp, MOpp_size);
    cudaMalloc((void**) &d_breaks, breaks_size);
    cudaMalloc((void**) &d_means, means_size);
+   cudaMalloc((void**) &d_bound, bound_size);
 
 
    /////////////////////////////////////////////////////////////////////////
@@ -670,13 +673,11 @@ int main(int argc, char const *argv[]) {
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
 
+      compBound(lam, n, N, Nmn, mappingindices, h_bound);
+      cudaMemcpy(d_bound, h_bound, bound_size, cudaMemcpyHostToDevice);
+
       // GPU call to kernel 10
-    //   ker10 <<< grid, block >>> (float lam, uint m, uint n, uint N, float* bound,
-    //     uint* Nss, uint* nss, float* sigmas, int* hs,
-    //     int* mappingindices, float* MO_fsts,
-    //     float* y_errors, int* val_indss, float* MOp,
-    //     float* means, int* fstBreakP, float* MOpp);
-      ker10 <<< grid, block >>> (lam, m, n, N, bound,
+      ker10 <<< grid, block >>> (lam, m, n, N, d_bound,
                                 d_Nss, d_nss, d_sigmas,  d_hs,
                                 d_mappingindices, d_MO_fsts,
                                 d_yerr, d_indss,  d_MOp,

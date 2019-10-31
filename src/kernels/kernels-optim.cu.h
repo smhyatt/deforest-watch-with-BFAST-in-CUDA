@@ -670,67 +670,71 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
                             int* mappingindices, float* MO_fsts,
                             float* y_errors, int* val_indss, float* MOp,
                             float* means, int* fstBreakP, float* MOpp) {
-    int pix = blockIdx.x;
-    int i = threadIdx.x;
-    uint Nmn = N - n;
+    extern __shared__ volatile float shmem[];
+    volatile int* sh_brk = (volatile int*) (shmem);
 
-    extern __shared__ volatile uint shmem[];
-    volatile float* shmem_acc = (volatile float*) shmem;
-    volatile float* MO = (volatile float*) (shmem + n);
-    // volatile float* isBreak = (volatile float*) (shmem + n);
+    //volatile float* shmem_acc = (volatile float*) shmem;
+    //volatile float* means = (volatile float*) (shmem + N - n);
+    //volatile int* breaks = (volatile int*) (means + N - n);
+    // volatile float* MO = (volatile float*) (shmem + n);
     // volatile float* fstBreak = (volatile float*) (shmem + n);
     // volatile float* adjBreak = (volatile float*) (shmem + n);
     // volatile float* val_indssP = (volatile float*) (shmem + n);
 
-    float acc = 0.0;
-    if(i >= Nss[pix]-nss[pix]){
-        MO[pix*Nmn + i] = acc;
+    int pix = blockIdx.x;
+    int i = threadIdx.x;
+    uint Nmn = N - n;
+    uint Ns = Nss[pix];
+    uint ns = nss[pix];
+    uint h = hs[pix];
+    float sigma = sigmas[pix];
+
+    float tmp;
+    if(i >= Ns-ns){
+        tmp = 0;
     } else if(i==0) {
-        acc += MO_fsts[pix];
-        MO[pix*Nmn + i] = acc;
+        tmp = MO_fsts[pix];
     } else {
-        acc += -y_errors[pix*N + nss[pix] - hs[pix] + i] + y_errors[pix*N + nss[pix] + i];
-        MO[pix*Nmn + i] = acc;
+        tmp = -y_errors[pix*N + ns - h + i] + y_errors[pix*N + ns + i];
     }
+    shmem[i] = tmp;
+    __syncthreads();
 
-    float mo = MO[pix*Nmn + i];
-    MOp[pix*Nmn + i] = mo / (sigmas[pix] * (sqrt( (float) nss[pix] )));
+    float mo = scanIncBlock<Add<float> >(shmem, threadIdx.x);
 
-#if 0
-    float mop = MOp[pix*Nmn + i];
-    if(i < (Nss[pix]-nss[pix]) && mop != F32_MIN){
-        if (fabsf(mop) > bound[i] == 1) {
-            isBreak[pix]  = 1;
-            fstBreak[pix] = i;
-            break;
-        }
+    float mop = mo / (sigma * sqrt((float) ns));
+    __syncthreads();
+    shmem[i] = (i < Ns - ns) ? mop : 0.0;
+    __syncthreads();
+    float mean = scanIncBlock<Add<float> >(shmem, threadIdx.x);
+    if(i == blockDim.x-1){
+        means[pix] = mean;
     }
-    if (i < (Nss[pix]-nss[pix])) {
-        means[pix] += MOp[pix*Nmn + i];
-    }
+    __syncthreads();
 
-    if (!isBreak[pix]){
-        fstBreak[pix] = -1;
+    sh_brk[i] = (i < Ns - ns
+                    && (F32_MIN != mop)
+                    && (fabsf(mop) > bound) ? i : -1;
+    __syncthreads();
+
+    int fstBreak = scanIncBlock<FirstInd>(sh_brk, i);
+
+    int fstBreakP  = 0;
+    if(fstBreak != -1) {
+        int adj_break = (ind<Nmn) ? val_inds[ind+ns] - n : -1;
+
+        // Note: remember cuda rounds up! in case of adj_break is zero we return -1
+        fstBreakP = adj_break? -1: ((adj_break-1) / 2) * 2 + 1;
     } else {
-        adjBreak[pix] = (fstBreak[pix] < Nss[pix]-nss[pix])?
-                        (val_indss[pix*N + fstBreak[pix] + nss[pix]]-n)
-                        : -1;
-        fstBreakP[pix] = ((adjBreak[pix]-1) / 2) * 2 + 1;
+        fstBreakP = -1;
     }
 
-    if (nss[pix] <= 5 || Nss[pix]-nss[pix] <= 5) {
-        fstBreakP[pix] = -2;
+    int fstBreakPP = (ns <=5 || Ns-ns <= 5) ? -2 : fstBreakP;
+
+    if(i==blockIdx.x-1){
+        fstBreakP[pix] = fstBreakPP;
     }
 
-    val_indssP[pix*Nmn + i] = (fstBreakP[pix] < Nss[pix]-nss[pix])?
-                                (val_indss[pix*N + fstBreakP[pix]+nss[pix]]-n)
-                            : -1;
-
-    int currIdx = val_indssP[pix*Nmn + i];
-    if (currIdx != -1 ) {
-        MOpp[pix*Nmn + currIdx] = MOp[pix*Nmn + i];
-    }
-#endif
 }
 
 #endif
