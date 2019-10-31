@@ -131,6 +131,6 @@ let allTestInds  = map thr [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, 
 let allTestFutE = map frt [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
 let allTestOurE = map fvt [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
 
-in (allTestTrue, allTestNumEr)
+in (allTestTrue, allTestNumEr, allTestInds, allTestFutE, allTestOurE)
 
 
