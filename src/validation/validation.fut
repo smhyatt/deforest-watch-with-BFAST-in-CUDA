@@ -121,8 +121,16 @@ let valindss = validate2Dint val_indss val_indssseq
 
 -- let (vXs,nps,inds,fes,ves) =
 let fst xs = let (x,_,_,_,_) = xs in x
-let allTestTrue = map fst [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
+let snd xs = let (_,x,_,_,_) = xs in x
+let thr xs = let (_,_,x,_,_) = xs in x
+let frt xs = let (_,_,_,x,_) = xs in x
+let fvt xs = let (_,_,_,_,x) = xs in x
+let allTestTrue  = map fst [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
+let allTestNumEr = map snd [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
+let allTestInds  = map thr [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
+let allTestFutE = map frt [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
+let allTestOurE = map fvt [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
 
-in allTestTrue
+in (allTestTrue, allTestNumEr)
 
 
