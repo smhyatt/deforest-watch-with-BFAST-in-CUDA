@@ -45,6 +45,7 @@ class FirstInd {
         { return (int) -1;    }
     static __device__ __host__ inline int apply(const int t1, const int t2)
         { return t1 != -1 ? t1 : t2; }
+    static __device__ __host__ inline int remVolatile(volatile int& t)    { int res = t; return res; }
 };
 
 

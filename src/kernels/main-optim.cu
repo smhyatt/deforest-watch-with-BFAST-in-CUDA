@@ -677,10 +677,10 @@ int main(int argc, char const *argv[]) {
       cudaMemcpy(d_bounds, h_bounds, bound_size, cudaMemcpyHostToDevice);
 
       // GPU call to kernel 10
-      ker10 <<< grid, block >>> (lam, m, n, N, d_bound,
+      ker10 <<< grid, block >>> (lam, m, n, N, d_bounds,
                                 d_Nss, d_nss, d_sigmas,  d_hs,
-                                d_mappingindices, d_MO_fsts,
-                                d_yerr, d_indss,  d_MOp,
+                                d_mappingindices, d_MOfsts,
+                                d_yerrs, d_indss,  d_MOp,
                                 d_means, d_breaks, d_MOpp);
       cudaDeviceSynchronize();
 
