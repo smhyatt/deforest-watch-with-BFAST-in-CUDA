@@ -81,25 +81,33 @@ let validate2Dint [n][m] (xs2 : [n][m]i32) (ys2: [n][m]i32) : (bool, i32, i32, f
 --                   (mappingindices : [N]i32)
 --                   (images : [m][N]f32) =
 
-entry main (X:[][]f32)
-           (Xsqr:[][][]f32)
-           (Xinv:[][][]f32)
-           (beta0:[][]f32)
-           (beta:[][]f32)
-           (y_preds:[][]f32)
-           (Nss:[]i32) (y_errors:[][]f32)(val_indss:[][]i32)
-           (nss:[]i32) (hs:[]i32) (sigmas:[]f32)
+entry main (X:[][]f32)          --1
+           (Xsqr:[][][]f32)     --2
+           (Xinv:[][][]f32)     --3
+           (beta0:[][]f32)      --4
+           (beta:[][]f32)       --5
+           (y_preds:[][]f32)    --6
+           (Nss:[]i32)          --7
+           (y_errors:[][]f32)   --8
+           (val_indss:[][]i32)  --9
+           (nss:[]i32)          --10
+           (hs:[]i32)           --11
+           (sigmas:[]f32)       --12
            --(MO_fsts:[]f32)
         --    (MOpp:[][]f32)  (MOp:[][]f32) (breaks:[]i32) (means:[]f32)
 
-           (Xseq:[][]f32)
-           (Xsqrseq:[][][]f32)
-           (Xinvseq:[][][]f32)
-           (beta0seq:[][]f32)
-           (betaseq:[][]f32)
-           (y_predsseq:[][]f32)
-           (Nssseq:[]i32) (y_errorsseq:[][]f32) (val_indssseq:[][]i32)
-           (nssseq:[]i32) (hsseq:[]i32) (sigmasseq:[]f32)
+           (Xseq:[][]f32)       --13
+           (Xsqrseq:[][][]f32)  --14
+           (Xinvseq:[][][]f32)  --15
+           (beta0seq:[][]f32)   --16
+           (betaseq:[][]f32)    --17
+           (y_predsseq:[][]f32) --18
+           (Nssseq:[]i32)       --19
+           (y_errorsseq:[][]f32)--20
+           (val_indssseq:[][]i32)--21
+           (nssseq:[]i32)       --22
+           (hsseq:[]i32)        --23
+           (sigmasseq:[]f32)    --24
         -- (MO_fstsseq:[]f32)
         --    (MOppseq:[][]f32) (MOpseq:[][]f32) (breaksseq:[]i32) (meansseq:[]f32)
             =
