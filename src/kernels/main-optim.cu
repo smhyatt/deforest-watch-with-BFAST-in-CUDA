@@ -612,43 +612,43 @@ int main(int argc, char const *argv[]) {
         printf( "GPU Optimized Kernel 8 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
     }
 
-#if 0
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 9
    /////////////////////////////////////////////////////////////////////////
    {
-      dim3 block(N, 1, 1);
-      dim3 grid (m, 1, 1);
+    dim3 block((n*hfrac), 1, 1);
+    dim3 grid (m, 1, 1);
 
-      unsigned long int elapsed;
-      struct timeval t_start, t_end, t_diff;
-      gettimeofday(&t_start, NULL);
+    unsigned long int elapsed;
+    struct timeval t_start, t_end, t_diff;
+    gettimeofday(&t_start, NULL);
 
-      // GPU call to kernel 9
-      ker9 <<< grid, block >>> (m, N, d_hs, d_yerrs, d_nss, d_MOfsts);
-      cudaDeviceSynchronize();
+    // GPU call to kernel 9
+    ker9 <<< grid, block, (n*hfrac)*sizeof(float) >>> (hfrac, n, m, N, d_hs, d_yerrs, d_nss, d_MOfsts);
+    cudaDeviceSynchronize();
 
-      gettimeofday(&t_end, NULL);
-      timeval_subtract(&t_diff, &t_end, &t_start);
-      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+    gettimeofday(&t_end, NULL);
+    timeval_subtract(&t_diff, &t_end, &t_start);
+    elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
 
-      // check for cuda errors
-      gpuAssert( cudaPeekAtLastError() );
+    // check for cuda errors
+    gpuAssert( cudaPeekAtLastError() );
 
-      // copy result from device to host
-      cudaMemcpy(h_MOfsts, d_MOfsts, _size, cudaMemcpyDeviceToHost);
+    // copy result from device to host
+    cudaMemcpy(h_MOfsts, d_MOfsts, MO_size, cudaMemcpyDeviceToHost);
 
-      // validation
-    //   printEf(fpV, h_MOfsts, m);
+    // validation
+    printEf(fpV, h_MOfsts, m);
 
-      printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
-      // float microsecPerMatrixMul = elapsed;
-      // double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-      // double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-      // printf( "GPU Optimized Kernel 9 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
-   }
+    printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
+    // float microsecPerMatrixMul = elapsed;
+    // double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+    // double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+    // printf( "GPU Optimized Kernel 9 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+ }
 
+ #if 0
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 10

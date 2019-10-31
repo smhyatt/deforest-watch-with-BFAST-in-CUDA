@@ -633,45 +633,104 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
 //// KERNEL 9
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+__global__ void ker9(float hfrac, uint n, uint m, uint N, int* hs,
+                     float* yerrs, uint* nss, float* MOfsts) {
+    extern __shared__ volatile float shmem1[];
+    volatile float* sh_yerrs = (volatile float*)shmem1;
 
-// `N` is the length of the input array
-// `T` is the total number of CUDA threads spawned.
-// `d_tmp` is the result array, having number-of-blocks elements.
-// `d_in` is the input array of length `N`.
+    uint  pix = blockIdx.x;    // grid.x: m
+    uint  i   = threadIdx.x;   // blockDim.x: n * hfrac
+    int   h   = hs[pix];
+    float tmp = 0.0;
 
-// __global__ void ker9(uint m, uint N, int* hs, float* yerrs, uint* nss, float* MOfsts) {
-//     extern __shared__ volatile uint shmem[];
+    if (i < h && pix < m) {
+        uint ns = nss[pix];
+        float yerr = yerrs[pix*N + i + ns-h+1];
+        tmp = yerr;
+    }
 
-//     uint pix = blockIdx.x;
-//     uint i = threadIdx.x;
+    sh_yerrs[threadIdx.x] = tmp;
 
-//     // get hmax
-//     // redCommuKernel(hmax_sh, hs_sh, N, T);
-//     int h = hs[pix*N + i];
+    __syncthreads();
 
-//     if (pix < m && threadIdx.x < N) {
-//         shmem[threadIdx.x] = h;
-//     }
+    tmp = scanIncBlock<Add<float> >(sh_yerrs, threadIdx.x);
 
-//     int hmax = scanIncBlock<Max<int> >(shmem, threadIdx.x);
-
-//     // RET - KUN MIDLERTIDIG !!!!!!
-//     int hpix = hs[pix];
-//     uint nsp = nns[pix];
-//     if (i < hmax) {
-//         MOfsts[pix] += yerrs[pix*N + i + nsp - hpix + 1];
-//     }
-
-// }
-
+    if (threadIdx.x == blockDim.x-1) {
+        MOfsts[pix] = tmp;
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 //// KERNEL 10
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+#if 0
+__global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
+                            uint* Nss, uint* nss, float* sigmas, int* hs,
+                            int* mappingindices, float* MO_fsts,
+                            float* y_errors, int* val_indss, float* MOp,
+                            float* means, int* fstBreakP, float* MOpp) {
+    int pix = blockIdx.x;
+    int i = threadIdx.x;
 
+    extern __shared__ volatile uint shmem[];
+    volatile float* shmem_acc = (volatile uint*) shmem;
+    volatile float* MO = (volatile float*) (shmem + n);
+    volatile float* isBreak = (volatile float*) (shmem + n);
+    volatile float* fstBreak = (volatile float*) (shmem + n);
+    volatile float* adjBreak = (volatile float*) (shmem + n);
+    volatile float* val_indssP = (volatile float*) (shmem + n);
 
+    float acc = 0.0;
+    if(i >= Nss[pix]-nss[pix]){
+        MO[pix*Nmn + i] = acc;
+    } else if(i==0) {
+        acc += MO_fsts[pix];
+        MO[pix*Nmn + i] = acc;
+    } else {
+        acc += -y_errors[pix*N + nss[pix] - hs[pix] + i] + y_errors[pix*N + nss[pix] + i];
+        MO[pix*Nmn + i] = acc;
+    }
+
+    float mo = MO[pix*Nmn + i];
+    MOp[pix*Nmn + i] = mo / (sigmas[pix] * (sqrt( (float) nss[pix] )));
+
+    float mop = MOp[pix*Nmn + i];
+    if(i < (Nss[pix]-nss[pix]) && mop != F32_MIN){
+        if (fabsf(mop) > bound[i] == 1) {
+            isBreak[pix]  = 1;
+            fstBreak[pix] = i;
+            break;
+        }
+    }
+    if (i < (Nss[pix]-nss[pix])) {
+        means[pix] += MOp[pix*Nmn + i];
+    }
+
+    if (!isBreak[pix]){
+        fstBreak[pix] = -1;
+    } else {
+        adjBreak[pix] = (fstBreak[pix] < Nss[pix]-nss[pix])?
+                        (val_indss[pix*N + fstBreak[pix] + nss[pix]]-n)
+                        : -1;
+        fstBreakP[pix] = ((adjBreak[pix]-1) / 2) * 2 + 1;
+    }
+
+    if (nss[pix] <= 5 || Nss[pix]-nss[pix] <= 5) {
+        fstBreakP[pix] = -2;
+    }
+
+    val_indssP[pix*Nmn + i] = (fstBreakP[pix] < Nss[pix]-nss[pix])?
+                                (val_indss[pix*N + fstBreakP[pix]+nss[pix]]-n)
+                            : -1;
+
+    int currIdx = val_indssP[pix*Nmn + i];
+    if (currIdx != -1 ) {
+        MOpp[pix*Nmn + currIdx] = MOp[pix*Nmn + i];
+    }
+}
+#endif
 
 #endif
 
