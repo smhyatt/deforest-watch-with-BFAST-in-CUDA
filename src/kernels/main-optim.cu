@@ -390,7 +390,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 3
-      ker3<<< grid, block, 4*K*K*sizeof(float) >>>(m, K, d_Xsqr, d_Xinv);
+    //   ker3<<< grid, block, 4*K*K*sizeof(float) >>>(m, K, d_Xsqr, d_Xinv);
       cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
@@ -403,6 +403,13 @@ int main(int argc, char const *argv[]) {
       // copy result from device to host
       cudaMemcpy(h_Xinv, d_Xinv, Xsqr_size, cudaMemcpyDeviceToHost);
 
+//------------------------------------------------------------------------------
+// X validation with the sequential version
+//------------------------------------------------------------------------------
+      // mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
+      gaussJordanG(m, K, h_Xsqr, h_XInv);
+      cudaMemcpy(d_XInv, h_XInv, Xsqr_size, cudaMemcpyHostToDevice);
+//------------------------------------------------------------------------------
       // validation
       printM(fpV, h_Xinv, m, K);
 
