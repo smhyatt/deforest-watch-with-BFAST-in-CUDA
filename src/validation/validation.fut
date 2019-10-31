@@ -113,8 +113,8 @@ let valnss   = validate1Dint Nss Nssseq
 let valindss = validate2Dint val_indss val_indssseq
 
 
-let tts(vXs,nps,inds,fes,ves) = zip [valX,valXsqr]
+let (vXs,nps,inds,fes,ves) = zip [valX,valXsqr]
 
-in tts
+in vXs
 
 
