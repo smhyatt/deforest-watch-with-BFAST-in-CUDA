@@ -313,11 +313,11 @@ int main(int argc, char const *argv[]) {
 //------------------------------------------------------------------------------
 // X validation with the sequential version
 //------------------------------------------------------------------------------
-      mkX(N, K, freq, h_mappingindices, h_seq_X);
-      transpose(N, K, h_seq_X, h_seq_XT);
+      mkX(N, K, freq, h_mappingindices, h_X);
+      transpose(N, K, h_X, h_XT);
       // copy host memory to device
-      cudaMemcpy(d_X, h_seq_X, X_size, cudaMemcpyHostToDevice);
-      cudaMemcpy(d_XT, h_seq_XT, X_size, cudaMemcpyHostToDevice);
+      cudaMemcpy(d_X, h_X, X_size, cudaMemcpyHostToDevice);
+      cudaMemcpy(d_XT, h_XT, X_size, cudaMemcpyHostToDevice);
 //------------------------------------------------------------------------------
 
       // add to validation
