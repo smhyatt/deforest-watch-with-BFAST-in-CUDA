@@ -174,6 +174,7 @@ int main(int argc, char const *argv[]) {
     float lam   = atof(input6);
 
     int K  = 2*k + 2;
+    uint Nmn = N-n;
     int mappingLen, imageLen, i = 0;
 
     // getting the lengths of mappingindices and images
@@ -238,7 +239,10 @@ int main(int argc, char const *argv[]) {
    uint Xsqr_size  = K*K*m*sizeof(float);
    uint B0_size    = K*m*sizeof(float);
    uint MO_size    = m*sizeof(float);
-
+   uint MOp_size    = Nmn*sizeof(float);
+   uint MOpp_size    = Nmn*sizeof(float);
+   uint means_size    = m*sizeof(float);
+   uint breaks_size    = m*sizeof(int);
    // Tile size for register tiling
    const uint R = 30;
 
@@ -261,9 +265,9 @@ int main(int argc, char const *argv[]) {
 
    // allocate device memory for X, XT and Xsqr
    float *d_X, *d_XT, *d_Xsqr, *d_Xinv, *d_YT, *d_B0, *d_B, *d_yhat;
-   float *d_yerall, *d_yerrs, *d_MOfsts, *d_sigmas;
+   float *d_yerall, *d_yerrs, *d_MOfsts, *d_sigmas, *d_MOp, *d_means, *d_MOpp;
    uint  *d_Nss, *d_nss;
-   int   *d_indss, *d_hs;
+   int   *d_indss, *d_hs, *d_break;
    cudaMalloc((void**) &d_X, X_size);
    cudaMalloc((void**) &d_XT, X_size);
    cudaMalloc((void**) &d_YT, Y_size);
@@ -281,6 +285,10 @@ int main(int argc, char const *argv[]) {
    cudaMalloc((void**) &d_indss, I_size);
    cudaMalloc((void**) &d_hs, MO_size);
    cudaMalloc((void**) &d_MOfsts, MO_size);
+   cudaMalloc((void**) &d_MOp, MOp_size);
+   cudaMalloc((void**) &d_MOpp, MOpp_size);
+   cudaMalloc((void**) &d_breaks, breaks_size);
+   cudaMalloc((void**) &d_means, means_size);
 
 
    /////////////////////////////////////////////////////////////////////////
@@ -648,7 +656,6 @@ int main(int argc, char const *argv[]) {
     // printf( "GPU Optimized Kernel 9 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
  }
 
- #if 0
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 10
@@ -664,8 +671,17 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 10
-      // ker10 <<< grid, block >>> ();
-      // cudaDeviceSynchronize();
+    //   ker10 <<< grid, block >>> (float lam, uint m, uint n, uint N, float* bound,
+    //     uint* Nss, uint* nss, float* sigmas, int* hs,
+    //     int* mappingindices, float* MO_fsts,
+    //     float* y_errors, int* val_indss, float* MOp,
+    //     float* means, int* fstBreakP, float* MOpp);
+      ker10 <<< grid, block >>> (lam, m, n, N, bound,
+                                d_Nss, d_nss, d_sigmas,  d_hs,
+                                d_mappingindices, d_MO_fsts,
+                                d_yerr, d_indss,  d_MOp,
+                                d_means, d_breaks, d_MOpp);
+      cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
@@ -678,13 +694,12 @@ int main(int argc, char const *argv[]) {
       // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
 
       printf("GPU Optimized Kernel 10 runs in: %lu microsecs\n", elapsed);
-      float microsecPerMatrixMul = elapsed;
-      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-      printf( "GPU Optimized Kernel 10 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+    //   float microsecPerMatrixMul = elapsed;
+    //   double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+    //   double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+    //   printf( "GPU Optimized Kernel 10 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
 
    }
-#endif
 
 
    fclose(fpV);

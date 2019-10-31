@@ -665,7 +665,6 @@ __global__ void ker9(float hfrac, uint n, uint m, uint N, int* hs,
 //// KERNEL 10
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
-#if 0
 __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
                             uint* Nss, uint* nss, float* sigmas, int* hs,
                             int* mappingindices, float* MO_fsts,
@@ -696,6 +695,7 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
     float mo = MO[pix*Nmn + i];
     MOp[pix*Nmn + i] = mo / (sigmas[pix] * (sqrt( (float) nss[pix] )));
 
+#if 0
     float mop = MOp[pix*Nmn + i];
     if(i < (Nss[pix]-nss[pix]) && mop != F32_MIN){
         if (fabsf(mop) > bound[i] == 1) {
@@ -729,8 +729,8 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
     if (currIdx != -1 ) {
         MOpp[pix*Nmn + currIdx] = MOp[pix*Nmn + i];
     }
-}
 #endif
+}
 
 #endif
 
