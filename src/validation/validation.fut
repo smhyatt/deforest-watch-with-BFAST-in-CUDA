@@ -136,7 +136,7 @@ let valhs     = validate1Dint hs hsseq
 let valsigmas = validate1Dfloat sigmas sigmasseq
 let valMO_fsts = validate1Dfloat MO_fsts MO_fstsseq
 let valMOp  = validate2Dfloat MOp MOpseq
-let valbreaks = validate1Dfloat breaks breaksseq
+let valbreaks = validate1Dint breaks breaksseq
 
 let fst xs = let (x,_,_,_,_) = xs in x
 let snd xs = let (_,x,_,_,_) = xs in x
