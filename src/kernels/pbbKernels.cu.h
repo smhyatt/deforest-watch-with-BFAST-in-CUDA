@@ -41,9 +41,9 @@ class FirstInd {
   public:
     typedef int RedElTp;
     static const bool commutative = false;
-    static __device__ __host__ inline T identity()
-        { return (T) -1;    }
-    static __device__ __host__ inline T apply(const T t1, const T t2)
+    static __device__ __host__ inline int identity()
+        { return (int) -1;    }
+    static __device__ __host__ inline int apply(const int t1, const int t2)
         { return t1 != -1 ? t1 : t2; }
 };
 
