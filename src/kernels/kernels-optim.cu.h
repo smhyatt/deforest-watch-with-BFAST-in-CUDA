@@ -680,7 +680,7 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
     uint ns = nss[pix];
     uint h = hs[pix];
     float sigma = sigmas[pix];
-    val_inds = val_indss[pix];
+    int val_inds = val_indss[pix];
 
     float tmp;
     if(i >= Ns-ns){
