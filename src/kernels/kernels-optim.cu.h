@@ -192,7 +192,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
         Ash[k1*2*K + k2] = A[i*K*K + k1*K + k2];
     } else {
         // writes the identity matrix to the second half
-        Ash[k1*2*K + k2] = (float) (k1+K == k2);
+        Ash[k1*2*K + k2] = (k1+K == k2) ? 1.0 : 0.0;
     }
 
     #pragma unroll
@@ -213,15 +213,15 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
 
         // barrier for block-level sync
         __syncthreads();
-        AshTmp[k1*2*K + k2] = tmp;
+        Ash[k1*2*K + k2] = tmp;
 
         // barrier for block-level sync
         __syncthreads();
 
         // swap pointers
-        float* tmp2 = AshTmp;
-        AshTmp = Ash;
-        Ash    = tmp2;
+        //float* tmp2 = AshTmp;
+        //AshTmp = Ash;
+        //Ash    = tmp2;
     }
 
     if (K <= k2) {
