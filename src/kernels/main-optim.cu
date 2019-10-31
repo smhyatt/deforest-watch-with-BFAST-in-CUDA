@@ -334,8 +334,10 @@ int main(int argc, char const *argv[]) {
       // for(int i=0; i<100; i++) {
          // transpose Y for kernel 2 optimization
          // GPU call to kernel 2
-      transposeTiled(d_Y, d_YT, m, N, 32);
-      ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
+    //   transposeTiled(d_Y, d_YT, m, N, 32);
+    //   ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
+
+
       // }
       cudaDeviceSynchronize();
 
@@ -348,6 +350,13 @@ int main(int argc, char const *argv[]) {
 
       // copy result from device to host
       cudaMemcpy(h_Xsqr, d_Xsqr, Xsqr_size, cudaMemcpyDeviceToHost);
+
+//------------------------------------------------------------------------------
+// X validation with the sequential version
+//------------------------------------------------------------------------------
+      mkXsqrOptim(n, N, m, h_X, h_XT, h_Y, h_Xsqr, K);
+
+
 
       // validation
       printM(fpV, h_Xsqr, m, K);
