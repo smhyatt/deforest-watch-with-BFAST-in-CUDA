@@ -219,7 +219,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
         __syncthreads();
 
         // swap pointers
-        float* tmp2 = AshTmp;
+        volatile float* tmp2 = AshTmp;
         AshTmp = Ash;
         Ash    = tmp2;
     }
