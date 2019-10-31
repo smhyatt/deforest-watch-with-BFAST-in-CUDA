@@ -295,7 +295,7 @@ int main(int argc, char const *argv[]) {
       gettimeofday(&t_start, NULL);
 
       // GPU call to kernel 1
-      ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
+    //   ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
       cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
@@ -308,6 +308,17 @@ int main(int argc, char const *argv[]) {
       // copy result from device to host
       cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
       cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+
+
+//------------------------------------------------------------------------------
+// X validation with the sequential version
+//------------------------------------------------------------------------------
+      mkX(N, K, freq, h_mappingindices, h_seq_X);
+      transpose(N, K, h_seq_X, h_seq_XT);
+      // copy host memory to device
+      cudaMemcpy(d_X, h_seq_X, X_size, cudaMemcpyHostToDevice);
+      cudaMemcpy(d_XT, h_seq_XT, X_size, cudaMemcpyHostToDevice);
+//------------------------------------------------------------------------------
 
       // add to validation
       printX(fpV, h_X, K, N);
@@ -331,14 +342,12 @@ int main(int argc, char const *argv[]) {
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
 
-      // for(int i=0; i<100; i++) {
-         // transpose Y for kernel 2 optimization
-         // GPU call to kernel 2
-    //   transposeTiled(d_Y, d_YT, m, N, 32);
-    //   ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
+      //  transpose Y for kernel 2 optimization
+      //  GPU call to kernel 2
+      transposeTiled(d_Y, d_YT, m, N, 32);
+      ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
 
 
-      // }
       cudaDeviceSynchronize();
 
       gettimeofday(&t_end, NULL);
@@ -354,7 +363,7 @@ int main(int argc, char const *argv[]) {
 //------------------------------------------------------------------------------
 // X validation with the sequential version
 //------------------------------------------------------------------------------
-      mkXsqrOptim(n, N, m, h_X, h_XT, h_Y, h_Xsqr, K);
+//   mkXsqrOptim(n, N, m, h_X, h_XT, h_Y, h_Xsqr, K);
 
 
 
