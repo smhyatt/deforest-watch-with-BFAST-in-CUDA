@@ -612,7 +612,7 @@ int main(int argc, char const *argv[]) {
       cudaMemcpy(h_MOfsts, d_MOfsts, _size, cudaMemcpyDeviceToHost);
 
       // validation
-      printEf(fpV, h_MOfsts, m);
+    //   printEf(fpV, h_MOfsts, m);
 
       printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
       // float microsecPerMatrixMul = elapsed;
