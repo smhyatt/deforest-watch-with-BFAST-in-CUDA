@@ -706,22 +706,22 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
 
     sh_brk[i] = (i < Ns - ns
                     && (F32_MIN != mop)
-                    && (fabsf(mop) > bound)) ? i : -1;
+                    && (fabsf(mop) > bound[i])) ? i : -1;
     __syncthreads();
 
     int fstBreak = scanIncBlock<FirstInd>(sh_brk, i);
 
-    int fstBreakP  = 0;
+    int fstBreakp  = 0;
     if(fstBreak != -1) {
-        int adj_break = (ind<Nmn) ? val_inds[ind+ns] - n : -1;
+        int adj_break = (fstBreak<Nmn) ? val_inds[ind+ns] - n : -1;
 
         // Note: remember cuda rounds up! in case of adj_break is zero we return -1
-        fstBreakP = adj_break? -1: ((adj_break-1) / 2) * 2 + 1;
+        fstBreakp = adj_break? -1: ((adj_break-1) / 2) * 2 + 1;
     } else {
-        fstBreakP = -1;
+        fstBreakp = -1;
     }
 
-    int fstBreakPP = (ns <=5 || Ns-ns <= 5) ? -2 : fstBreakP;
+    int fstBreakPP = (ns <=5 || Ns-ns <= 5) ? -2 : fstBreakp;
 
     if(i==blockIdx.x-1){
         fstBreakP[pix] = fstBreakPP;
