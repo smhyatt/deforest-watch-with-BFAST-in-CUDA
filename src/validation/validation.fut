@@ -113,7 +113,7 @@ let valnss   = validate1Dint Nss Nssseq
 let valindss = validate2Dint val_indss val_indssseq
 
 
-let (vXs,nps,inds,fes,ves) = unzip [valX,valXsqr]
+let (vXs,nps,inds,fes,ves) = unzip (valX,valXsqr)
 
 in vXs
 
