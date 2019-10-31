@@ -269,7 +269,7 @@ int main(int argc, char const *argv[]) {
    float *d_X, *d_XT, *d_Xsqr, *d_Xinv, *d_YT, *d_B0, *d_B, *d_yhat;
    float *d_yerall, *d_yerrs, *d_MOfsts, *d_sigmas, *d_MOp, *d_means, *d_MOpp, *d_bounds;
    uint  *d_Nss, *d_nss;
-   int   *d_indss, *d_hs, *d_break;
+   int   *d_indss, *d_hs, *d_breaks;
    cudaMalloc((void**) &d_X, X_size);
    cudaMalloc((void**) &d_XT, X_size);
    cudaMalloc((void**) &d_YT, Y_size);
