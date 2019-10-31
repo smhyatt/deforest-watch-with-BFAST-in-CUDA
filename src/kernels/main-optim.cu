@@ -543,7 +543,6 @@ int main(int argc, char const *argv[]) {
       // double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
       // printf( "GPU Optimized Kernel 7 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
    }
-#if 0
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 8
@@ -589,6 +588,7 @@ int main(int argc, char const *argv[]) {
         printf( "GPU Optimized Kernel 8 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
     }
 
+#if 0
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 9
