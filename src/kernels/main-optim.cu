@@ -666,13 +666,15 @@ int main(int argc, char const *argv[]) {
    {
       dim3 block(N-n, 1, 1);
       dim3 grid (m, 1, 1);
-
+      printf("1\n");
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
 
       compBound(lam, n, N, Nmn, h_mappingindices, h_bounds);
+      printf("2\n");
       cudaMemcpy(d_bounds, h_bounds, bound_size, cudaMemcpyHostToDevice);
+      printf("3\n");
 
       // GPU call to kernel 10
       ker10 <<< grid, block, (N-n)*sizeof(float) >>> (lam, m, n, N, d_bounds,
@@ -680,8 +682,9 @@ int main(int argc, char const *argv[]) {
                                 d_mappingindices, d_MOfsts,
                                 d_yerrs, d_indss,  d_MOp,
                                 d_means, d_breaks, d_MOpp);
-      cudaDeviceSynchronize();
+                                cudaDeviceSynchronize();
 
+      printf("4\n");
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
       elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
