@@ -88,7 +88,8 @@ entry main (X:[][]f32)
            (beta:[][]f32)
            (y_preds:[][]f32)
            (Nss:[]i32) (y_errors:[][]f32)(val_indss:[][]i32)
-           --(hs:[]i32) (nss:[]i32) (sigmas:[]f32) (MO_fsts:[]f32)
+           (nss:[]i32) (hs:[]i32) (sigmas:[]f32)
+           --(MO_fsts:[]f32)
         --    (MOpp:[][]f32)  (MOp:[][]f32) (breaks:[]i32) (means:[]f32)
 
            (Xseq:[][]f32)
@@ -98,7 +99,8 @@ entry main (X:[][]f32)
            (betaseq:[][]f32)
            (y_predsseq:[][]f32)
            (Nssseq:[]i32) (y_errorsseq:[][]f32) (val_indssseq:[][]i32)
-        --    (hsseq:[]i32) (nssseq:[]i32) (sigmasseq:[]f32) (MO_fstsseq:[]f32)
+           (nssseq:[]i32) (hsseq:[]i32) (sigmasseq:[]f32)
+        -- (MO_fstsseq:[]f32)
         --    (MOppseq:[][]f32) (MOpseq:[][]f32) (breaksseq:[]i32) (meansseq:[]f32)
             =
 -- , Xsqr, Xinv, beta0,
@@ -115,21 +117,25 @@ let valbeta0 = validate2Dfloat beta0 beta0seq
 let valbeta  = validate2Dfloat beta betaseq
 let valyhat  = validate2Dfloat y_preds y_predsseq
 let valyerr  = validate2Dfloat y_errors y_errorsseq
-let valnss   = validate1Dint Nss Nssseq
+let valNss   = validate1Dint Nss Nssseq
 let valindss = validate2Dint val_indss val_indssseq
+let valnss    = validate1Dint nss nssseq
+let valhs     = validate1Dint hs hsseq
+let valsigmas = validate1Dfloat sigmas sigmasseq
 
-
--- let (vXs,nps,inds,fes,ves) =
 let fst xs = let (x,_,_,_,_) = xs in x
 let snd xs = let (_,x,_,_,_) = xs in x
 let thr xs = let (_,_,x,_,_) = xs in x
 let frt xs = let (_,_,_,x,_) = xs in x
 let fvt xs = let (_,_,_,_,x) = xs in x
-let allTestTrue  = map fst [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
-let allTestNumEr = map snd [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
-let allTestInds  = map thr [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
-let allTestFutE = map frt [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
-let allTestOurE = map fvt [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr, valnss, valindss]
+let results = [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr,
+               valNss, valindss, valnss,valhs,valsigmas]
+
+let allTestTrue  = map fst results
+let allTestNumEr = map snd results
+let allTestInds  = map thr results
+let allTestFutE  = map frt results
+let allTestOurE  = map fvt results
 
 in (allTestTrue, allTestNumEr, allTestInds, allTestFutE, allTestOurE)
 
