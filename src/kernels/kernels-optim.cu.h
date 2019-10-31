@@ -183,9 +183,9 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
     int k1 = threadIdx.y;
     int k2 = threadIdx.x;
 
-    extern __shared__ volatile float shared[]; // 2*K*K
-    volatile float* Ash = &shared[0];
-    volatile float* AshTmp = &shared[2*K*K];
+    extern __shared__ float shared[]; // 2*K*K
+    volatile float* Ash = (volatile float*) &shared[0];
+    volatile float* AshTmp = (volatile float*) &shared[2*K*K];
 
     if (k2 < K) {
         // copy the data from the device memory to the first half of the sh_mem
@@ -219,7 +219,7 @@ __global__ void ker3(uint M, uint K, float* A, float* AI){
         __syncthreads();
 
         // swap pointers
-        float* tmp2 = AshTmp;
+        volatile float* tmp2 = AshTmp;
         AshTmp = Ash;
         Ash    = tmp2;
     }
