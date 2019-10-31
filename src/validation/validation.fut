@@ -112,6 +112,9 @@ let valyerr  = validate2Dfloat y_errors y_errorsseq
 let valnss   = validate1Dint Nss Nssseq
 let valindss = validate2Dint val_indss val_indssseq
 
-in valX
+
+let tts(vXs,nps,inds,fes,ves) = zip [valX,valXsqr]
+
+in tts
 
 
