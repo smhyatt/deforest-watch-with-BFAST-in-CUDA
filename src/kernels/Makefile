@@ -308,9 +308,54 @@ saharatestseq: seq2Vsahara
 
 
 
-#############################################################################
-##############################  VALIDATING Y   ##############################
-#############################################################################
+########################################################################################
+##############################  VALIDATING SEQ. W/ PAR.   ##############################
+########################################################################################
+
+
+
+# Validation of the sequential implementation against the parallel one with Sahara
+
+sval:
+	# empties the data file
+	rm ../data/saharaval.data || true
+	# compiles the sequential
+	make compileSeq
+	# compiles the optimized
+	make compileOP
+	# runs the sequential and adds to ../data/saharaval.data
+	make SseqFullRun
+	# runs the optimized and adds to ../data/saharaval.data
+	make SopFullRun
+	# compiling validation file
+	cd ../validation && futhark opencl validation.fut
+	# runs a validation against sequential and optimized
+	cd ../validation && ./validation < ../data/saharaval.data
+	# clean-up
+	cd ../validation && rm validation || true
+
+
+
+# Validation of the sequential implementation against the parallel one with Peru
+
+pval:
+	# empties the data file
+	rm ../data/peruval.data || true
+	# compiles the sequential
+	make compileSeq
+	# compiles the optimized
+	make compileOP
+	# runs the sequential and adds to ../data/saharaval.data
+	make PseqFullRun
+	# runs the optimized and adds to ../data/saharaval.data
+	make PopFullRun
+	# compiling validation file
+	cd ../validation && futhark opencl validation.fut
+	# runs a validation against sequential and optimized
+	cd ../validation && ./validation < ../data/peruval.data
+	# clean-up
+	cd ../validation && rm validation || true
+
 
 
 
