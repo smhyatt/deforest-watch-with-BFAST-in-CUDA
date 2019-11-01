@@ -285,8 +285,8 @@ int main(int argc, char const *argv[]) {
         gpuAssert( cudaPeekAtLastError() );
 
         // copy result from device to host
-        cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+        // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+        // cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
 
 
     //--------------------------------------------------------------------------
@@ -334,7 +334,7 @@ int main(int argc, char const *argv[]) {
         gpuAssert( cudaPeekAtLastError() );
 
         // copy result from device to host
-        cudaMemcpy(h_Xsqr, d_Xsqr, Xsqr_size, cudaMemcpyDeviceToHost);
+        // cudaMemcpy(h_Xsqr, d_Xsqr, Xsqr_size, cudaMemcpyDeviceToHost);
 
         // validation
         cudaMemcpy(d_Xsqr, h_Xsqr, X_size, cudaMemcpyHostToDevice);
@@ -356,7 +356,14 @@ int main(int argc, char const *argv[]) {
 
         // GPU call to kernel 3
     //   ker3<<< grid, block, 4*K*K*sizeof(float) >>>(m, K, d_Xsqr, d_Xinv);
-        cudaDeviceSynchronize();
+        // cudaDeviceSynchronize();
+        //------------------------------------------------------------------------------
+        // X validation with the sequential version
+        //------------------------------------------------------------------------------
+            // mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
+            gaussJordanG(m, K, h_Xsqr, h_Xinv);
+            cudaMemcpy(d_Xinv, h_Xinv, Xsqr_size, cudaMemcpyHostToDevice);
+        //------------------------------------------------------------------------------
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -368,13 +375,6 @@ int main(int argc, char const *argv[]) {
         // copy result from device to host
         cudaMemcpy(h_Xinv, d_Xinv, Xsqr_size, cudaMemcpyDeviceToHost);
 
-    //------------------------------------------------------------------------------
-    // X validation with the sequential version
-    //------------------------------------------------------------------------------
-        // mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
-        gaussJordanG(m, K, h_Xsqr, h_Xinv);
-        cudaMemcpy(d_Xinv, h_Xinv, Xsqr_size, cudaMemcpyHostToDevice);
-    //------------------------------------------------------------------------------
         // validation
         printM(fpV, h_Xinv, m, K);
 
