@@ -680,7 +680,7 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
     uint ns = nss[pix];
     uint h = hs[pix];
     float sigma = sigmas[pix];
-    int* val_inds = &val_indss[pix];
+    int* val_inds = &val_indss[pix*N];
 
     float tmp;
     if(i >= Ns-ns){
@@ -707,7 +707,7 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
 
     sh_brk[i] = (i < Ns - ns
                     && (F32_MIN != mop)
-                    && (fabsf(mop) > bound[pix])) ? i : -1;
+                    && (fabsf(mop) > bound[i])) ? i : -1;
     __syncthreads();
 
     int fstBreak = scanIncBlock<FirstInd>(sh_brk, i);
