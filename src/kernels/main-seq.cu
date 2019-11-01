@@ -84,7 +84,7 @@ int main(int argc, char const *argv[]) {
 //// PARSING
 ///////////////////////////////////////////////////////////////////////////////
 
-    FILE *fp, *fpim, *fpV, *fpTEST;
+    FILE *fp, *fpim, *fpV;// *fpTEST;
     uint m = 0;
 
     // opening files with input and fpV for validating the results
@@ -316,7 +316,7 @@ int main(int argc, char const *argv[]) {
         transposeTiled(d_Y, d_YT, m, N, 32);
         // ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
         // ker2naive <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
-        ker2tiled(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K, R);
+        ker2tiled(n, N, m, h_X, h_XT, h_Y, h_Xsqr, K, R);
 
 
         cudaDeviceSynchronize();

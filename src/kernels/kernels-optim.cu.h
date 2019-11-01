@@ -748,7 +748,7 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
 
     int pix = blockIdx.x;
     int i = threadIdx.x;
-    uint Nmn = N - n;
+    // uint Nmn = N - n;
     uint Ns = Nss[pix];
     uint ns = nss[pix];
     uint h = hs[pix];
