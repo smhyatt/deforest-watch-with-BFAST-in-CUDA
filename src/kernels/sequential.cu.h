@@ -162,26 +162,26 @@ void ker2tiled(uint n, uint N, uint m, float* X, float* XT, float* Y, float* Xsq
 
 // }
 
-// int isNotNan(float x){
-//     if (F32_MIN == x) return 0;
-//     else return 1;
-// }
+int isNotNan(float x){
+    if (F32_MIN == x) return 0;
+    else return 1;
+}
 
-// // the squared MM multiplication in one gathered function
-// void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K){
-//     for (uint pix = 0; pix < m; pix++) {    // pix = blockIdx.x
-//         for (int i = 0; i < K; i++) {       // i = threadIdx.y
-//             for (int j = 0; j < K; j++) {   // j = threadIdx.x
-//                 float acc = 0.0;
-//                 for (uint k = 0; k < n; k++) {
-//                     int mask = isNotNan(sample[pix*N+k]);
-//                     acc += X[i*N+k] * XT[k*K+j] * mask;
-//                 }
-//                 Xsqr[pix*K*K + i*K + j] = acc;
-//             }
-//         }
-//     }
-// }
+// the squared MM multiplication in one gathered function
+void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K){
+    for (uint pix = 0; pix < m; pix++) {    // pix = blockIdx.x
+        for (int i = 0; i < K; i++) {       // i = threadIdx.y
+            for (int j = 0; j < K; j++) {   // j = threadIdx.x
+                float acc = 0.0;
+                for (uint k = 0; k < n; k++) {
+                    int mask = isNotNan(sample[pix*N+k]);
+                    acc += X[i*N+k] * XT[k*K+j] * mask;
+                }
+                Xsqr[pix*K*K + i*K + j] = acc;
+            }
+        }
+    }
+}
 
 
 // void transposeMatrix(float* M, float* MT, uint m, uint N) {
