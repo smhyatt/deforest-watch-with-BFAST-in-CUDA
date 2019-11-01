@@ -389,12 +389,14 @@ int main(int argc, char const *argv[]) {
 
         // calling sequential kernel 9
         ker9merged(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, h_seq_MO_fsts);
-        printEf(fpV, h_seq_MO_fsts, m);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 9 version runs in: %lu microsecs\n", elapsed);
+
+        // validation
+        printEf(fpV, h_seq_MO_fsts, m);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -407,7 +409,7 @@ int main(int argc, char const *argv[]) {
 
         // calling sequential kernel 10
         // ker10merged(lam, m, n, N, h_seq_bound, h_seq_Nss,
-            ker10seq(lam, m, n, N, h_seq_bound, h_seq_Nss,
+        ker10seq(lam, m, n, N, h_seq_bound, h_seq_Nss,
                 h_seq_nss,
               h_seq_sigmas,
               h_seq_hs,
@@ -425,8 +427,8 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 10 version runs in: %lu microsecs\n", elapsed);
         // validation
-        printVfnan(fpV, h_seq_MOpp, m, N-n);
-        printVfnan(fpV, h_seq_MOp, m, N-n);
+        // printVfnan(fpV, h_seq_MOpp, m, N-n);
+        // printVfnan(fpV, h_seq_MOp, m, N-n);
         printEi(fpV, h_seq_fstBreakP, m);
         printEf(fpV, h_seq_means, m);
     }
