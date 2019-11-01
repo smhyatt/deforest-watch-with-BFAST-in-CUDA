@@ -377,7 +377,6 @@ int main(int argc, char const *argv[]) {
         printEf(fpV, h_seq_sigmas,  m);
     }
 
-#if 0
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 9
@@ -432,7 +431,7 @@ int main(int argc, char const *argv[]) {
         printEi(fpV, h_seq_fstBreakP, m);
         printEf(fpV, h_seq_means, m);
     }
-#endif
+
 
     fclose(fpV);
 
