@@ -11,15 +11,7 @@
 #include "pbbKernels.cu.h"
 #include "sequential.cu.h"
 
-// #define BLOCK_SIZE 1024//1024 //1024//2048
-// #define WIDTH_A  1024//1024 //1024//2048
-// #define HEIGHT_A 1//2048//2048//2048
-// #define WIDTH_B  1024//4096//2048
-// #define TILE_HEIGHT 1
-// #define TILE_WIDTH 1024
-
 #define F32_MIN -FLT_MAX
-// #define I32_MIN -2147483648
 typedef unsigned int uint;
 
 
@@ -36,37 +28,6 @@ int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval 
     result->tv_usec = diff % resolution;
     return (diff<0);
 }
-
-
-// void randomInit(float* data, int size) {
-//    for (int i = 0; i < size; ++i)
-//    data[i] = rand() / (float)RAND_MAX;
-// }
-
-
-// template<class T>
-// void matMult(T* A, T* B, T* C, int colsA, int rowsA, int colsB) {
-//   for(int i = 0; i < rowsA; i++) {
-//     for(int j = 0; j < colsB; j++) {
-//       float sum = 0.0;
-//       for(int k = 0; k < colsA; k++) {
-//         sum += A[i*colsA + k] * B[k * colsB + j];
-//       }
-//       C[i * colsB + j] = sum;
-//     }
-//   }
-// }
-
-// template<class T>
-// bool validate(float* A,float* B, unsigned int sizeAB){
-//     for(int i = 0; i < sizeAB; i++)
-//       if (fabs(A[i] - B[i]) > 0.0005){
-//         printf("INVALID RESULT %d %f %f\n", i, A[i], B[i]);
-//         return false;
-//       }
-//     printf("VALID RESULT!\n");
-//     return true;
-// }
 
 int gpuAssert(cudaError_t code) {
     if(code != cudaSuccess) {
@@ -623,15 +584,12 @@ int main(int argc, char const *argv[]) {
     {
         dim3 block(N-n, 1, 1);
         dim3 grid (m, 1, 1);
-        printf("1\n");
         unsigned long int elapsed;
         struct timeval t_start, t_end, t_diff;
         gettimeofday(&t_start, NULL);
 
         compBound(lam, n, N, Nmn, h_mappingindices, h_bounds);
-        printf("2\n");
         cudaMemcpy(d_bounds, h_bounds, bound_size, cudaMemcpyHostToDevice);
-        printf("3\n");
 
         // GPU call to kernel 10
         ker10 <<< grid, block, (N-n)*sizeof(float) >>> (lam, m, n, N, d_bounds,
@@ -641,7 +599,6 @@ int main(int argc, char const *argv[]) {
                                 d_means, d_breaks, d_MOpp);
                                 cudaDeviceSynchronize();
 
-        printf("4\n");
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
