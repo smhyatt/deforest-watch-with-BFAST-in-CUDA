@@ -269,7 +269,9 @@ int main(int argc, char const *argv[]) {
 
         // GPU call to kernel 1
         //   ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
-        cudaDeviceSynchronize();
+        // cudaDeviceSynchronize();
+        mkX(N, K, freq, h_mappingindices, h_X);
+        transpose(N, K, h_X, h_XT);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -286,8 +288,6 @@ int main(int argc, char const *argv[]) {
     //--------------------------------------------------------------------------
     // X validation with the sequential version
     //--------------------------------------------------------------------------
-        mkX(N, K, freq, h_mappingindices, h_X);
-        transpose(N, K, h_X, h_XT);
         // copy host memory to device
         cudaMemcpy(d_X, h_X, X_size, cudaMemcpyHostToDevice);
         cudaMemcpy(d_XT, h_XT, X_size, cudaMemcpyHostToDevice);
@@ -296,7 +296,7 @@ int main(int argc, char const *argv[]) {
         // add to validation
         printX(fpV, h_X, K, N);
 
-        printf("GPU Optimized Kernel 1 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Sequential Kernel 1 runs in: %lu microsecs\n", elapsed);
    }
 
 
@@ -347,8 +347,15 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // GPU call to kernel 3
-    //   ker3<<< grid, block, 4*K*K*sizeof(float) >>>(m, K, d_Xsqr, d_Xinv);
-        cudaDeviceSynchronize();
+        // ker3<<< grid, block, 4*K*K*sizeof(float) >>>(m, K, d_Xsqr, d_Xinv);
+        // cudaDeviceSynchronize();
+        //------------------------------------------------------------------------------
+        // X validation with the sequential version
+        //------------------------------------------------------------------------------
+            // mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
+            gaussJordanG(m, K, h_Xsqr, h_Xinv);
+            cudaMemcpy(d_Xinv, h_Xinv, Xsqr_size, cudaMemcpyHostToDevice);
+        //------------------------------------------------------------------------------
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -360,18 +367,11 @@ int main(int argc, char const *argv[]) {
         // copy result from device to host
         cudaMemcpy(h_Xinv, d_Xinv, Xsqr_size, cudaMemcpyDeviceToHost);
 
-    //------------------------------------------------------------------------------
-    // X validation with the sequential version
-    //------------------------------------------------------------------------------
-        // mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
-        gaussJordanG(m, K, h_Xsqr, h_Xinv);
-        cudaMemcpy(d_Xinv, h_Xinv, Xsqr_size, cudaMemcpyHostToDevice);
-    //------------------------------------------------------------------------------
         // validation
         printM(fpV, h_Xinv, m, K);
 
 
-        printf("GPU Optimized Kernel 3 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Sequential Kernel 3 runs in: %lu microsecs\n", elapsed);
     }
 
 

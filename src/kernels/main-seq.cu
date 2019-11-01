@@ -273,7 +273,9 @@ int main(int argc, char const *argv[]) {
 
         // GPU call to kernel 1
         //   ker1 <<< grid, block >>>(N, K, freq, d_mappingindices, d_X, d_XT);
-        cudaDeviceSynchronize();
+        // cudaDeviceSynchronize();
+        mkX(N, K, freq, h_mappingindices, h_X);
+        transpose(N, K, h_X, h_XT);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -290,8 +292,6 @@ int main(int argc, char const *argv[]) {
     //--------------------------------------------------------------------------
     // X validation with the sequential version
     //--------------------------------------------------------------------------
-        mkX(N, K, freq, h_mappingindices, h_X);
-        transpose(N, K, h_X, h_XT);
         // copy host memory to device
         cudaMemcpy(d_X, h_X, X_size, cudaMemcpyHostToDevice);
         cudaMemcpy(d_XT, h_XT, X_size, cudaMemcpyHostToDevice);
