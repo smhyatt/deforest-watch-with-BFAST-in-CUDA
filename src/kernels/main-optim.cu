@@ -281,8 +281,8 @@ int main(int argc, char const *argv[]) {
         gpuAssert( cudaPeekAtLastError() );
 
         // copy result from device to host
-        cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
-        cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
+        // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+        // cudaMemcpy(h_XT, d_XT, X_size, cudaMemcpyDeviceToHost);
 
 
     //--------------------------------------------------------------------------
