@@ -206,6 +206,8 @@ int main(int argc, char const *argv[]) {
     float* h_seq_MOpp      = (float*) calloc(m*(N-n),sizeof(float));
     float* h_seq_MO_fsts   = (float*) calloc(m,sizeof(float));
 
+    const uint R = 30;
+
     for (int i = 0; i < m*N; i++) { h_seq_yerrs[i] = F32_MIN; }
 
     /////////////////////////////////////////////////////////////////////////
