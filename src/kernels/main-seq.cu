@@ -199,6 +199,13 @@ int main(int argc, char const *argv[]) {
     int  * h_seq_hs        = (int  *) calloc(m  ,sizeof(int));
     float* h_seq_sigmas    = (float*) calloc(m  ,sizeof(float));
 
+    float* h_seq_bound     = (float*) calloc(N-n,sizeof(float));
+    float* h_seq_MOp       = (float*) calloc(m*(N-n),sizeof(float));
+    float* h_seq_means     = (float*) calloc(m,sizeof(float));
+    int*   h_seq_fstBreakP = (int*)   calloc(m,sizeof(int));
+    float* h_seq_MOpp      = (float*) calloc(m*(N-n),sizeof(float));
+    float* h_seq_MO_fsts   = (float*) calloc(m,sizeof(float));
+
     for (int i = 0; i < m*N; i++) { h_seq_yerrs[i] = F32_MIN; }
 
     /////////////////////////////////////////////////////////////////////////
