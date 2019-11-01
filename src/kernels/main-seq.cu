@@ -370,7 +370,7 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
 
         // check for cuda errors
-        gpuAssert( cudaPeekAtLastError() );
+        // gpuAssert( cudaPeekAtLastError() );
 
         // copy result from device to host
         cudaMemcpy(h_Xinv, d_Xinv, Xsqr_size, cudaMemcpyDeviceToHost);
