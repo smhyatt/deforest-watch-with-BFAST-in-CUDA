@@ -315,7 +315,8 @@ int main(int argc, char const *argv[]) {
         //  GPU call to kernel 2
         transposeTiled(d_Y, d_YT, m, N, 32);
         // ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
-        ker2naive <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
+        // ker2naive <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
+        ker2tiled(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K, R);
 
 
         cudaDeviceSynchronize();
@@ -331,6 +332,7 @@ int main(int argc, char const *argv[]) {
         cudaMemcpy(h_Xsqr, d_Xsqr, Xsqr_size, cudaMemcpyDeviceToHost);
 
         // validation
+        cudaMemcpy(d_Xsqr, h_Xsqr, X_size, cudaMemcpyHostToDevice);
         printM(fpV, h_Xsqr, m, K);
 
         printf("GPU Naive Kernel 2 runs in: %lu microsecs\n", elapsed);
