@@ -296,7 +296,7 @@ int main(int argc, char const *argv[]) {
         // add to validation
         printX(fpV, h_X, K, N);
 
-        printf("GPU Optimized Kernel 1 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 1 runs in: %lu microsecs\n", elapsed);
    }
 
 
@@ -332,7 +332,7 @@ int main(int argc, char const *argv[]) {
         // validation
         printM(fpV, h_Xsqr, m, K);
 
-        printf("GPU Optimized Kernel 2 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 2 runs in: %lu microsecs\n", elapsed);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -371,7 +371,7 @@ int main(int argc, char const *argv[]) {
         printM(fpV, h_Xinv, m, K);
 
 
-        printf("GPU Optimized Kernel 3 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 3 runs in: %lu microsecs\n", elapsed);
     }
 
 
@@ -403,7 +403,7 @@ int main(int argc, char const *argv[]) {
         // add to validation
         printVf(fpV, h_B0, m, K);
 
-        printf("GPU Optimized Kernel 4 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 4 runs in: %lu microsecs\n", elapsed);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -435,7 +435,7 @@ int main(int argc, char const *argv[]) {
         // validation
         printVf(fpV, h_B, m, K);
 
-        printf("GPU Optimized Kernel 5 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 5 runs in: %lu microsecs\n", elapsed);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -468,7 +468,7 @@ int main(int argc, char const *argv[]) {
         // validation
         printVf(fpV, h_yhat, m, N);
 
-        printf("GPU Optimized Kernel 6 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 6 runs in: %lu microsecs\n", elapsed);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -503,7 +503,7 @@ int main(int argc, char const *argv[]) {
         printVfnan(fpV, h_yerrs, m, N);
         printVi(fpV, h_indss, m, N);
 
-        printf("GPU Optimized Kernel 7 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 7 runs in: %lu microsecs\n", elapsed);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -542,7 +542,7 @@ int main(int argc, char const *argv[]) {
         printEi(fpV, h_hs,  m);
         printEf(fpV, h_sigmas,  m);
 
-        printf("GPU Optimized Kernel 8 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 8 runs in: %lu microsecs\n", elapsed);
     }
 
 
@@ -574,7 +574,7 @@ int main(int argc, char const *argv[]) {
         // validation
         printEf(fpV, h_MOfsts, m);
 
-        printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 9 runs in: %lu microsecs\n", elapsed);
     }
 
 
@@ -612,7 +612,7 @@ int main(int argc, char const *argv[]) {
         printEi(fpV, h_breaks, m);
         printEf(fpV, h_means, m);
 
-        printf("GPU Optimized Kernel 10 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Naive Kernel 10 runs in: %lu microsecs\n", elapsed);
     }
 
 
