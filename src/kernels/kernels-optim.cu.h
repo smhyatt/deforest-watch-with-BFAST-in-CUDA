@@ -170,47 +170,48 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* YT, flo
     }
 }
 
-__global__ void ker2naive(uint n, uint N, uint m, float* X, float* XT, float* YT, float* Xsqr, uint K) {
+// produces a lot of errors
+// __global__ void ker2naive(uint n, uint N, uint m, float* X, float* XT, float* YT, float* Xsqr, uint K) {
 
-    const int R = 30;
+//     const int R = 30;
 
-    int ii  = blockIdx.x * R;       // grid.z
-    int j1  = threadIdx.y;          // block.y
-    int j2  = threadIdx.x;          // block.x
+//     int ii  = blockIdx.x * R;       // grid.z
+//     int j1  = threadIdx.y;          // block.y
+//     int j2  = threadIdx.x;          // block.x
 
-    float acc[R];                   // registers
+//     float acc[R];                   // registers
 
-    #pragma unroll
-    for (int i = 0; i < R; i++) {   // fully unroll
-        acc[i] = 0.0;
-    }
+//     #pragma unroll
+//     for (int i = 0; i < R; i++) {   // fully unroll
+//         acc[i] = 0.0;
+//     }
 
-    float a, b, ab;
+//     float a, b, ab;
 
-    for (int q = 0; q < n; q++) {
-        a = X[j1*N + q];       // a = X[j1, q];
-        b = XT[q*K + j2];      // b = XT[q, j2];
-        ab = a*b;
+//     for (int q = 0; q < n; q++) {
+//         a = X[j1*N + q];       // a = X[j1, q];
+//         b = XT[q*K + j2];      // b = XT[q, j2];
+//         ab = a*b;
 
 
-        #pragma unroll
-        for (int i1 = 0; i1 < R; i1++) { // fully unroll
-            float y = YT[q*m + (ii+i1)];
-            if (y != F32_MIN) {
-                acc[i1] += ab * y;       // acc[i1] += ab * (1.0-isnan(yqsh[i1]));
-            }
-        }
+//         #pragma unroll
+//         for (int i1 = 0; i1 < R; i1++) { // fully unroll
+//             float y = YT[q*m + (ii+i1)];
+//             if (y != F32_MIN) {
+//                 acc[i1] += ab * y;       // acc[i1] += ab * (1.0-isnan(yqsh[i1]));
+//             }
+//         }
 
-        __syncthreads();
-    }
+//         __syncthreads();
+//     }
 
-    #pragma unroll
-    for (int i2 = 0; i2 < R; i2++) { // fully unroll
-        if (ii+i2 < m && j1 < K && j2 < K) {
-            Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
-        }
-    }
-}
+//     #pragma unroll
+//     for (int i2 = 0; i2 < R; i2++) { // fully unroll
+//         if (ii+i2 < m && j1 < K && j2 < K) {
+//             Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
+//         }
+//     }
+// }
 
 
 /////////////////////////////////////////////////////////////////////////
