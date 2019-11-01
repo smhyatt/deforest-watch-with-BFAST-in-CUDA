@@ -72,7 +72,7 @@ void ker2naive(uint n, uint N, uint m, float* X, float* XT, float* Y, float* Xsq
                         acc += X[j1*N+q] * XT[q*K+j2] * y;
                     }
                 }
-                Xsqr[i*K*K + j1*K + j] = acc;
+                Xsqr[i*K*K + j1*K + j2] = acc;
             }
         }
     }
