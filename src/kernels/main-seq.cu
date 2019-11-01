@@ -296,7 +296,7 @@ int main(int argc, char const *argv[]) {
         // add to validation
         printX(fpV, h_X, K, N);
 
-        printf("GPU Naive Kernel 1 runs in: %lu microsecs\n", elapsed);
+        printf("GPU sequential Kernel 1 runs in: %lu microsecs\n", elapsed);
    }
 
 
@@ -314,7 +314,8 @@ int main(int argc, char const *argv[]) {
         //  transpose Y for kernel 2 optimization
         //  GPU call to kernel 2
         transposeTiled(d_Y, d_YT, m, N, 32);
-        ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
+        // ker2 <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
+        ker2naive <<< grid, block >>> (n, N, m, d_X, d_XT, d_YT, d_Xsqr, K);
 
 
         cudaDeviceSynchronize();
@@ -371,7 +372,7 @@ int main(int argc, char const *argv[]) {
         printM(fpV, h_Xinv, m, K);
 
 
-        printf("GPU Naive Kernel 3 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Sequential Kernel 3 runs in: %lu microsecs\n", elapsed);
     }
 
 
@@ -503,7 +504,7 @@ int main(int argc, char const *argv[]) {
         printVfnan(fpV, h_yerrs, m, N);
         printVi(fpV, h_indss, m, N);
 
-        printf("GPU Naive Kernel 7 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Optimized Kernel 7 runs in: %lu microsecs\n", elapsed);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -574,7 +575,7 @@ int main(int argc, char const *argv[]) {
         // validation
         printEf(fpV, h_MOfsts, m);
 
-        printf("GPU Naive Kernel 9 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
     }
 
 
@@ -612,7 +613,7 @@ int main(int argc, char const *argv[]) {
         printEi(fpV, h_breaks, m);
         printEf(fpV, h_means, m);
 
-        printf("GPU Naive Kernel 10 runs in: %lu microsecs\n", elapsed);
+        printf("GPU Optimized Kernel 10 runs in: %lu microsecs\n", elapsed);
     }
 
 
