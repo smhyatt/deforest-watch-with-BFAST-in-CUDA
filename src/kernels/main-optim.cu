@@ -19,7 +19,7 @@
 // #define TILE_WIDTH 1024
 
 #define F32_MIN -FLT_MAX
-#define I32_MIN -2147483648
+// #define I32_MIN -2147483648
 typedef unsigned int uint;
 
 
@@ -38,35 +38,35 @@ int timeval_subtract(struct timeval *result, struct timeval *t2, struct timeval 
 }
 
 
-void randomInit(float* data, int size) {
-   for (int i = 0; i < size; ++i)
-   data[i] = rand() / (float)RAND_MAX;
-}
+// void randomInit(float* data, int size) {
+//    for (int i = 0; i < size; ++i)
+//    data[i] = rand() / (float)RAND_MAX;
+// }
 
 
-template<class T>
-void matMult(T* A, T* B, T* C, int colsA, int rowsA, int colsB) {
-  for(int i = 0; i < rowsA; i++) {
-    for(int j = 0; j < colsB; j++) {
-      float sum = 0.0;
-      for(int k = 0; k < colsA; k++) {
-        sum += A[i*colsA + k] * B[k * colsB + j];
-      }
-      C[i * colsB + j] = sum;
-    }
-  }
-}
+// template<class T>
+// void matMult(T* A, T* B, T* C, int colsA, int rowsA, int colsB) {
+//   for(int i = 0; i < rowsA; i++) {
+//     for(int j = 0; j < colsB; j++) {
+//       float sum = 0.0;
+//       for(int k = 0; k < colsA; k++) {
+//         sum += A[i*colsA + k] * B[k * colsB + j];
+//       }
+//       C[i * colsB + j] = sum;
+//     }
+//   }
+// }
 
-template<class T>
-bool validate(float* A,float* B, unsigned int sizeAB){
-    for(int i = 0; i < sizeAB; i++)
-      if (fabs(A[i] - B[i]) > 0.0005){
-        printf("INVALID RESULT %d %f %f\n", i, A[i], B[i]);
-        return false;
-      }
-    printf("VALID RESULT!\n");
-    return true;
-}
+// template<class T>
+// bool validate(float* A,float* B, unsigned int sizeAB){
+//     for(int i = 0; i < sizeAB; i++)
+//       if (fabs(A[i] - B[i]) > 0.0005){
+//         printf("INVALID RESULT %d %f %f\n", i, A[i], B[i]);
+//         return false;
+//       }
+//     printf("VALID RESULT!\n");
+//     return true;
+// }
 
 int gpuAssert(cudaError_t code) {
     if(code != cudaSuccess) {
