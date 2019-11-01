@@ -295,11 +295,11 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
 	        let fst_break' = if !is_break then -1
                              else let adj_break = adjustValInds n ns Ns val_inds fst_break
                                   in  ((adj_break-1) / 2) * 2 + 1  -- Cosmin's validation hack
-            let fst_break' = if ns <=5 || Ns-ns <= 5 then -2 else fst_break'
+            let fst_break'' = if ns <=5 || Ns-ns <= 5 then -2 else fst_break'
 
             let val_inds' = map (adjustValInds n ns Ns val_inds) (iota Nmn)
             let MO'' = scatter (replicate Nmn f32.nan) val_inds' MO'
-            in (MO'', MO', fst_break', mean)
+            in (MO'', MO', fst_break'', mean)
 
             -- 1:fst_break':[int,-1,int,-1,...,LEN]
             -- 2:fst_break':[int,-2,int,...,-2,-1,...,LEN]
@@ -319,7 +319,7 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
   -- This is the final validation output
 --   in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, hs, nss, sigmas, MO_fsts, MOs, MOs_NN, breaks, means)
   -- This is the working validation output
-  in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, nss, hs, sigmas)
+  in (X, Xsqr, Xinv, beta0, beta, y_preds, Nss, y_errors, val_indss, nss, hs, sigmas, MO_fsts, breaks, means)
 
 
 

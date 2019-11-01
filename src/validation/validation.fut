@@ -93,23 +93,29 @@ entry main (X:[][]f32)          --0
            (nss:[]i32)          --9
            (hs:[]i32)           --10
            (sigmas:[]f32)       --11
-           --(MO_fsts:[]f32)
-        --    (MOpp:[][]f32)  (MOp:[][]f32) (breaks:[]i32) (means:[]f32)
+           (MO_fsts:[]f32)      --12
+        --    (MOp:[][]f32)        --13
+        --    (MOpp:[][]f32)  (MOp:[][]f32)
+           (breaks:[]i32)       --14
+           (means:[]f32)        --15
 
-           (Xseq:[][]f32)        --12
-           (Xsqrseq:[][][]f32)   --13
-           (Xinvseq:[][][]f32)   --14
-           (beta0seq:[][]f32)    --15
-           (betaseq:[][]f32)     --16
-           (y_predsseq:[][]f32)  --17
-           (Nssseq:[]i32)        --18
-           (y_errorsseq:[][]f32) --19
-           (val_indssseq:[][]i32)--20
-           (nssseq:[]i32)        --21
-           (hsseq:[]i32)         --22
-           (sigmasseq:[]f32)     --23
-        -- (MO_fstsseq:[]f32)    --24
-        --    (MOppseq:[][]f32) (MOpseq:[][]f32) (breaksseq:[]i32) (meansseq:[]f32)
+           (Xseq:[][]f32)       --16
+           (Xsqrseq:[][][]f32)  --17
+           (Xinvseq:[][][]f32)  --18
+           (beta0seq:[][]f32)   --19
+           (betaseq:[][]f32)     --20
+           (y_predsseq:[][]f32)  --21
+           (Nssseq:[]i32)        --22
+           (y_errorsseq:[][]f32) --23
+           (val_indssseq:[][]i32)--24
+           (nssseq:[]i32)        --25
+           (hsseq:[]i32)         --26
+           (sigmasseq:[]f32)     --27
+           (MO_fstsseq:[]f32)    --28
+        --    (MOpseq:[][]f32)      --29
+        --    (MOppseq:[][]f32)
+           (breaksseq:[]i32)
+           (meansseq:[]f32)
             =
 -- , Xsqr, Xinv, beta0,
 --                   beta, y_preds, Nss, y_errors,
@@ -130,6 +136,10 @@ let valindss = validate2Dint val_indss val_indssseq
 let valnss    = validate1Dint nss nssseq
 let valhs     = validate1Dint hs hsseq
 let valsigmas = validate1Dfloat sigmas sigmasseq
+let valMO_fsts= validate1Dfloat MO_fsts MO_fstsseq
+-- let valMOp    = validate2Dfloat MOp MOpseq
+let valbreaks = validate1Dint breaks breaksseq
+let valmeans  = validate1Dfloat means meansseq
 
 let fst xs = let (x,_,_,_,_) = xs in x
 let snd xs = let (_,x,_,_,_) = xs in x
@@ -137,7 +147,7 @@ let thr xs = let (_,_,x,_,_) = xs in x
 let frt xs = let (_,_,_,x,_) = xs in x
 let fvt xs = let (_,_,_,_,x) = xs in x
 let results = [valX, valXsqr, valXinv, valbeta0, valbeta, valyhat, valyerr,
-               valNss, valindss, valnss,valhs,valsigmas]
+               valNss, valindss, valnss,valhs,valsigmas,valMO_fsts, valbreaks, valmeans]
 
 let allTestTrue  = map fst results
 let allTestNumEr = map snd results

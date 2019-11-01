@@ -174,6 +174,7 @@ int main(int argc, char const *argv[]) {
     float lam   = atof(input6);
 
     int K  = 2*k + 2;
+    uint Nmn = N-n;
     int mappingLen, imageLen, i = 0;
 
     // getting the lengths of mappingindices and images
@@ -238,7 +239,11 @@ int main(int argc, char const *argv[]) {
    uint Xsqr_size  = K*K*m*sizeof(float);
    uint B0_size    = K*m*sizeof(float);
    uint MO_size    = m*sizeof(float);
-
+   uint MOp_size   = Nmn*sizeof(float);
+   uint MOpp_size  = Nmn*sizeof(float);
+   uint means_size = m*sizeof(float);
+   uint breaks_size= m*sizeof(int);
+   uint bound_size = (N-n)*sizeof(float);
    // Tile size for register tiling
    const uint R = 30;
 
@@ -258,12 +263,15 @@ int main(int argc, char const *argv[]) {
    float* h_sigmas = (float*) calloc(m,sizeof(float));
    int  * h_indss  = (int  *) calloc(m*N,sizeof(int));
    float* h_MOfsts = (float*) calloc(m,sizeof(float));
+   float* h_bounds = (float*) calloc(N-n,sizeof(float));
+   int*   h_breaks = (int*) calloc(m,sizeof(int));
+   float* h_means = (float*) calloc(m,sizeof(float));
 
    // allocate device memory for X, XT and Xsqr
    float *d_X, *d_XT, *d_Xsqr, *d_Xinv, *d_YT, *d_B0, *d_B, *d_yhat;
-   float *d_yerall, *d_yerrs, *d_MOfsts, *d_sigmas;
+   float *d_yerall, *d_yerrs, *d_MOfsts, *d_sigmas, *d_MOp, *d_means, *d_MOpp, *d_bounds;
    uint  *d_Nss, *d_nss;
-   int   *d_indss, *d_hs;
+   int   *d_indss, *d_hs, *d_breaks;
    cudaMalloc((void**) &d_X, X_size);
    cudaMalloc((void**) &d_XT, X_size);
    cudaMalloc((void**) &d_YT, Y_size);
@@ -281,6 +289,11 @@ int main(int argc, char const *argv[]) {
    cudaMalloc((void**) &d_indss, I_size);
    cudaMalloc((void**) &d_hs, MO_size);
    cudaMalloc((void**) &d_MOfsts, MO_size);
+   cudaMalloc((void**) &d_MOp, MOp_size);
+   cudaMalloc((void**) &d_MOpp, MOpp_size);
+   cudaMalloc((void**) &d_breaks, breaks_size);
+   cudaMalloc((void**) &d_means, means_size);
+   cudaMalloc((void**) &d_bounds, bound_size);
 
 
    /////////////////////////////////////////////////////////////////////////
@@ -606,67 +619,74 @@ int main(int argc, char const *argv[]) {
         printEf(fpV, h_sigmas,  m);
 
         printf("GPU Optimized Kernel 8 runs in: %lu microsecs\n", elapsed);
-        float microsecPerMatrixMul = elapsed;
-        double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-        double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-        printf( "GPU Optimized Kernel 8 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+        // float microsecPerMatrixMul = elapsed;
+        // double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+        // double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+        // printf( "GPU Optimized Kernel 8 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
     }
 
-#if 0
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 9
    /////////////////////////////////////////////////////////////////////////
    {
-      dim3 block(N, 1, 1);
-      dim3 grid (m, 1, 1);
+    dim3 block((n*hfrac), 1, 1);
+    dim3 grid (m, 1, 1);
 
-      unsigned long int elapsed;
-      struct timeval t_start, t_end, t_diff;
-      gettimeofday(&t_start, NULL);
+    unsigned long int elapsed;
+    struct timeval t_start, t_end, t_diff;
+    gettimeofday(&t_start, NULL);
 
-      // GPU call to kernel 9
-      ker9 <<< grid, block >>> (m, N, d_hs, d_yerrs, d_nss, d_MOfsts);
-      cudaDeviceSynchronize();
+    // GPU call to kernel 9
+    ker9 <<< grid, block, (n*hfrac)*sizeof(float) >>> (hfrac, n, m, N, d_hs, d_yerrs, d_nss, d_MOfsts);
+    cudaDeviceSynchronize();
 
-      gettimeofday(&t_end, NULL);
-      timeval_subtract(&t_diff, &t_end, &t_start);
-      elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
+    gettimeofday(&t_end, NULL);
+    timeval_subtract(&t_diff, &t_end, &t_start);
+    elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
 
-      // check for cuda errors
-      gpuAssert( cudaPeekAtLastError() );
+    // check for cuda errors
+    gpuAssert( cudaPeekAtLastError() );
 
-      // copy result from device to host
-      cudaMemcpy(h_MOfsts, d_MOfsts, _size, cudaMemcpyDeviceToHost);
+    // copy result from device to host
+    cudaMemcpy(h_MOfsts, d_MOfsts, MO_size, cudaMemcpyDeviceToHost);
 
-      // validation
-    //   printEf(fpV, h_MOfsts, m);
+    // validation
+    printEf(fpV, h_MOfsts, m);
 
-      printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
-      // float microsecPerMatrixMul = elapsed;
-      // double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-      // double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-      // printf( "GPU Optimized Kernel 9 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
-   }
+    printf("GPU Optimized Kernel 9 runs in: %lu microsecs\n", elapsed);
+    // float microsecPerMatrixMul = elapsed;
+    // double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+    // double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+    // printf( "GPU Optimized Kernel 9 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+ }
 
 
    /////////////////////////////////////////////////////////////////////////
    //// KERNEL 10
    /////////////////////////////////////////////////////////////////////////
    {
-      int  dimx = ceil( ((float) WIDTH_B)/TILE_HEIGHT );
-      int  dimy = ceil( ((float)HEIGHT_A)/TILE_WIDTH );
-      dim3 block(TILE_WIDTH, TILE_HEIGHT, 1);
-      dim3 grid (dimx, dimy, 1);
-
+      dim3 block(N-n, 1, 1);
+      dim3 grid (m, 1, 1);
+      printf("1\n");
       unsigned long int elapsed;
       struct timeval t_start, t_end, t_diff;
       gettimeofday(&t_start, NULL);
 
-      // GPU call to kernel 10
-      // ker10 <<< grid, block >>> ();
-      // cudaDeviceSynchronize();
+      compBound(lam, n, N, Nmn, h_mappingindices, h_bounds);
+      printf("2\n");
+      cudaMemcpy(d_bounds, h_bounds, bound_size, cudaMemcpyHostToDevice);
+      printf("3\n");
 
+      // GPU call to kernel 10
+      ker10 <<< grid, block, (N-n)*sizeof(float) >>> (lam, m, n, N, d_bounds,
+                                d_Nss, d_nss, d_sigmas,  d_hs,
+                                d_mappingindices, d_MOfsts,
+                                d_yerrs, d_indss,  d_MOp,
+                                d_means, d_breaks, d_MOpp);
+                                cudaDeviceSynchronize();
+
+      printf("4\n");
       gettimeofday(&t_end, NULL);
       timeval_subtract(&t_diff, &t_end, &t_start);
       elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
@@ -675,16 +695,18 @@ int main(int argc, char const *argv[]) {
       gpuAssert( cudaPeekAtLastError() );
 
       // copy result from device to host
-      // cudaMemcpy(h_X, d_X, X_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_breaks, d_breaks, breaks_size, cudaMemcpyDeviceToHost);
+      cudaMemcpy(h_means, d_means, means_size, cudaMemcpyDeviceToHost);
+      printEi(fpV, h_breaks, m);
+      printEf(fpV, h_means, m);
 
       printf("GPU Optimized Kernel 10 runs in: %lu microsecs\n", elapsed);
-      float microsecPerMatrixMul = elapsed;
-      double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
-      double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
-      printf( "GPU Optimized Kernel 10 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
+    //   float microsecPerMatrixMul = elapsed;
+    //   double flopsPerMatrixMul = 2.0 * HEIGHT_A * WIDTH_B * WIDTH_A;
+    //   double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (microsecPerMatrixMul / (1000.0f * 1000.0f));
+    //   printf( "GPU Optimized Kernel 10 Performance= %.2f GFlop/s, Time= %.3f microsec %d %d\n", gigaFlops, microsecPerMatrixMul, grid.x, grid.y);
 
    }
-#endif
 
 
    fclose(fpV);

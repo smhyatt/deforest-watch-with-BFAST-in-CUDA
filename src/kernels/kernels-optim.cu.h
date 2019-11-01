@@ -633,45 +633,99 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
 //// KERNEL 9
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+__global__ void ker9(float hfrac, uint n, uint m, uint N, int* hs,
+                     float* yerrs, uint* nss, float* MOfsts) {
+    extern __shared__ volatile float shmem1[];
+    volatile float* sh_yerrs = (volatile float*)shmem1;
 
-// `N` is the length of the input array
-// `T` is the total number of CUDA threads spawned.
-// `d_tmp` is the result array, having number-of-blocks elements.
-// `d_in` is the input array of length `N`.
+    uint  pix = blockIdx.x;    // grid.x: m
+    uint  i   = threadIdx.x;   // blockDim.x: n * hfrac
+    int   h   = hs[pix];
+    float tmp = 0.0;
 
-// __global__ void ker9(uint m, uint N, int* hs, float* yerrs, uint* nss, float* MOfsts) {
-//     extern __shared__ volatile uint shmem[];
+    if (i < h && pix < m) {
+        uint ns = nss[pix];
+        float yerr = yerrs[pix*N + i + ns-h+1];
+        tmp = yerr;
+    }
 
-//     uint pix = blockIdx.x;
-//     uint i = threadIdx.x;
+    sh_yerrs[threadIdx.x] = tmp;
 
-//     // get hmax
-//     // redCommuKernel(hmax_sh, hs_sh, N, T);
-//     int h = hs[pix*N + i];
+    __syncthreads();
 
-//     if (pix < m && threadIdx.x < N) {
-//         shmem[threadIdx.x] = h;
-//     }
+    tmp = scanIncBlock<Add<float> >(sh_yerrs, threadIdx.x);
 
-//     int hmax = scanIncBlock<Max<int> >(shmem, threadIdx.x);
-
-//     // RET - KUN MIDLERTIDIG !!!!!!
-//     int hpix = hs[pix];
-//     uint nsp = nns[pix];
-//     if (i < hmax) {
-//         MOfsts[pix] += yerrs[pix*N + i + nsp - hpix + 1];
-//     }
-
-// }
-
+    if (threadIdx.x == blockDim.x-1) {
+        MOfsts[pix] = tmp;
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 //// KERNEL 10
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
+__global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
+                            uint* Nss, uint* nss, float* sigmas, int* hs,
+                            int* mappingindices, float* MO_fsts,
+                            float* y_errors, int* val_indss, float* MOp,
+                            float* means, int* fstBreakP, float* MOpp) {
+    extern __shared__ volatile float sh__mem[];
+    volatile int* sh_brk = (volatile int*) sh__mem;
 
+    int pix = blockIdx.x;
+    int i = threadIdx.x;
+    uint Nmn = N - n;
+    uint Ns = Nss[pix];
+    uint ns = nss[pix];
+    uint h = hs[pix];
+    float sigma = sigmas[pix];
+    int* val_inds = &val_indss[pix*N];
 
+    float tmp;
+    if(i >= Ns-ns){
+        tmp = 0;
+    } else if(i==0) {
+        tmp = MO_fsts[pix];
+    } else {
+        tmp = -y_errors[pix*N + ns - h + i] + y_errors[pix*N + ns + i];
+    }
+    sh__mem[i] = tmp;
+    __syncthreads();
+
+    float mo = scanIncBlock<Add<float> >(sh__mem, threadIdx.x);
+
+    float mop = mo / (sigma * sqrt((float) ns));
+    __syncthreads();
+    sh__mem[i] = (i < Ns - ns) ? mop : 0.0;
+    __syncthreads();
+    float mean = scanIncBlock<Add<float> >(sh__mem, threadIdx.x);
+    if(i == blockDim.x-1){
+        means[pix] = mean;
+    }
+    __syncthreads();
+
+    sh_brk[i] = (i < Ns - ns
+                    && (F32_MIN != mop)
+                    && (fabsf(mop) > bound[i])) ? i : -1;
+    __syncthreads();
+
+    int fstBreak = scanIncBlock<FirstInd>(sh_brk, i);
+
+    if(threadIdx.x == blockDim.x-1) {
+        if(fstBreak != -1) {
+            int adj_break = (fstBreak<(Ns - ns)) ? val_inds[fstBreak+ns] - n : -1;
+
+            // Note: remember cuda rounds up! in case of adj_break is zero we return -1
+            // fstBreak = adj_break? -1: ((adj_break-1) / 2) * 2 + 1;
+            fstBreak = ((adj_break-1) / 2) * 2 + 1;
+        }
+
+        int fstBreakPP = (ns <=5 || Ns-ns <= 5) ? -2 : fstBreak;
+
+        fstBreakP[pix] = fstBreakPP;
+    }
+}
 
 #endif
 
