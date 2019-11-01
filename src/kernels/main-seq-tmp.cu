@@ -240,7 +240,8 @@ int main(int argc, char const *argv[]) {
         // calling sequential kernel 2
         // mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
         // mkXsqrG(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
-        mkXsqrOptim(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
+        ker2naive(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
+        // ker2tiled(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K, R);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);

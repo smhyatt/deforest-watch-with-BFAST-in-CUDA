@@ -60,61 +60,19 @@ void transpose(uint N, int K, float* X, float* XT) {
 /////////////////////////////////////////////////////////////////////////
 
 
-float dotProdFilt(uint n, float* Xvct, float* XTvct, float* yvct) {
-    float acc = 0.0;
-    for (uint i = 0; i < n; i++) {
-        if (yvct[i] != F32_MIN) {
-            acc += Xvct[i] * XTvct[i];
-        }
-    }
-    return acc;
-}
-
-
-void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint K){
-    float* tspVct = (float*)calloc(n,sizeof(float));
-    for (int i = 0; i < K; i++) {
-        for (int j = 0; j < K; j++) {
-            uint XIdx = i*N;
-            uint resIdx = i*K + j;
-
-            for (uint l = 0; l < n; l++) {
-                uint idx  = l*K + j;
-                tspVct[l] = XT[idx];
-            }
-
-            Xsqr[resIdx] = dotProdFilt(n, &X[XIdx], tspVct, y);
-        }
-    }
-
-    // free(tspVct);
-}
-
-// -- Xsqr,Xsqr−1:[K][K]f32; β0,β:[K]f32
-// let Xsqr = mmMulFilt X[:,:n] XT[:n,:] y[:n] -- ker 2
-void mkXsqr(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
-    for (uint pix = 0; pix < m; pix++) {
-        mmMulFilt(n, N, X, XT, &sample[pix*N], &Xsqr[pix*K*K], K);
-    }
-
-}
-
-int isNotNan(float x){
-    if (F32_MIN == x) return 0;
-    else return 1;
-}
-
-// the squared MM multiplication in one gathered function
-void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K){
-    for (uint pix = 0; pix < m; pix++) {    // pix = blockIdx.x
-        for (int i = 0; i < K; i++) {       // i = threadIdx.y
-            for (int j = 0; j < K; j++) {   // j = threadIdx.x
+void ker2naive(uint n, uint N, uint m, float* X, float* XT, float* Y, float* Xsqr, uint K){
+    for (uint i = 0; i < m; i++) {              // i  = blockIdx.x
+        for (int j1 = 0; j1 < K; j1++) {        // j1 = threadIdx.y
+            for (int j2 = 0; j2 < K; j2++) {    // j2 = threadIdx.x
                 float acc = 0.0;
-                for (uint k = 0; k < n; k++) {
-                    int mask = isNotNan(sample[pix*N+k]);
-                    acc += X[i*N+k] * XT[k*K+j] * mask;
+
+                for (uint q = 0; q < n; q++) {
+                    float y = Y[i*N+q];
+                    if (y != F32_MIN) {
+                        acc += X[j1*N+q] * XT[q*K+j2] * y;
+                    }
                 }
-                Xsqr[pix*K*K + i*K + j] = acc;
+                Xsqr[i*K*K + j1*K + j] = acc;
             }
         }
     }
@@ -129,58 +87,163 @@ void transposeMatrix(float* M, float* MT, uint m, uint N) {
     }
 }
 
-
-void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
-
+void ker2tiled(uint n, uint N, uint m, float* X, float* XT, float* Y, float* Xsqr, uint K, const int R) {
     float* YT = (float*) calloc(N*m,sizeof(float));
-    transposeMatrix(sample, YT, m, N);
+    transposeMatrix(Y, YT, m, N);
 
+    for (int ii = 0; ii < m; ii+=R) {           // grid.z
+        for (int j1 = 0; j1 < K; j1++) {        // block.y
+            for (int j2 = 0; j2 < K; j2++) {    // block.x
 
-    const int R = 30;
-    for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
-        //for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
-        //    for (int jj2 = 0; jj2 < K; jj2+=T2){                       // forall, grid.x
-                for (int j1 = 0; j1 < K; j1++) {        // forall, block.y
-                    for (int j2 = 0; j2 < K; j2++) {    // forall, block.x
+                float acc[R];
+                for (int i = 0; i < R; i++) {  acc[i] = 0.0; }
 
-                        // float yqsh[R];          // size R, shared memory
-                        float acc[R]; //  = calloc(R,sizeof(float));          // size R, registers
+                float a, b, ab;
+                for (int q = 0; q < n; q++) {
+                    a = X[j1*N + q];
+                    b = XT[q*K + j2];
+                    ab = a*b;
 
-                        for (int i = 0; i < R; i++) {                   // fully unroll
-                            acc[i] = 0.0;
-                        }
-                        float a, b, ab; //, y;
-                        for (int q = 0; q < n; q++) {
-                            a = X[j1*N + q];       // a = X[j1, q];
-                            b = XT[q*K + j2];      // b = XT[q, j2];
-                            ab = a*b;
-                            // collective copy global-to-shared
-                            // for (int idx = 0; idx < R; idx++) {
-                            //     yqsh[idx] = YT[q, ii]; // YT[q,ii:min(ii+R,M)] ?????????????
-                            // }
-                            // barrier; // block-level synch
-
-                            for (int i1 = 0; i1 < R; i1++) { // fully unroll
-                                if (ii+i1 < m) {
-                                    if (YT[q*m + ii+i1] != F32_MIN) {
-                                    // if (sample[(ii+i1)*N + q] != F32_MIN) {
-                                        acc[i1] += ab;          // acc[i1] += ab * (1.0-isnan(yqsh[i1]));
-                                    }
-                                }
-                            }
-
-                        }
-                        for (int i2 = 0; i2 < R; i2++) { // fully unroll
-                            if (ii+i2 < m) {
-                                // Xsqr[pix*K*K + i*K + j] = acc;
-                                Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
+                    for (int i1 = 0; i1 < R; i1++) { // fully unroll
+                        if (ii+i1 < m) {
+                            if (YT[q*m + ii+i1] != F32_MIN) {
+                                acc[i1] += ab;
                             }
                         }
                     }
                 }
+                for (int i2 = 0; i2 < R; i2++) {    // fully unroll
+                    if (ii+i2 < m) {
+                        Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
+                    }
+                }
             }
-
+        }
+    }
 }
+
+
+// float dotProdFilt(uint n, float* Xvct, float* XTvct, float* yvct) {
+//     float acc = 0.0;
+//     for (uint i = 0; i < n; i++) {
+//         if (yvct[i] != F32_MIN) {
+//             acc += Xvct[i] * XTvct[i];
+//         }
+//     }
+//     return acc;
+// }
+
+
+// void mmMulFilt(uint n, uint N, float* X, float* XT, float* y, float* Xsqr, uint K){
+//     float* tspVct = (float*)calloc(n,sizeof(float));
+//     for (int i = 0; i < K; i++) {
+//         for (int j = 0; j < K; j++) {
+//             uint XIdx = i*N;
+//             uint resIdx = i*K + j;
+
+//             for (uint l = 0; l < n; l++) {
+//                 uint idx  = l*K + j;
+//                 tspVct[l] = XT[idx];
+//             }
+
+//             Xsqr[resIdx] = dotProdFilt(n, &X[XIdx], tspVct, y);
+//         }
+//     }
+
+//     // free(tspVct);
+// }
+
+// // -- Xsqr,Xsqr−1:[K][K]f32; β0,β:[K]f32
+// // let Xsqr = mmMulFilt X[:,:n] XT[:n,:] y[:n] -- ker 2
+// void mkXsqr(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
+//     for (uint pix = 0; pix < m; pix++) {
+//         mmMulFilt(n, N, X, XT, &sample[pix*N], &Xsqr[pix*K*K], K);
+//     }
+
+// }
+
+// int isNotNan(float x){
+//     if (F32_MIN == x) return 0;
+//     else return 1;
+// }
+
+// // the squared MM multiplication in one gathered function
+// void mkXsqrG(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K){
+//     for (uint pix = 0; pix < m; pix++) {    // pix = blockIdx.x
+//         for (int i = 0; i < K; i++) {       // i = threadIdx.y
+//             for (int j = 0; j < K; j++) {   // j = threadIdx.x
+//                 float acc = 0.0;
+//                 for (uint k = 0; k < n; k++) {
+//                     int mask = isNotNan(sample[pix*N+k]);
+//                     acc += X[i*N+k] * XT[k*K+j] * mask;
+//                 }
+//                 Xsqr[pix*K*K + i*K + j] = acc;
+//             }
+//         }
+//     }
+// }
+
+
+// void transposeMatrix(float* M, float* MT, uint m, uint N) {
+//     for (int row = 0; row < m; row++) {
+//         for (int col = 0; col < N; col++) {
+//             MT[col*m + row] = M[row*N + col];
+//         }
+//     }
+// }
+
+
+// void mkXsqrOptim(uint n, uint N, uint m, float* X, float* XT, float* sample, float* Xsqr, uint K) {
+
+//     float* YT = (float*) calloc(N*m,sizeof(float));
+//     transposeMatrix(sample, YT, m, N);
+
+
+//     const int R = 30;
+//     for (int ii = 0; ii < m; ii+=R) {                                  // forall, grid.z
+//         //for (int jj1 = 0; jj1 < K; jj1+=T1) {                          // forall, grid.y
+//         //    for (int jj2 = 0; jj2 < K; jj2+=T2){                       // forall, grid.x
+//                 for (int j1 = 0; j1 < K; j1++) {        // forall, block.y
+//                     for (int j2 = 0; j2 < K; j2++) {    // forall, block.x
+
+//                         // float yqsh[R];          // size R, shared memory
+//                         float acc[R]; //  = calloc(R,sizeof(float));          // size R, registers
+
+//                         for (int i = 0; i < R; i++) {                   // fully unroll
+//                             acc[i] = 0.0;
+//                         }
+//                         float a, b, ab; //, y;
+//                         for (int q = 0; q < n; q++) {
+//                             a = X[j1*N + q];       // a = X[j1, q];
+//                             b = XT[q*K + j2];      // b = XT[q, j2];
+//                             ab = a*b;
+//                             // collective copy global-to-shared
+//                             // for (int idx = 0; idx < R; idx++) {
+//                             //     yqsh[idx] = YT[q, ii]; // YT[q,ii:min(ii+R,M)] ?????????????
+//                             // }
+//                             // barrier; // block-level synch
+
+//                             for (int i1 = 0; i1 < R; i1++) { // fully unroll
+//                                 if (ii+i1 < m) {
+//                                     if (YT[q*m + ii+i1] != F32_MIN) {
+//                                     // if (sample[(ii+i1)*N + q] != F32_MIN) {
+//                                         acc[i1] += ab;          // acc[i1] += ab * (1.0-isnan(yqsh[i1]));
+//                                     }
+//                                 }
+//                             }
+
+//                         }
+//                         for (int i2 = 0; i2 < R; i2++) { // fully unroll
+//                             if (ii+i2 < m) {
+//                                 // Xsqr[pix*K*K + i*K + j] = acc;
+//                                 Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
+//                             }
+//                         }
+//                     }
+//                 }
+//             }
+
+// }
 
 
 /////////////////////////////////////////////////////////////////////////
