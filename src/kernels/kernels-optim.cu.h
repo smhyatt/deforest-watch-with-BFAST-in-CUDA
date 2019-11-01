@@ -712,22 +712,19 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
 
     int fstBreak = scanIncBlock<FirstInd>(sh_brk, i);
 
-    int fstBreakp  = 0;
-    if(fstBreak != -1) {
-        int adj_break = (fstBreak<Nmn) ? val_inds[fstBreak+ns] - n : -1;
+    if(threadIdx.x == blockDim.x-1) {
+        if(fstBreak != -1) {
+            int adj_break = (fstBreak<(Ns - ns)) ? val_inds[fstBreak+ns] - n : -1;
 
-        // Note: remember cuda rounds up! in case of adj_break is zero we return -1
-        fstBreakp = adj_break? -1: ((adj_break-1) / 2) * 2 + 1;
-    } else {
-        fstBreakp = -1;
-    }
+            // Note: remember cuda rounds up! in case of adj_break is zero we return -1
+            // fstBreak = adj_break? -1: ((adj_break-1) / 2) * 2 + 1;
+            fstBreak = ((adj_break-1) / 2) * 2 + 1;
+        }
 
-    int fstBreakPP = (ns <=5 || Ns-ns <= 5) ? -2 : fstBreakp;
+        int fstBreakPP = (ns <=5 || Ns-ns <= 5) ? -2 : fstBreak;
 
-    if(i==blockIdx.x-1){
         fstBreakP[pix] = fstBreakPP;
     }
-
 }
 
 #endif
