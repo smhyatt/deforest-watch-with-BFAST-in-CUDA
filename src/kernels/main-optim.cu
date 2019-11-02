@@ -127,8 +127,11 @@ int main(int argc, char const *argv[]) {
     if (m == 0) {
         m = (uint)atoi(input7);
     }
-    printf("\n\n%u\n\n", m);
-    printf("\n\n%u\n\n", N);
+
+    printf("m: \n\n%u\n", m);
+    printf("N: %u\n", N);
+    printf("n: %u\n\n", n);
+
     int   trend = atoi(input1);
     float freq  = atof(input4);
     float hfrac = atof(input5);
