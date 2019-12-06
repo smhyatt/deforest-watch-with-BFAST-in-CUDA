@@ -222,7 +222,7 @@ int main(int argc, char const *argv[]) {
    float* h_B      = (float*) calloc(K*m,sizeof(float));
    float* h_yhat   = (float*) calloc(N*m,sizeof(float));
    float* h_Xinv   = (float*) calloc(K*K*m,sizeof(float));
-   // float* h_yerall = (float*) calloc(m*N,sizeof(float));
+   float* h_yerall = (float*) calloc(m*N,sizeof(float));
    float* h_yerrs  = (float*) calloc(m*N,sizeof(float));
    uint * h_Nss    = (uint *) calloc(m*N,sizeof(uint));
    uint * h_nss    = (uint *) calloc(m,sizeof(uint));
