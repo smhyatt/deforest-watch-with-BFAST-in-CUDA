@@ -170,6 +170,49 @@ __global__ void ker2(uint n, uint N, uint m, float* X, float* XT, float* YT, flo
     }
 }
 
+// produces a lot of errors
+// __global__ void ker2naive(uint n, uint N, uint m, float* X, float* XT, float* YT, float* Xsqr, uint K) {
+
+//     const int R = 30;
+
+//     int ii  = blockIdx.x * R;       // grid.z
+//     int j1  = threadIdx.y;          // block.y
+//     int j2  = threadIdx.x;          // block.x
+
+//     float acc[R];                   // registers
+
+//     #pragma unroll
+//     for (int i = 0; i < R; i++) {   // fully unroll
+//         acc[i] = 0.0;
+//     }
+
+//     float a, b, ab;
+
+//     for (int q = 0; q < n; q++) {
+//         a = X[j1*N + q];       // a = X[j1, q];
+//         b = XT[q*K + j2];      // b = XT[q, j2];
+//         ab = a*b;
+
+
+//         #pragma unroll
+//         for (int i1 = 0; i1 < R; i1++) { // fully unroll
+//             float y = YT[q*m + (ii+i1)];
+//             if (y != F32_MIN) {
+//                 acc[i1] += ab * y;       // acc[i1] += ab * (1.0-isnan(yqsh[i1]));
+//             }
+//         }
+
+//         __syncthreads();
+//     }
+
+//     #pragma unroll
+//     for (int i2 = 0; i2 < R; i2++) { // fully unroll
+//         if (ii+i2 < m && j1 < K && j2 < K) {
+//             Xsqr[(ii+i2)*(K*K) + j1*K + j2] = acc[i2];
+//         }
+//     }
+// }
+
 
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
@@ -628,6 +671,37 @@ __global__ void ker8optim(uint m, uint n, uint N, uint K, float hfrac,
     }
 }
 
+
+__global__ void ker8naive(uint m, uint n, uint N, uint K, float hfrac,
+                          float* y_errors, float* Y, uint* nss, int* hs,
+                          float* sigmas) {
+    int pix = blockIdx.x;
+    int i = threadIdx.x;
+
+    if(i==0) {
+        nss[pix] = 0;
+    }
+    __syncthreads();
+
+    for (size_t k = 0; k < N; k++){
+        if(i == k){
+            nss[pix] += (Y[pix*N + i] != F32_MIN);      // reduce (p) [] nss
+        }
+        __syncthreads();
+    }
+
+    float acc = 0.0;
+    if (i < nss[pix]) {
+        float y_err = y_errors[pix*N + i];
+        acc += y_err * y_err;               // reduce (err^2) [] y_err
+    }
+    __syncthreads();
+    if(i == blockDim.x) {
+        hs[pix] = (int)(((float) nss[pix]) * hfrac);
+        sigmas[pix] = sqrt(acc / ((float)(nss[pix] - K)));
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////
 //// KERNEL 9
@@ -675,7 +749,7 @@ __global__ void ker10(float lam, uint m, uint n, uint N, float* bound,
 
     int pix = blockIdx.x;
     int i = threadIdx.x;
-    uint Nmn = N - n;
+    // uint Nmn = N - n;
     uint Ns = Nss[pix];
     uint ns = nss[pix];
     uint h = hs[pix];

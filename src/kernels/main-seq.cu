@@ -9,14 +9,14 @@
 #include "helper.cu.h"
 #include "sequential.cu.h"
 
-#define BLOCK_SIZE 1024//1024 //1024//2048
-#define WIDTH_A  1024//1024 //1024//2048
-#define HEIGHT_A 1//2048//2048//2048
-#define WIDTH_B  1024//4096//2048
-#define TILE_HEIGHT 1
-#define TILE_WIDTH 1024
+// #define BLOCK_SIZE 1024//1024 //1024//2048
+// #define WIDTH_A  1024//1024 //1024//2048
+// #define HEIGHT_A 1//2048//2048//2048
+// #define WIDTH_B  1024//4096//2048
+// #define TILE_HEIGHT 1
+// #define TILE_WIDTH 1024
 #define F32_MIN -FLT_MAX
-#define I32_MIN -2147483648
+// #define I32_MIN -2147483648
 typedef unsigned int uint;
 
 
@@ -199,6 +199,15 @@ int main(int argc, char const *argv[]) {
     int  * h_seq_hs        = (int  *) calloc(m  ,sizeof(int));
     float* h_seq_sigmas    = (float*) calloc(m  ,sizeof(float));
 
+    float* h_seq_bound     = (float*) calloc(N-n,sizeof(float));
+    float* h_seq_MOp       = (float*) calloc(m*(N-n),sizeof(float));
+    float* h_seq_means     = (float*) calloc(m,sizeof(float));
+    int*   h_seq_fstBreakP = (int*)   calloc(m,sizeof(int));
+    float* h_seq_MOpp      = (float*) calloc(m*(N-n),sizeof(float));
+    float* h_seq_MO_fsts   = (float*) calloc(m,sizeof(float));
+
+    const uint R = 30;
+
     for (int i = 0; i < m*N; i++) { h_seq_yerrs[i] = F32_MIN; }
 
     /////////////////////////////////////////////////////////////////////////
@@ -233,7 +242,8 @@ int main(int argc, char const *argv[]) {
         // calling sequential kernel 2
         // mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
         // mkXsqrG(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
-        mkXsqrOptim(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
+        // ker2naive(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
+        ker2tiled(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K, R);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -377,7 +387,6 @@ int main(int argc, char const *argv[]) {
         printEf(fpV, h_seq_sigmas,  m);
     }
 
-#if 0
 
     /////////////////////////////////////////////////////////////////////////
     //// KERNEL 9
@@ -389,12 +398,14 @@ int main(int argc, char const *argv[]) {
 
         // calling sequential kernel 9
         ker9merged(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, h_seq_MO_fsts);
-        printEf(fpV, h_seq_MO_fsts, m);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 9 version runs in: %lu microsecs\n", elapsed);
+
+        // validation
+        printEf(fpV, h_seq_MO_fsts, m);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -407,7 +418,7 @@ int main(int argc, char const *argv[]) {
 
         // calling sequential kernel 10
         // ker10merged(lam, m, n, N, h_seq_bound, h_seq_Nss,
-            ker10seq(lam, m, n, N, h_seq_bound, h_seq_Nss,
+        ker10seq(lam, m, n, N, h_seq_bound, h_seq_Nss,
                 h_seq_nss,
               h_seq_sigmas,
               h_seq_hs,
@@ -425,12 +436,12 @@ int main(int argc, char const *argv[]) {
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 10 version runs in: %lu microsecs\n", elapsed);
         // validation
-        printVfnan(fpV, h_seq_MOpp, m, N-n);
-        printVfnan(fpV, h_seq_MOp, m, N-n);
+        // printVfnan(fpV, h_seq_MOpp, m, N-n);
+        // printVfnan(fpV, h_seq_MOp, m, N-n);
         printEi(fpV, h_seq_fstBreakP, m);
         printEf(fpV, h_seq_means, m);
     }
-#endif
+
 
     fclose(fpV);
 
