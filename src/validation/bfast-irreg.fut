@@ -225,10 +225,11 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
   ---------------------------------------------
   -- ker9
   let hmax = reduce_comm (i32.max) 0 hs
+  -- let hmax_pad = n * hfrac
   -- find max h value
   let MO_fsts = zip3 y_errors nss hs |>
     map (\(y_error, ns, h) -> unsafe
-            map (\i -> if i < h then unsafe y_error[i + ns-h+1] else 0.0) (iota hmax)
+            map (\i -> if i < h then unsafe y_error[i + ns-h+1] else 0.0) (iota hmax) --(iota hmax_pad)
             -- [float,float,0,0]
             |> reduce (+) 0.0
             -- float
@@ -295,11 +296,11 @@ entry main [m][N] (trend: i32) (k: i32) (n: i32) (freq: f32)
 	        let fst_break' = if !is_break then -1
                              else let adj_break = adjustValInds n ns Ns val_inds fst_break
                                   in  ((adj_break-1) / 2) * 2 + 1  -- Cosmin's validation hack
-            let fst_break'' = if ns <=5 || Ns-ns <= 5 then -2 else fst_break'
+            let fst_break' = if ns <=5 || Ns-ns <= 5 then -2 else fst_break'
 
-            let val_inds' = map (adjustValInds n ns Ns val_inds) (iota Nmn)
-            let MO'' = scatter (replicate Nmn f32.nan) val_inds' MO'
-            in (MO'', MO', fst_break'', mean)
+            -- let val_inds' = map (adjustValInds n ns Ns val_inds) (iota Nmn)
+            -- let MO'' = scatter (replicate Nmn f32.nan) val_inds' MO'
+            in (MO', MO', fst_break', mean)
 
             -- 1:fst_break':[int,-1,int,-1,...,LEN]
             -- 2:fst_break':[int,-2,int,...,-2,-1,...,LEN]

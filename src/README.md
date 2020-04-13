@@ -97,6 +97,26 @@ Running the optimized implementation on the testset
 
 
 
+## 3.1 Compile and run the sequential version against the parallel one, with validation 
+
+### Sahara:
+```make sval```
+
+
+### Peru: 
+```make pval```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

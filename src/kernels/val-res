@@ -1,0 +1,567 @@
+[true, false, false, false, false, false, false, true, true, true, true, false, false]
+[0, 116, 98, 16, 16, 828, 406, 0, 0, 0, 0, 2, 2]
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[0.000000, 109.000000, 0.041273, 651231.500000, 6328.348633, 6312.356445, 188.211426, 0.000000, 0.000000, 0.000000, 0.000000, 1132.312500, 2280.112305]
+[0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 6939.676758, 0.000000, 0.000000, 0.000000, 0.000000, 6319.633301, 156062.125000]
+
+
+
+[true, false, false, false, false, false, false, true, true, true, true, false, false]
+[0, 31582, 389259, 210, 76369, 3898113, 2051932, 0, 0, 0, 0, 9094, 10136]
+[0, 311, 384, 439, 48, 2484, 2484, 0, 0, 0, 0, 6, 6]
+[0.000000, 0.000121, 0.034194, -13.443848, 5458.857422, 5827.191406, -841.769531, 0.000000, 0.000000, 0.000000, 0.000000, 1152.854858, -12.826172]
+[0.000000, -0.000000, -35.448544, -13.269043, -5659097.000000, -5651610.000000, 5656595.500000, 0.000000, 0.000000, 0.000000, 0.000000, 5858127.500000, 169840960.000000]
+
+
+DIFFERENT X
+
+[true, false, false, false, false, false, false, true, true, true, true, false, false]
+[0, 4110344, 3313309, 543736, 543733, 28138338, 14054790, 0, 0, 0, 0, 67967, 67967]
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[0.000000, 109.000000, 0.041273, 651231.500000, 6328.348633, 6312.356445, 188.211426, 0.000000, 0.000000, 0.000000, 0.000000, 1132.312500, 2280.112305]
+[0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 6939.676758, 0.000000, 0.000000, 0.000000, 0.000000, 6319.633301, 156062.125000]
+
+
+DIFFERENT X and XINV
+
+[true, false, false, false, false, false, false, true, true, true, true, false, false]
+[0, 4110344, 3313284, 543736, 543733, 28138338, 14054790, 0, 0, 0, 0, 67967, 67967]
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+[0.000000, 109.000000, 0.041273, 651231.500000, 6328.348633, 6312.356445, 188.211426, 0.000000, 0.000000, 0.000000, 0.000000, 1132.312500, 2280.112305]
+[0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 6939.676758, 0.000000, 0.000000, 0.000000, 0.000000, 6319.633301, 156062.125000]
+
+
+DIFFERENT X, XSQR and XINV  
+
+X 		   Xsqr 	  Xinv      beta0       beta         yhat         yerrors      Nss       indss     nss       hs        sigmas       MOfst
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+[true,     false,     true,     false,      false,       false,       false,       true,     true,     true,     true,     false,       false]
+[0,        15422,     0,        543736,     543733,      28138338,    14054790,    0,        0,        0,        0,        67967,       67967]
+[0,        567,       0,        0,          0,           0,           0,           0,        0,        0,        0,        0,           0]
+[0.000000, 0.000109,  0.000000, 651231.500, 6328.348633, 6312.356445, 188.211426,  0.000000, 0.000000, 0.000000, 0.000000, 1132.312500, 2280.112305]
+[0.000000, -0.000008, 0.000000, 0.000000,   0.000000,    0.000000,    6939.676758, 0.000000, 0.000000, 0.000000, 0.000000, 6319.633301, 156062.125000]
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+DIFFERENT X, XSQR and XINV  
+
+X 		   Xsqr 	  Xinv      beta0       beta         yhat      yerrors      Nss       indss     nss       hs        sigmas       MOfst
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+[true,     false,     true,     false,      false,       true,     false,       true,     true,     true,     true,     true,        false     ]
+[0,        15422,     0,        269,        243,         0,        3057,        0,        0,        0,        0,        0,           203       ]
+[0,        567,       0,        439,        4636,        0,        38155,       0,        0,        0,        0,        0,           6	       ]
+[0.000000, 0.000109,  0.000000, -13.443848, -0.018592,   0.000000, 0.125977,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    -12.826172]
+[0.000000, -0.000008, 0.000000, -13.206543, -0.020391,   0.000000, 0.130859,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    -12.593262]
+
+
+
+
+---------------------------------------------------------------------   SAHARA   --------------------------------------------------------------------
+
+COMPARING THE SEQUENTIAL WITH THE PARALLEL IMPLEMENTATION  (where the parallel X and Xinv are the sequential versions)
+
+epsilon: 0.01 and 0.01
+
+X 		   Xsqr 	  Xinv      beta0       beta         yhat      yerrors      Nss       indss     nss       hs        sigmas       MOfst
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+[true,     true,      true,     false,      false,       true,     false,       true,     true,     true,     true,     true,        false		]
+[0,        0,         0,        2,          6,           0,        638,         0,        0,        0,        0,        0,           41			] 
+[0,        0,         0,        427194,     82853,       0,        38155,       0,        0,        0,        0,        0,           235  		]
+[0.000000, 0.000000,  0.000000, -0.210793,  0.015949,    0.000000, 0.129395,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    0.995605	]
+[0.000000, 0.000000,  0.000000, -0.206833,  0.016129,    0.000000, 0.130859,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    0.931152	]
+
+
+Sequential kernel 1 version runs in: 147 microsecs
+Sequential kernel 2 version runs in: 7869807 microsecs
+Sequential kernel 3 version runs in: 497610 microsecs
+Sequential kernel 4 version runs in: 833485 microsecs
+Sequential kernel 5 version runs in: 18264 microsecs
+Sequential kernel 6 version runs in: 945012 microsecs
+Sequential kernel 7 version runs in: 718593 microsecs
+Sequential kernel 8 version runs in: 110336 microsecs
+Sequential kernel 9 version runs in: 238621 microsecs
+
+GPU Optimized Kernel 1 runs in: 173 microsecs
+GPU Optimized Kernel 2 runs in: 1139 microsecs
+GPU Optimized Kernel 3 runs in: 504150 microsecs
+GPU Optimized Kernel 4 runs in: 502 microsecs
+GPU Optimized Kernel 5 runs in: 62 microsecs
+GPU Optimized Kernel 6 runs in: 747 microsecs
+GPU Optimized Kernel 7 runs in: 6007 microsecs
+GPU Optimized Kernel 8 runs in: 904 microsecs
+GPU Optimized Kernel 9 runs in: 143 microsecs
+GPU Optimized Kernel 10 runs in: 0 microsecs
+
+
+
+COMPARING THE SEQUENTIAL WITH THE PARALLEL IMPLEMENTATION  (where the parallel X and Xinv are the sequential versions)
+
+epsilon: 0.1 and 0.01
+
+
+X 		   Xsqr 	  Xinv      beta0       beta         yhat      yerrors      Nss       indss     nss       hs        sigmas       MOfst
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+[true,     true,      true,     true,       true,        true,     false,       true,     true,     true,     true,     true,        false		]
+[0,        0,         0,        0,          0,           0,        50,          0,        0,        0,        0,        0,           6			] 
+[0,        0,         0,        0,          0,           0,        534174,      0,        0,        0,        0,        0,           29184  	]
+[0.000000, 0.000000,  0.000000, 0.000000,   0.000000,    0.000000, 0.019043,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    -0.042969	]
+[0.000000, 0.000000,  0.000000, 0.000000,   0.000000,    0.000000, 0.016602,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    -0.057617	]
+
+
+[true, true, true, true, true, true, false, true, false, true, true, true, false]
+[0, 0, 0, 0, 0, 0, 					 37759, 0,    39509, 0, 0, 0, 6]
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29184]
+[0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 188.213379, 0.000000, 2.000000, 0.000000, 0.000000, 0.000000, -0.042969]
+[0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, .nan, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, -0.057617]
+
+
+
+Sequential kernel 1 version runs in: 153 microsecs
+Sequential kernel 2 version runs in: 8027942 microsecs
+Sequential kernel 3 version runs in: 518479 microsecs
+Sequential kernel 4 version runs in: 845502 microsecs
+Sequential kernel 5 version runs in: 18239 microsecs
+Sequential kernel 6 version runs in: 981649 microsecs
+Sequential kernel 7 version runs in: 826131 microsecs
+Sequential kernel 8 version runs in: 122101 microsecs
+Sequential kernel 9 version runs in: 68259 microsecs
+
+GPU Optimized Kernel 1 runs in: 181 microsecs
+GPU Optimized Kernel 2 runs in: 1138 microsecs
+GPU Optimized Kernel 3 runs in: 553255 microsecs
+GPU Optimized Kernel 4 runs in: 491 microsecs
+GPU Optimized Kernel 5 runs in: 69 microsecs
+GPU Optimized Kernel 6 runs in: 749 microsecs
+GPU Optimized Kernel 7 runs in: 4946 microsecs
+GPU Optimized Kernel 8 runs in: 991 microsecs
+GPU Optimized Kernel 9 runs in: 147 microsecs
+GPU Optimized Kernel 10 runs in: 0 microsecs
+
+
+
+
+X 		   Xsqr 	  Xinv      beta0       beta         yhat      yerrors      Nss       indss     nss       hs        sigmas       MOfst			breaks    means
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[true,     true,      true,     true,       true,        true,     false,       true,     true,     true,     true,     true,        false			false, 	  false     ]
+[0,        0,         0,        0,          0,           0,        50,          0,        0,        0,        0,        0,           6				37368,    27450     ]
+[0,        0,         0,        0,          0,           0,        534174,      0,        0,        0,        0,        0,           29184  		0, 		  0		    ]
+[0.000000, 0.000000,  0.000000, 0.000000,   0.000000,    0.000000, 0.019043,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    -0.042969	    57.00000, 100.279411]
+[0.000000, 0.000000,  0.000000, 0.000000,   0.000000,    0.000000, 0.016602,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    -0.057617		55.00000, 117.828850]
+
+
+
+
+
+Sequential kernel 1 version runs in: 152 microsecs
+Sequential kernel 2 version runs in: 8009617 microsecs
+Sequential kernel 3 version runs in: 500629 microsecs
+Sequential kernel 4 version runs in: 828639 microsecs
+Sequential kernel 5 version runs in: 18340 microsecs
+Sequential kernel 6 version runs in: 944360 microsecs
+Sequential kernel 7 version runs in: 724109 microsecs
+Sequential kernel 8 version runs in: 107565 microsecs
+Sequential kernel 9 version runs in: 61113 microsecs
+Sequential kernel 10 version runs in: 461040 microsecs
+
+
+
+GPU Optimized Kernel 1 runs in: 175 microsecs
+GPU Optimized Kernel 2 runs in: 1153 microsecs
+GPU Optimized Kernel 3 runs in: 501024 microsecs
+GPU Optimized Kernel 4 runs in: 483 microsecs
+GPU Optimized Kernel 5 runs in: 62 microsecs
+GPU Optimized Kernel 6 runs in: 743 microsecs
+GPU Optimized Kernel 7 runs in: 10658 microsecs
+GPU Optimized Kernel 8 runs in: 825 microsecs
+GPU Optimized Kernel 9 runs in: 146 microsecs
+GPU Optimized Kernel 10 runs in: 924 microsecs
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------    PERU    --------------------------------------------------------------------
+
+COMPARING THE SEQUENTIAL WITH THE PARALLEL IMPLEMENTATION  (where the parallel X and Xinv are the sequential versions)
+
+epsilon: 0.1 and 0.01
+
+
+X 		   Xsqr 	  Xinv      beta0       beta         yhat      yerrors      Nss       indss     nss       hs        sigmas       MOfst
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+[true,     true,      true,     false,     false,        true,     false,       true,     true,     true,     true,     true,     false 	]
+[0,        0,         0,        1,         1,            0,        116,         0,        0,        0,        0,        0,        6 	  	]
+[0,        0,         0,        373334,    350802,       0,        168298,      0,        0,        0,        0,        0,        4774		]
+[0.000000, 0.000000,  0.000000, -0.013672, -0.001221,    0.000000, 0.012451,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.105957	]
+[0.000000, 0.000000,  0.000000, -0.017490, 0.000070,     0.000000, 0.014160,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.118896	]
+
+
+
+
+
+GPU Optimized Kernel 1 runs in: 117 microsecs
+GPU Optimized Kernel 2 runs in: 1006 microsecs
+GPU Optimized Kernel 3 runs in: 761411 microsecs
+GPU Optimized Kernel 4 runs in: 386 microsecs
+GPU Optimized Kernel 5 runs in: 95 microsecs
+GPU Optimized Kernel 6 runs in: 490 microsecs
+GPU Optimized Kernel 7 runs in: 947 microsecs
+GPU Optimized Kernel 8 runs in: 583 microsecs
+GPU Optimized Kernel 9 runs in: 155 microsecs
+GPU Optimized Kernel 10 runs in: 0 microsecs
+
+117+1006+386+95+490+800+947+583+155 = 4579
+
+
+
+
+
+
+
+X 		   Xsqr 	  Xinv      beta0       beta         yhat      yerrors      Nss       indss     nss       hs        sigmas       MOfst  	breaks    means
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[true,     true,      true,     false,     false,        true,     false,       true,     true,     true,     true,     true,     false, 		false, 	  false    ]
+[0,        0,         0,        1,         1,            0,        116,         0,        0,        0,        0,        0,        6, 			43974,    54926    ]
+[0,        0,         0,        373334,    350802,       0,        168298,      0,        0,        0,        0,        0,        4774, 		0, 		  0		   ]
+[0.000000, 0.000000,  0.000000, -0.013672, -0.001221,    0.000000, 0.012451,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.105957,     0.000000, 24.366955]
+[0.000000, 0.000000,  0.000000, -0.017490, 0.000070,     0.000000, 0.014160,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.118896, 	-1.00000, 16.851479]
+
+
+
+
+
+Sequential kernel 1 version runs in: 95 microsecs
+Sequential kernel 2 version runs in: 3176142 microsecs
+Sequential kernel 3 version runs in: 774750 microsecs
+Sequential kernel 4 version runs in: 467019 microsecs
+Sequential kernel 5 version runs in: 30168 microsecs
+Sequential kernel 6 version runs in: 884969 microsecs
+Sequential kernel 7 version runs in: 414227 microsecs
+Sequential kernel 8 version runs in: 88188 microsecs
+Sequential kernel 9 version runs in: 69947 microsecs
+Sequential kernel 10 version runs in: 474841 microsecs
+
+
+GPU Optimized Kernel 1 runs in: 117 microsecs
+GPU Optimized Kernel 2 runs in: 1013 microsecs
+GPU Optimized Kernel 3 runs in: 757485 microsecs
+GPU Optimized Kernel 4 runs in: 359 microsecs
+GPU Optimized Kernel 5 runs in: 93 microsecs
+GPU Optimized Kernel 6 runs in: 678 microsecs
+GPU Optimized Kernel 7 runs in: 8052 microsecs
+GPU Optimized Kernel 8 runs in: 682 microsecs
+GPU Optimized Kernel 9 runs in: 185 microsecs
+GPU Optimized Kernel 10 runs in: 966 microsecs
+
+
+
+
+
+
+
+-----------------------------------------------------    NAIVE VS. OPTIMAL    ----------------------------------------------------
+
+
+OPTIMAL PERFORMANCE 
+
+GPU Optimized Kernel 1 runs in: 116 microsecs
+GPU Optimized Kernel 2 runs in: 988 microsecs
+GPU Optimized Kernel 3 runs in: 757050 microsecs
+GPU Optimized Kernel 4 runs in: 369 microsecs
+GPU Optimized Kernel 5 runs in: 92 microsecs
+GPU Optimized Kernel 6 runs in: 681 microsecs
+GPU Optimized Kernel 7 runs in: 7023 microsecs
+GPU Optimized Kernel 8 runs in: 692 microsecs
+GPU Optimized Kernel 9 runs in: 182 microsecs
+GPU Optimized Kernel 10 runs in: 962 microsecs
+
+
+
+
+
+
+X 		   Xsqr 	  Xinv      beta0       beta         yhat      yerrors      Nss       indss     nss       hs        sigmas       MOfst  	breaks    means
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+[true,     true,      true,     false,     false,        true,     false,       true,     true,     true,     true,     true,        false,     false,    true     ]
+[0,        0,         0,        1,         1,            0,        116,         0,        0,        0,        0,        0,           6,         19510,    0        ]
+[0,        0,         0,        373334,    350802,       0,        168298,      0,        0,        0,        0,        0,           4774,      0,        0        ]
+[0.000000, 0.000000,  0.000000, -0.013672, -0.001221,    0.000000, 0.012451,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    0.105957,  0.000000, 0.000000 ]
+[0.000000, 0.000000,  0.000000, -0.017490, 0.000070,     0.000000, 0.014160,    0.000000, 0.000000, 0.000000, 0.000000, 0.000000,    0.118896,  -1.000000,0.000000 ]
+
+
+
+Sequential kernel 1 version runs in: 93 microsecs
+Sequential kernel 2 version runs in: 3140689 microsecs
+Sequential kernel 3 version runs in: 743543 microsecs
+Sequential kernel 4 version runs in: 477630 microsecs
+Sequential kernel 5 version runs in: 29676 microsecs
+Sequential kernel 6 version runs in: 885301 microsecs
+Sequential kernel 7 version runs in: 413576 microsecs
+Sequential kernel 8 version runs in: 88566 microsecs
+Sequential kernel 9 version runs in: 13447 microsecs
+Sequential kernel 10 version runs in: 480912 microsecs
+
+
+GPU Optimized Kernel 1 runs in: 115 microsecs
+GPU Optimized Kernel 2 runs in: 1002 microsecs
+GPU Optimized Kernel 3 runs in: 756679 microsecs
+GPU Optimized Kernel 4 runs in: 350 microsecs
+GPU Optimized Kernel 5 runs in: 95 microsecs
+GPU Optimized Kernel 6 runs in: 680 microsecs
+GPU Optimized Kernel 7 runs in: 4648 microsecs
+GPU Optimized Kernel 8 runs in: 679 microsecs
+GPU Optimized Kernel 9 runs in: 181 microsecs
+GPU Optimized Kernel 10 runs in: 967 microsecs
+
+
+GPU Optimized Kernel 1 runs in: 119 microsecs
+GPU Optimized Kernel 2 runs in: 1010 microsecs
+GPU Optimized Kernel 3 runs in: 760312 microsecs
+GPU Optimized Kernel 4 runs in: 358 microsecs
+GPU Optimized Kernel 5 runs in: 97 microsecs
+GPU Optimized Kernel 6 runs in: 687 microsecs
+GPU Optimized Kernel 7 runs in: 7156 microsecs
+GPU Optimized Kernel 8 runs in: 684 microsecs
+GPU Optimized Kernel 9 runs in: 182 microsecs
+GPU Optimized Kernel 10 runs in: 970 microsecs
+
+
+---------------------------------------  NAIVE 2, 4, 8 and only tiled 5 and 6  ---------------------------------------
+
+[true, false, false, false, false, false, false, true, true, true, false, false, false, false, false]
+[0, 5159628, 3859738, 576456, 644105, 18946875, 7792254, 0, 0, 0, 83874, 83874, 83874, 83874, 83874]
+[0, 238016, 238016, 111560, 29752, 873965, 44886, 0, 0, 0, 0, 0, 0, 0, 0]
+[0.000000, 46.000000, 0.177205, 193034.000000, 3831.226074, 3534.543213, -0.054443, 0.000000, 0.000000, 0.000000, 12.000000, 493.399658, -546.235596, 0.000000, 16.851807]
+[0.000000, 0.000000, 1.000000, 0.000000, 185678.000000, 51513864192.000000, -0.060547, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, -1.000000, .nan]
+
+
+GPU Optimized Kernel 1 runs in: 116 microsecs
+GPU Optimized Kernel 2 runs in: 131 microsecs
+GPU Optimized Kernel 3 runs in: 562198 microsecs
+GPU Optimized Kernel 4 runs in: 229 microsecs
+GPU Optimized Kernel 5 runs in: 87 microsecs
+GPU Optimized Kernel 6 runs in: 598 microsecs
+GPU Optimized Kernel 7 runs in: 1014 microsecs
+GPU Optimized Kernel 8 runs in: 6563 microsecs
+GPU Optimized Kernel 9 runs in: 147 microsecs
+GPU Optimized Kernel 10 runs in: 958 microsecs
+
+
+
+---------------------------------------  NAIVE 2  ---------------------------------------
+
+[true, false, false, false, false, false, false, true, true, true, true, false, false, false, false]
+[0i32, 5159628i32, 3859738i32, 1i32, 644728i32, 18946875i32, 7831767i32, 0i32, 0i32, 0i32, 0i32, 80625i32, 80625i32, 80099i32, 74114i32]
+[0i32, 238016i32, 238016i32, 373334i32, 29752i32, 873965i32, 44886i32, 0i32, 0i32, 0i32, 0i32, 3719i32, 3719i32, 0i32, 1903i32]
+[0.000000f32, 46.000000f32, 0.177205f32, -0.013672f32, 3831.226074f32, 3534.543213f32, -0.054443f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 479.126495f32, 877.248779f32, 0.000000f32, -0.014761f32]
+[0.000000f32, 0.000000f32, 1.000000f32, -0.017490f32, 185678.000000f32, 51513864192.000000f32, -0.060547f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 1160657371136.000000f32, -16051172540416.000000f32, -1.000000f32, -0.012622f32]
+
+
+GPU Optimized Kernel 1 runs in: 127 microsecs
+GPU Optimized Kernel 2 runs in: 142 microsecs
+GPU Optimized Kernel 3 runs in: 589781 microsecs
+GPU Optimized Kernel 4 runs in: 368 microsecs
+GPU Optimized Kernel 5 runs in: 107 microsecs
+GPU Optimized Kernel 6 runs in: 712 microsecs
+GPU Optimized Kernel 7 runs in: 11968 microsecs
+GPU Optimized Kernel 8 runs in: 725 microsecs
+GPU Optimized Kernel 9 runs in: 194 microsecs
+GPU Optimized Kernel 10 runs in: 1026 microsecs
+
+
+---------------------------------------  NAIVE 4  ---------------------------------------
+
+[true, true, true, false, false, false, false, true, true, true, true, false, false, false, false]
+[0i32, 0i32, 0i32, 576456i32, 575595i32, 16933395i32, 6988615i32, 0i32, 0i32, 0i32, 0i32, 72057i32, 72059i32, 75480i32, 67698i32]
+[0i32, 0i32, 0i32, 111560i32, 111560i32, 3277075i32, 168298i32, 0i32, 0i32, 0i32, 0i32, 13945i32, 4774i32, 0i32, 13946i32]
+[0.000000f32, 0.000000f32, 0.000000f32, 193034.000000f32, 3957.537109f32, 3538.406494f32, 0.012451f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 288.111877f32, 0.105957f32, 0.000000f32, 15.935946f32]
+[0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.014160f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 4321.444824f32, 0.118896f32, -1.000000f32, 69.608841f32]
+
+GPU Optimized Kernel 1 runs in: 118 microsecs
+GPU Optimized Kernel 2 runs in: 997 microsecs
+GPU Optimized Kernel 3 runs in: 758726 microsecs
+GPU Optimized Kernel 4 runs in: 235 microsecs
+GPU Optimized Kernel 5 runs in: 92 microsecs
+GPU Optimized Kernel 6 runs in: 673 microsecs
+GPU Optimized Kernel 7 runs in: 1056 microsecs
+GPU Optimized Kernel 8 runs in: 705 microsecs
+GPU Optimized Kernel 9 runs in: 185 microsecs
+GPU Optimized Kernel 10 runs in: 955 microsecs
+
+
+
+
+---------------------------------------  NAIVE 5  ---------------------------------------
+
+[true, true, true, false, false, false, false, true, true, true, true, false, false, false, false]
+[0i32, 0i32, 0i32, 1i32, 575595i32, 16933395i32, 6988615i32, 0i32, 0i32, 0i32, 0i32, 72057i32, 72059i32, 75480i32, 67698i32]
+[0i32, 0i32, 0i32, 373334i32, 111560i32, 3277075i32, 168298i32, 0i32, 0i32, 0i32, 0i32, 13945i32, 4774i32, 0i32, 13946i32]
+[0.000000f32, 0.000000f32, 0.000000f32, -0.013672f32, 3957.537109f32, 3538.406494f32, 0.012451f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 288.111877f32, 0.105957f32, 0.000000f32, 15.935946f32]
+[0.000000f32, 0.000000f32, 0.000000f32, -0.017490f32, 0.000000f32, 0.000000f32, 0.014160f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 4321.444824f32, 0.118896f32, -1.000000f32, 69.608841f32]
+
+
+GPU Optimized Kernel 1 runs in: 118 microsecs
+GPU Optimized Kernel 2 runs in: 1012 microsecs
+GPU Optimized Kernel 3 runs in: 762159 microsecs
+GPU Optimized Kernel 4 runs in: 360 microsecs
+GPU Optimized Kernel 5 runs in: 48 microsecs
+GPU Optimized Kernel 6 runs in: 674 microsecs
+GPU Optimized Kernel 7 runs in: 1050 microsecs
+GPU Optimized Kernel 8 runs in: 694 microsecs
+GPU Optimized Kernel 9 runs in: 182 microsecs
+GPU Optimized Kernel 10 runs in: 958 microsecs
+
+
+
+
+
+---------------------------------------  NAIVE 8 and only tiled 2, 4, 5 and 6  ---------------------------------------
+
+
+
+[true, false, false, false, false, false, false, true, true, true, false, false, false, false, false]
+[0i32, 7139410i32, 4152915i32, 1i32, 669237i32, 19710353i32, 8100258i32, 0i32, 0i32, 0i32, 83874i32, 83874i32, 83874i32, 83874i32, 83874i32]
+[0i32, 0i32, 0i32, 373334i32, 0i32, 0i32, 0i32, 0i32, 0i32, 0i32, 0i32, 0i32, 0i32, 0i32, 0i32]
+[0.000000f32, 50.000000f32, 0.149001f32, -0.013672f32, 3958.826660f32, 3880.068848f32, 345.316406f32, 0.000000f32, 0.000000f32, 0.000000f32, 12.000000f32, 493.399658f32, -546.235596f32, 0.000000f32, 16.851807f32]
+[0.000000f32, 150454.000000f32, 0.000042f32, -0.017490f32, 1.727997f32, 1.004400f32, 4713.870605f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, -1.000000f32, f32.nan]
+
+
+
+
+GPU Optimized Kernel 1 runs in: 118 microsecs
+GPU Optimized Kernel 2 runs in: 948 microsecs
+GPU Optimized Kernel 3 runs in: 823879 microsecs
+GPU Optimized Kernel 4 runs in: 540 microsecs
+GPU Optimized Kernel 5 runs in: 96 microsecs
+GPU Optimized Kernel 6 runs in: 600 microsecs
+GPU Optimized Kernel 7 runs in: 1058 microsecs
+GPU Optimized Kernel 8 runs in: 6574 microsecs
+GPU Optimized Kernel 9 runs in: 148 microsecs
+GPU Optimized Kernel 10 runs in: 957 microsecs
+
+
+
+
+
+
+
+---------------------------------------  FULLY OPTIMIZED  ---------------------------------------
+
+
+[true, false, true, false, false, false, false, true, true, true, true, true, false, false, false]
+[0i32, 418i32, 0i32, 143i32, 274i32, 2i32, 8805i32, 0i32, 0i32, 0i32, 0i32, 0i32, 347i32, 241i32, 95i32]
+[0i32, 104526i32, 0i32, 606i32, 2615i32, 1453237i32, 3086i32, 0i32, 0i32, 0i32, 0i32, 0i32, 422i32, 86i32, 124i32]
+[0.000000f32, 13.333559f32, 0.000000f32, -3.545419f32, 0.054194f32, -0.785051f32, -0.129883f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, -2.738525f32, -1.000000f32, -0.126457f32]
+[0.000000f32, 13.190218f32, 0.000000f32, -3.600785f32, 0.055028f32, -0.773307f32, -0.118164f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, -2.791504f32, 1.000000f32, -0.128402f32]
+
+
+GPU Optimized Kernel 1 runs in: 114 microsecs
+GPU Optimized Kernel 2 runs in: 994 microsecs
+GPU Optimized Kernel 3 runs in: 780727 microsecs
+GPU Optimized Kernel 4 runs in: 352 microsecs
+GPU Optimized Kernel 5 runs in: 99 microsecs
+GPU Optimized Kernel 6 runs in: 689 microsecs
+GPU Optimized Kernel 7 runs in: 4465 microsecs
+GPU Optimized Kernel 8 runs in: 687 microsecs
+GPU Optimized Kernel 9 runs in: 182 microsecs
+GPU Optimized Kernel 10 runs in: 966 microsecs
+
+
+
+
+
+
+---------------- Kernel 2 as tiled only -----------------------
+
+[true, false, true, false, false, false, false, true, true, true, true, true, false, false, false]
+[0i32, 418i32, 0i32, 143i32, 274i32, 2i32, 8805i32, 0i32, 0i32, 0i32, 0i32, 0i32, 347i32, 241i32, 95i32]
+[0i32, 104526i32, 0i32, 606i32, 2615i32, 1453237i32, 3086i32, 0i32, 0i32, 0i32, 0i32, 0i32, 422i32, 86i32, 124i32]
+[0.000000f32, 13.333559f32, 0.000000f32, -3.545419f32, 0.054194f32, -0.785051f32, -0.129883f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, -2.738525f32, -1.000000f32, -0.126457f32]
+[0.000000f32, 13.190218f32, 0.000000f32, -3.600785f32, 0.055028f32, -0.773307f32, -0.118164f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, -2.791504f32, 1.000000f32, -0.128402f32]
+
+
+
+GPU Optimized Kernel 1 runs in: 114 microsecs
+GPU Optimized Kernel 2 runs in: 994 microsecs
+GPU Optimized Kernel 3 runs in: 780727 microsecs
+GPU Optimized Kernel 4 runs in: 352 microsecs
+GPU Optimized Kernel 5 runs in: 99 microsecs
+GPU Optimized Kernel 6 runs in: 689 microsecs
+GPU Optimized Kernel 7 runs in: 4465 microsecs
+GPU Optimized Kernel 8 runs in: 687 microsecs
+GPU Optimized Kernel 9 runs in: 182 microsecs
+GPU Optimized Kernel 10 runs in: 966 microsecs
+
+
+
+
+[true, false, true, false, false, true, false, true, true, true, true, true, false, false, false]
+[0i32, 6i32, 0i32, 2i32, 107i32, 0i32, 5991i32, 0i32, 0i32, 0i32, 0i32, 0i32, 264i32, 19509i32, 86i32]
+[0i32, 2772046i32, 0i32, 373334i32, 2615i32, 0i32, 3086i32, 0i32, 0i32, 0i32, 0i32, 0i32, 318i32, 0i32, 893i32]
+[0.000000f32, 0.116731f32, 0.000000f32, -0.013672f32, 0.054443f32, 0.000000f32, -0.118896f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 6.050293f32, 0.000000f32, 0.102774f32]
+[0.000000f32, 0.115370f32, 0.000000f32, -0.017490f32, 0.055066f32, 0.000000f32, -0.116699f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 6.169922f32, -1.000000f32, 0.104619f32]
+
+
+
+
+
+seq vs parallel
+
+X 		   Xsqr 	  Xinv      beta0       beta         yhat      yerrors      Nss       indss     nss       hs        sigmas       MOfst  	breaks    means
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+[true, false, true, false, false, false, false, true, true, true, true, true, false, false, false]
+[0i32, 418i32, 0i32, 143i32, 262i32, 2i32, 8564i32, 0i32, 0i32, 0i32, 0i32, 0i32, 363i32, 241i32, 98i32]
+[0i32, 104526i32, 0i32, 606i32, 2615i32, 1453237i32, 3086i32, 0i32, 0i32, 0i32, 0i32, 0i32, 746i32, 86i32, 124i32]
+[0.000000f32, 13.333559f32, 0.000000f32, -3.545419f32, 0.054194f32, -0.785051f32, -0.129883f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 10.598145f32, -1.000000f32, -0.126457f32]
+[0.000000f32, 13.190218f32, 0.000000f32, -3.600785f32, 0.055028f32, -0.773581f32, -0.120605f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 10.752930f32, 1.000000f32, -0.129712f32]
+
+
+
+
+
+
+
+
+
+seq vs futhark 
+
+
+[true, false, true, false, false, false, false, true, true, true, true, true, false, false, false]
+[0i32, 558i32, 0i32, 210i32, 231i32, 1i32, 8600i32, 0i32, 0i32, 0i32, 0i32, 0i32, 384i32, 244i32, 96i32]
+[0i32, 82189i32, 0i32, 606i32, 7782i32, 1453237i32, 3623i32, 0i32, 0i32, 0i32, 0i32, 0i32, 388i32, 86i32, 329i32]
+[0.000000f32, 6.955322f32, 0.000000f32, -3.388437f32, -0.002167f32, -0.785927f32, 0.283691f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 6.603271f32, -1.000000f32, 0.687959f32]
+[0.000000f32, 7.050537f32, 0.000000f32, -3.600778f32, -0.001617f32, -0.773048f32, 0.291992f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 6.685547f32, 1.000000f32, 0.679680f32]
+
+
+futhark vs. parallel 
+
+[true, false, true, false, false, false, false, true, true, true, true, true, false, false, false]
+[0i32, 558i32, 0i32, 209i32, 225i32, 1i32, 8631i32, 0i32, 0i32, 0i32, 0i32, 0i32, 365i32, 243i32, 93i32]
+[0i32, 82189i32, 0i32, 606i32, 7782i32, 1453237i32, 5887i32, 0i32, 0i32, 0i32, 0i32, 0i32, 388i32, 86i32, 124i32]
+[0.000000f32, 6.955322f32, 0.000000f32, -3.388437f32, -0.002167f32, -0.785927f32, -0.120117f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 6.603271f32, -1.000000f32, -0.127799f32]
+[0.000000f32, 7.050537f32, 0.000000f32, -3.600785f32, -0.000906f32, -0.773581f32, -0.112793f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 0.000000f32, 6.699219f32, 1.000000f32, -0.129712f32]
+
+
+
+
+
+
+
+
+
+

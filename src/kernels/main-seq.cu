@@ -9,14 +9,8 @@
 #include "helper.cu.h"
 #include "sequential.cu.h"
 
-// #define BLOCK_SIZE 1024//1024 //1024//2048
-// #define WIDTH_A  1024//1024 //1024//2048
-// #define HEIGHT_A 1//2048//2048//2048
-// #define WIDTH_B  1024//4096//2048
-// #define TILE_HEIGHT 1
-// #define TILE_WIDTH 1024
 #define F32_MIN -FLT_MAX
-// #define I32_MIN -2147483648
+#define I32_MIN -2147483648
 typedef unsigned int uint;
 
 
@@ -70,7 +64,7 @@ void readNum(FILE *fp, char* buff) {
   char c = getc(fp);
   while( c != ',' && c != EOF) {
     buff[i++] = c;
-    c = getc(fp);
+    c = getc(fp); 
   }
   buff[i] = '\0';
 }
@@ -91,7 +85,7 @@ int main(int argc, char const *argv[]) {
 //// PARSING
 ///////////////////////////////////////////////////////////////////////////////
 
-    FILE *fp, *fpim, *fpV, *fpTEST;
+    FILE *fp, *fpim, *fpV;
     uint m = 0;
 
     // opening files with input and fpV for validating the results
@@ -134,13 +128,12 @@ int main(int argc, char const *argv[]) {
     if (m == 0) {
         m = (uint)atoi(input7);
     }
-    printf("\n\n%u\n\n", m);
-    printf("\n\n%u\n\n", N);
+
     int   trend = atoi(input1);
     float freq  = atof(input4);
     float hfrac = atof(input5);
     float lam   = atof(input6);
-
+    
     int K  = 2*k + 2;
     int mappingLen, imageLen, i = 0;
 
@@ -159,7 +152,7 @@ int main(int argc, char const *argv[]) {
 
     // allocating host memory for mappingindices and pixels
     int* h_mappingindices = (int*) calloc(N,sizeof(int));
-    float* h_Y = (float*) calloc(N*m,sizeof(float));
+    float* h_Y = (float*) calloc(N*m,sizeof(float));    
 
     char buff[1000];
     for (int i = 0; i < N*m; i++) {
@@ -183,11 +176,14 @@ int main(int argc, char const *argv[]) {
     // closing file with data
    fclose(fp);
 
+   // Tile size for register tiling 
+   const uint R = 30;
+
     // allocate host memory for X
     float* h_seq_X         = (float*) calloc(N*K,sizeof(float));
     float* h_seq_XT        = (float*) calloc(N*K,sizeof(float));
     float* h_seq_Xsqr      = (float*) calloc(K*K*m,sizeof(float));
-    float* h_seq_XInv      = (float*) calloc(K*K*m,sizeof(float));
+    float* h_seq_Xinv      = (float*) calloc(K*K*m,sizeof(float));
     float* h_seq_B0        = (float*) calloc(K*m,sizeof(float));
     float* h_seq_B         = (float*) calloc(K*m,sizeof(float));
     float* h_seq_yhat      = (float*) calloc(N*m,sizeof(float));
@@ -198,15 +194,12 @@ int main(int argc, char const *argv[]) {
     uint * h_seq_nss       = (uint *) calloc(m  ,sizeof(uint));
     int  * h_seq_hs        = (int  *) calloc(m  ,sizeof(int));
     float* h_seq_sigmas    = (float*) calloc(m  ,sizeof(float));
-
+    float* h_seq_MOfsts    = (float*) calloc(m  ,sizeof(float));
     float* h_seq_bound     = (float*) calloc(N-n,sizeof(float));
     float* h_seq_MOp       = (float*) calloc(m*(N-n),sizeof(float));
     float* h_seq_means     = (float*) calloc(m,sizeof(float));
-    int*   h_seq_fstBreakP = (int*)   calloc(m,sizeof(int));
+    int*   h_seq_fstBreakP = (int  *) calloc(m,sizeof(int));
     float* h_seq_MOpp      = (float*) calloc(m*(N-n),sizeof(float));
-    float* h_seq_MO_fsts   = (float*) calloc(m,sizeof(float));
-
-    const uint R = 30;
 
     for (int i = 0; i < m*N; i++) { h_seq_yerrs[i] = F32_MIN; }
 
@@ -219,7 +212,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 1 and transpose from the sequential file
-        mkX(N, K, freq, h_mappingindices, h_seq_X);
+        ker1seq(N, K, freq, h_mappingindices, h_seq_X);
         transpose(N, K, h_seq_X, h_seq_XT);
 
         gettimeofday(&t_end, NULL);
@@ -240,10 +233,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 2
-        // mkXsqr(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
-        // mkXsqrG(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
-        // ker2naive(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K);
-        ker2tiled(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K, R);
+        ker2seqtiled(n, N, m, h_seq_X, h_seq_XT, h_Y, h_seq_Xsqr, K, R);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -263,8 +253,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 3
-        // mkXsqrInv(m, h_seq_Xsqr, h_seq_XInv, K);
-        gaussJordanG(m, K, h_seq_Xsqr, h_seq_XInv);
+        ker3seq(m, K, h_seq_Xsqr, h_seq_Xinv);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -272,7 +261,7 @@ int main(int argc, char const *argv[]) {
         printf("Sequential kernel 3 version runs in: %lu microsecs\n", elapsed);
 
         // validation
-        printM(fpV, h_seq_XInv, m, K);
+        printM(fpV, h_seq_Xinv, m, K);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -284,10 +273,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 4
-        // mkB0(m, n, N, h_seq_X, K, h_Y, h_seq_B0);
-        // mkB0G(m, n, N, h_seq_X, K, h_Y, h_seq_B0);
-        // ker4MkB0(m, n, N, h_seq_X, K, h_Y, h_seq_B0);
-        mkBOPN(m, n, N, h_seq_X, K, h_Y, h_seq_B0);
+        ker4seqtiled(m, n, N, h_seq_X, K, h_Y, h_seq_B0);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -308,8 +294,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 5
-        // mkB(m, h_seq_XInv, K, h_seq_B0, h_seq_B);
-        ker5seq(m, h_seq_XInv, K, h_seq_B0, h_seq_B);
+        ker5seqtiled(m, h_seq_Xinv, K, h_seq_B0, h_seq_B);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -329,8 +314,8 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 6
-        // ker6seq(m, N, h_seq_XT, h_seq_B, K, h_seq_yhat);
-        ker6seqOP(m, N, h_seq_XT, h_seq_B, K, h_seq_yhat);
+        // ker6seqnaive(m, N, h_seq_XT, h_seq_B, K, h_seq_yhat);
+        ker6seqtiled(m, N, h_seq_XT, h_seq_B, K, h_seq_yhat);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -351,7 +336,8 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 7
-        ker7seq(m, N, h_seq_yhat, h_seq_yerrs_all, h_seq_Nss, h_seq_yerrs, h_Y, h_seq_indss);
+        ker7seq(m, N, h_seq_yhat, h_seq_yerrs_all, h_seq_Nss, 
+                                h_seq_yerrs, h_Y, h_seq_indss);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -374,7 +360,7 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         ker8seq(m, n, N, K, hfrac, h_seq_yerrs, h_Y,
-            h_seq_nss, h_seq_hs, h_seq_sigmas);
+                h_seq_nss, h_seq_hs, h_seq_sigmas);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
@@ -397,15 +383,15 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 9
-        ker9merged(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, h_seq_MO_fsts);
+        ker9seq(m, N, h_seq_hs, h_seq_yerrs, h_seq_nss, h_seq_MOfsts);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 9 version runs in: %lu microsecs\n", elapsed);
-
+        
         // validation
-        printEf(fpV, h_seq_MO_fsts, m);
+        printEf(fpV, h_seq_MOfsts, m);
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -417,31 +403,28 @@ int main(int argc, char const *argv[]) {
         gettimeofday(&t_start, NULL);
 
         // calling sequential kernel 10
-        // ker10merged(lam, m, n, N, h_seq_bound, h_seq_Nss,
         ker10seq(lam, m, n, N, h_seq_bound, h_seq_Nss,
                 h_seq_nss,
-              h_seq_sigmas,
-              h_seq_hs,
-              h_mappingindices,
-              h_seq_MO_fsts,
-              h_seq_yerrs,
-              h_seq_indss,
-              h_seq_MOp,
-              h_seq_means,
-              h_seq_fstBreakP,
-              h_seq_MOpp);
+                h_seq_sigmas,
+                h_seq_hs,
+                h_mappingindices,
+                h_seq_MOfsts,
+                h_seq_yerrs,
+                h_seq_indss,
+                h_seq_MOp,
+                h_seq_means,
+                h_seq_fstBreakP,
+                h_seq_MOpp);
 
         gettimeofday(&t_end, NULL);
         timeval_subtract(&t_diff, &t_end, &t_start);
         elapsed = (t_diff.tv_sec*1e6+t_diff.tv_usec);
         printf("Sequential kernel 10 version runs in: %lu microsecs\n", elapsed);
+        
         // validation
-        // printVfnan(fpV, h_seq_MOpp, m, N-n);
-        // printVfnan(fpV, h_seq_MOp, m, N-n);
         printEi(fpV, h_seq_fstBreakP, m);
         printEf(fpV, h_seq_means, m);
     }
-
 
     fclose(fpV);
 
@@ -451,11 +434,28 @@ int main(int argc, char const *argv[]) {
     free(h_seq_X);
     free(h_seq_XT);
     free(h_seq_Xsqr);
-    free(h_seq_XInv);
+    free(h_seq_Xinv);
     free(h_seq_B0);
     free(h_seq_B);
     free(h_seq_yhat);
+    free(h_seq_bound);
+    free(h_seq_MOp);
+    free(h_seq_means);
+    free(h_seq_fstBreakP);
+    free(h_seq_MOpp);
+    free(h_seq_MOfsts);
+    free(h_seq_indss);
+    free(h_seq_nss);
+    free(h_seq_Nss);
+    free(h_seq_sigmas);
+    free(h_seq_hs);
+    free(h_seq_yerrs);
+    free(h_seq_yerrs_all);
 }
+
+
+
+
 
 
 

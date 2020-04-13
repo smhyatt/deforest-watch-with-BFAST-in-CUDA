@@ -59,23 +59,23 @@ $(EXECUTABLE3): $(SRC3) $(HELPERS)
 ############### RUN AND NO VALIDATION ###############
 
 # FULL SET
-# Running the sequential implementation on the full dataset
+# Running the sequential implementation on the full dataset 
 SseqFullRun: $(EXECUTABLE1)
 			./$(EXECUTABLE1) sahara
 
 # TESTSET
-# Running the sequential implementation on the testset
+# Running the sequential implementation on the testset 
 S2seqFullRun: $(EXECUTABLE1)
 			./$(EXECUTABLE1) 2sahara
 
 
 # FULL SET
-# Running the optimized implementation on the full dataset
+# Running the optimized implementation on the full dataset 
 SopFullRun: $(EXECUTABLE3)
 			./$(EXECUTABLE3) sahara
 
 # TESTSET
-# Running the optimized implementation on the testset
+# Running the optimized implementation on the testset 
 S2opFullRun: $(EXECUTABLE3)
 			./$(EXECUTABLE3) 2sahara
 
@@ -86,12 +86,12 @@ S2opFullRun: $(EXECUTABLE3)
 ############### RUN AND VALIDATION ###############
 
 # FULL SET
-# Runs and validates the sequential implementation of the full Sahara dataset
+# Runs and validates the sequential implementation of the full Sahara dataset  
 
-seqVsahara:
+seqVsahara: 
 	$(info )
 	$(info The validation for the sequential implementation with the full Sahara dataset.)
-	# creates the validation results from bfast-irreg
+	# creates the validation results from bfast-irreg 
 	cd ../validation && make fullSeqSahara && cd ../kernels
 	# compile and run sequential implementation with full dataset
 	make compileSeq
@@ -101,14 +101,14 @@ seqVsahara:
 	cd ../validation && futhark c validation.fut
 	# validating the bfast result with our sequential implementation
 	cd ../validation && ./validation < ../data/saharaval.data
-	# clean-up
+	# clean-up 
 	cd ../validation && rm validation validation.c || true
 
 
 # TESTSET
-# Runs and validates the sequential implementation of two pixels from the Sahara dataset
+# Runs and validates the sequential implementation of two pixels from the Sahara dataset  
 
-seq2Vsahara:
+seq2Vsahara: 
 	$(info )
 	$(info The validation for the sequential implementation with two pixels of the Sahara dataset.)
 	cd ../validation && make 2pixelsSeq && cd ../kernels
@@ -120,17 +120,17 @@ seq2Vsahara:
 	cd ../validation && futhark c validation.fut
 	# validating the bfast result with our sequential implementation
 	cd ../validation && ./validation < ../data/sahara2val.data
-	# clean-up
+	# clean-up 
 	cd ../validation && rm validation validation.c || true
 
 
 # FULL SET
-# Runs and validates the optimized implementation of the full Sahara dataset
+# Runs and validates the optimized implementation of the full Sahara dataset  
 
-opVsahara:
+opVsahara: 
 	$(info )
 	$(info The validation for the optimized implementation with the full Sahara dataset.)
-	# creates the validation results from bfast-irreg
+	# creates the validation results from bfast-irreg 
 	cd ../validation && make fullParSahara && cd ../kernels
 	# compile and run optimized implementation with full dataset
 	make compileOP
@@ -140,14 +140,14 @@ opVsahara:
 	cd ../validation && futhark opencl validation.fut
 	# validating the bfast result with our sequential implementation
 	cd ../validation && ./validation < ../data/saharaval.data
-	# clean-up
-	cd ../validation && rm validation validation.cl || true
+	# clean-up 
+	cd ../validation && rm validation validation.cl || true 
 
 
 # TESTSET
-# Runs and validates the optimized implementation of two pixels from the Sahara dataset
+# Runs and validates the optimized implementation of two pixels from the Sahara dataset  
 
-op2Vsahara:
+op2Vsahara: 
 	$(info )
 	$(info The validation for the optimized implementation with two pixels of the Sahara dataset.)
 	cd ../validation && make 2pixelsPar && cd ../kernels
@@ -159,7 +159,7 @@ op2Vsahara:
 	cd ../validation && futhark opencl validation.fut
 	# validating the bfast result with our sequential implementation
 	cd ../validation && ./validation < ../data/sahara2val.data
-	# clean-up
+	# clean-up 
 	cd ../validation && rm validation validation.cl || true
 
 
@@ -173,23 +173,23 @@ op2Vsahara:
 ############### RUN AND NO VALIDATION ###############
 
 # FULL SET
-# Running the sequential implementation on the full dataset
+# Running the sequential implementation on the full dataset 
 PseqFullRun: $(EXECUTABLE1)
 			./$(EXECUTABLE1) peru
 
 # TESTSET
-# Running the sequential implementation on the testset
+# Running the sequential implementation on the testset 
 P2seqFullRun: $(EXECUTABLE1)
 			./$(EXECUTABLE1) 2peru
 
 
 # FULL SET
-# Running the optimized implementation on the full dataset
+# Running the optimized implementation on the full dataset 
 PopFullRun: $(EXECUTABLE3)
 			./$(EXECUTABLE3) peru
 
 # TESTSET
-# Running the optimized implementation on the testset
+# Running the optimized implementation on the testset 
 P2opFullRun: $(EXECUTABLE3)
 			./$(EXECUTABLE3) 2peru
 
@@ -198,12 +198,12 @@ P2opFullRun: $(EXECUTABLE3)
 ############### RUN AND VALIDATION ###############
 
 # FULL SET
-# Runs and validates the sequential implementation of the full Peru dataset
+# Runs and validates the sequential implementation of the full Peru dataset  
 
-seqVperu:
+seqVperu: 
 	$(info )
 	$(info The validation for the sequential implementation with the full Peru dataset.)
-	# creates the validation results from bfast-irreg
+	# creates the validation results from bfast-irreg 
 	cd ../validation && make fullSeqPeru && cd ../kernels
 	# compile and run sequential implementation with full dataset
 	make compileSeq
@@ -213,14 +213,14 @@ seqVperu:
 	cd ../validation && futhark c validation.fut
 	# validating the bfast result with our sequential implementation
 	cd ../validation && ./validation < ../data/peruval.data
-	# clean-up
+	# clean-up 
 	cd ../validation && rm validation validation.c || true
 
 
 # TESTSET
-# Runs and validates the sequential implementation of two pixels from the Peru dataset
+# Runs and validates the sequential implementation of two pixels from the Peru dataset  
 
-seq2Vperu:
+seq2Vperu: 
 	$(info )
 	$(info The validation for the sequential implementation with two pixels of the Peru dataset.)
 	cd ../validation && make 2pixelsSeq && cd ../kernels
@@ -232,17 +232,17 @@ seq2Vperu:
 	cd ../validation && futhark c validation.fut
 	# validating the bfast result with our sequential implementation
 	cd ../validation && ./validation < ../data/peru2val.data
-	# clean-up
+	# clean-up 
 	cd ../validation && rm validation validation.c || true
 
 
 # FULL SET
-# Runs and validates the optimized implementation of the full Peru dataset
+# Runs and validates the optimized implementation of the full Peru dataset  
 
-opVperu:
+opVperu: 
 	$(info )
 	$(info The validation for the optimized implementation with the full Peru dataset.)
-	# creates the validation results from bfast-irreg
+	# creates the validation results from bfast-irreg 
 	cd ../validation && make fullParPeru && cd ../kernels
 	# compile and run optimized implementation with full dataset
 	make compileOP
@@ -252,14 +252,14 @@ opVperu:
 	cd ../validation && futhark opencl validation.fut
 	# validating the bfast result with our sequential implementation
 	cd ../validation && ./validation < ../data/peruval.data
-	# clean-up
-	cd ../validation && rm validation validation.cl || true
+	# clean-up 
+	cd ../validation && rm validation validation.cl || true 
 
 
 # TESTSET
-# Runs and validates the optimized implementation of two pixels from the Peru dataset
+# Runs and validates the optimized implementation of two pixels from the Peru dataset  
 
-op2Vperu:
+op2Vperu: 
 	$(info )
 	$(info The validation for the optimized implementation with two pixels of the Peru dataset.)
 	cd ../validation && make 2pixelsPar && cd ../kernels
@@ -271,7 +271,7 @@ op2Vperu:
 	cd ../validation && futhark opencl validation.fut
 	# validating the bfast result with our sequential implementation
 	cd ../validation && ./validation < ../data/peru2val.data
-	# clean-up
+	# clean-up 
 	cd ../validation && rm validation validation.cl || true
 
 
@@ -294,7 +294,7 @@ peruseq: seqVperu
 perutestseq: seq2Vperu
 
 
-# SAHARA OPTIMIZED FULL SET
+# SAHARA OPTIMIZED FULL SET 
 sahara:	opVsahara
 
 # SAHARA OPTIMIZED TESTSET
@@ -319,7 +319,7 @@ saharatestseq: seq2Vsahara
 sval:
 	# empties the data file
 	rm ../data/saharaval.data || true
-	# compiles the sequential
+	# compiles the sequential 
 	make compileSeq
 	# compiles the optimized
 	make compileOP
@@ -331,7 +331,7 @@ sval:
 	cd ../validation && futhark opencl validation.fut
 	# runs a validation against sequential and optimized
 	cd ../validation && ./validation < ../data/saharaval.data
-	# clean-up
+	# clean-up 
 	cd ../validation && rm validation || true
 
 
@@ -341,7 +341,7 @@ sval:
 pval:
 	# empties the data file
 	rm ../data/peruval.data || true
-	# compiles the sequential
+	# compiles the sequential 
 	make compileSeq
 	# compiles the optimized
 	make compileOP
@@ -353,7 +353,7 @@ pval:
 	cd ../validation && futhark opencl validation.fut
 	# runs a validation against sequential and optimized
 	cd ../validation && ./validation < ../data/peruval.data
-	# clean-up
+	# clean-up 
 	cd ../validation && rm validation || true
 
 

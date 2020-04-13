@@ -18,7 +18,7 @@
 2pixelsPar:
 	rm ../data/sahara2val.data || true
 	rm ../data/peru2val.data   || true
-	futhark opencl bfast-irreg.fut
+	futhark c bfast-irreg.fut
 	./bfast-irreg   < ../data/sahara2pix.in > ../data/sahara2val.data
 	./bfast-irreg   < ../data/peru2pix.in   > ../data/peru2val.data	
 	rm bfast-irreg bfast-irreg.cl || true
@@ -30,26 +30,26 @@ fullSeqSahara:
 	rm ../data/saharaval.data || true
 	futhark c bfast-irreg.fut
 	./bfast-irreg   < ../data/sahara.in > ../data/saharaval.data	
-	rm bfast-irreg bfast-irreg.c || true
+	rm bfast-irreg || true
 
 fullSeqPeru:
 	rm ../data/peruval.data   || true
 	futhark c bfast-irreg.fut
 	./bfast-irreg   < ../data/peru.in > ../data/peruval.data	
-	rm bfast-irreg bfast-irreg.c || true
+	rm bfast-irreg || true
 
 
 # Creating validation files for a parallel run of the full datasets
 
 fullParSahara:
 	rm ../data/saharaval.data || true
-	futhark opencl bfast-irreg.fut
+	futhark c bfast-irreg.fut
 	./bfast-irreg   < ../data/sahara.in > ../data/saharaval.data	
 	rm bfast-irreg || true
 
 fullParPeru:
 	rm ../data/peruval.data   || true
-	futhark opencl bfast-irreg.fut
+	futhark c bfast-irreg.fut
 	./bfast-irreg   < ../data/peru.in   > ../data/peruval.data	
 	rm bfast-irreg || true
 
