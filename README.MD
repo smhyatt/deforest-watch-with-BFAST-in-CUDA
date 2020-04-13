@@ -1,5 +1,5 @@
 
-# Deforest Watch with BFAST in CUDA 
+# Deforestation Watch with BFAST in CUDA 
 
 ## What is this Repository?
 
