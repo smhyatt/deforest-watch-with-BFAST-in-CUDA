@@ -1,6 +1,6 @@
 
 
-# This is a Guide to Run and Validate BFAST
+# This is a Guide to Run and Validate our Implementation of BFAST
 
 ## Initial Set-Up Step
 
@@ -57,7 +57,7 @@ Running the optimised implementation on the test-set
 ```make S2opFullRun```
 
 
-## 3.2 Compiling and Running with Validation
+## Compiling and Running with Validation
 
 ### Peru Optimized on the full set:
 
@@ -93,7 +93,7 @@ Running the optimised implementation on the test-set
 
 
 
-## 3.1 Compiling and Running the Sequential Version Against the Parallel one, with validation
+## Compiling and Running the Sequential Version Against the Parallel one, with validation
 
 ### Sahara:
 ```make sval```
