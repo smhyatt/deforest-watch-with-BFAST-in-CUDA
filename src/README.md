@@ -2,81 +2,77 @@
 
 # This is a Guide to Run and Validate BFAST
 
-# 1. If you haven't run anything before, start by decompressing and creating the datasets ready for parsing (THIS STEP SHOULD ONLY BE APPLIED ONCE). 
+## Initial Set-Up Step
 
-```
-cd parser && make decompress && make parse && cd ..
-```
+1. If you haven't run anything before, start by decompressing and creating the datasets ready for parsing (THIS STEP SHOULD ONLY BE APPLIED ONCE). 
+    1. `cd parser && make decompress && make parse && cd ..`
 
-# 2. Remember to modify the bfast-irreg.fut and validation.fut to get the output you want to test, both are in the validation folder. 
+2. Remember to modify the bfast-irreg.fut and validation.fut to get the output you want to test; both are in the validation folder. 
 
+3. To run and validate you have to work from the kernels folder
+    1. `cd kernels`
 
-# 3. To run and validate you have to work from the kernels folder
-```
-cd kernels
-```
+## Compiling and Running without Validation 
 
-## 3.1 Compile and run without validation 
+If you only want to compile to get the performance without validation, you can run the following.
 
-If you only want to compile to get the performance without validation you can run the following.
-
-### Peru Sequentail: 
+### Peru Dataset with the Sequential Implementation:
 
 Running the sequential implementation on the full dataset 
 ```make PseqFullRun```
 
 
-Running the sequential implementation on the testset 
+Running the sequential implementation on the test-set 
 ```make P2seqFullRun```
 
 
-### Peru Optimized: 
+### Peru Dataset with the Optimised Implementation:
 
-Running the optimized implementation on the full dataset 
+Running the optimised implementation on the full dataset 
 ```make PopFullRun```
 
 
-Running the optimized implementation on the testset 
+Running the optimised implementation on the test-set 
 ```make P2opFullRun```
 
 
 
-### Sahara Sequentail
+### Sahara Dataset with the Sequential Implementation:
 
 Running the sequential implementation on the full dataset 
 ```make SseqFullRun```
 
 
-Running the sequential implementation on the testset 
+Running the sequential implementation on the test-set 
 ```make S2seqFullRun```
 
 
-### Sahara Optimized
+### Sahara Dataset with the Optimised Implementation:
 
-Running the optimized implementation on the full dataset 
+Running the optimised implementation on the full dataset 
 ```make SopFullRun```
 
 
-Running the optimized implementation on the testset 
+Running the optimised implementation on the test-set 
 ```make S2opFullRun```
 
 
-## 3.2 Compile and run with validation 
+## 3.2 Compiling and Running with Validation
 
 ### Peru Optimized on the full set:
 
 ```make peru```
 
 
-### Peru Optimized on the testset:
+### Peru Optimized on the test-set:
 ```make perutest```
 
 
-### Peru Sequentail on the full set:
+### Peru Sequential on the full set:
 ```make peruseq```
 
 
-### Peru Sequentail on the testset:
+### Peru Sequential on the test-set:
 ```make perutestseq```
 
 
@@ -84,20 +80,20 @@ Running the optimized implementation on the testset
 ```make sahara```
 
 
-### Sahara Optimized on the testset:
+### Sahara Optimized on the test-set:
 ```make saharatest```
 
 
-### Sahara Sequentail on the full set:
+### Sahara Sequential on the full set:
 ```make saharaseq```
 
 
-### Sahara Sequentail on the testset:
+### Sahara Sequential on the test-set:
 ```make saharatestseq```
 
 
 
-## 3.1 Compile and run the sequential version against the parallel one, with validation 
+## 3.1 Compiling and Running the Sequential Version Against the Parallel one, with validation
 
 ### Sahara:
 ```make sval```
@@ -105,17 +101,6 @@ Running the optimized implementation on the testset
 
 ### Peru: 
 ```make pval```
-
-
-
-
-
-
-
-
-
-
-
 
 
 
