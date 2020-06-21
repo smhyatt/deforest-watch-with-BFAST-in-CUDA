@@ -19,8 +19,8 @@ typedef unsigned int uint;
 /////////////////////////////////////////////////////////////////////////
 
 
-void ker1seq(uint N, int kp, int f, int* mappingindices, float* X){
-    for (uint i = 0; i < kp; i++){
+void ker1seq(uint N, int Kp, int f, int* mappingindices, float* X){
+    for (uint i = 0; i < Kp; i++){
         for (uint j = 0; j < N; j++){
             float ind = mappingindices[j];
             uint index = i*N + j;
@@ -496,14 +496,14 @@ void ker10seq(float lam, uint m, uint n, uint N, float* bound, uint* Nss,
         float sigma = sigmas[pix];
         int  Ns = Nss[pix];
         int  ns = nss[pix];
-        int  h = hs[pix];
+        int  h  = hs[pix];
         float mo = 0.0;
         float mean = 0.0;
         int fstBreak = -1;
         int* val_inds = &val_indss[pix*N];
         for(int i = 0; i < Ns-ns; i++) {
             float tmp;
-            if(i==0) { //det er jeg ked af; 
+            if(i==0) {
                 tmp = MO_fsts[pix];
             } else {
                 tmp = -y_errors[pix*N + ns - h + i] + y_errors[pix*N + ns + i];
